@@ -14,13 +14,21 @@ namespace BotAnbotip.Bot.Commands
         private const byte ColorChangingSpeed = 50;
         private static bool flag;
 
-        public static async Task SetTheRoleColorAutoChangingAsync(SocketMessage message, string argument)
+        public static async Task SetTheRoleColorAutoChangingAsync(string argument, SocketMessage message = null)
         {
-            await message.DeleteAsync();
+            if (message != null) await message.DeleteAsync();
 
-            if ((argument == "вкл") && (!Info.RoleColorAutoChangingIsSwitchedOn))
+            var str = argument.Split(' ');
+            if (str.Length > 1)
             {
-                Info.RoleColorAutoChangingIsSwitchedOn = true;
+                DataManager.RoleColorAutoChangingId = ulong.Parse(str[1]);
+                argument = str[0];
+            }
+
+            if ((argument == "вкл") && (!DataManager.RoleColorAutoChangingIsSwitchedOn))
+            {
+                DataManager.RoleColorAutoChangingIsSwitchedOn = true;
+                await DataManager.SaveDataAsync();
                 Task.Run(() => LaunchRoleColorAutoChangingAsync()).GetAwaiter().GetResult();
             }
             else if (argument == "выкл") flag = false;
@@ -36,12 +44,12 @@ namespace BotAnbotip.Bot.Commands
             {
                 if (!Info.BotLoaded) continue;
 
-                await Info.GroupGuild.GetRole((ulong)RoleIds.Динамический_цвет).ModifyAsync((roleProperties) =>
+                await Info.GroupGuild.GetRole(DataManager.RoleColorAutoChangingId).ModifyAsync((roleProperties) =>
                 {
                     roleProperties.Color = GetNextColor(ref red, ref green, ref blue, ref redFlag, ref greenFlag, ref blueFlag); ;
                 });
             }
-            Info.RoleColorAutoChangingIsSwitchedOn = false;
+            DataManager.RoleColorAutoChangingIsSwitchedOn = false;
         }
 
         private static Color GetNextColor(ref byte red, ref byte green, ref byte blue, ref bool redFlag, ref bool greenFlag, ref bool blueFlag)

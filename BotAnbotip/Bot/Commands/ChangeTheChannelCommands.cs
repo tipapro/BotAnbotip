@@ -11,13 +11,21 @@ namespace BotAnbotip.Bot.Commands
         private const int Length = 10;
         private static bool flag;
 
-        public static async void SetTheChannelNameAutoChangingAsync(SocketMessage message, string argument)
-        {
-            await message.DeleteAsync();
+        public static async Task SetTheChannelNameAutoChangingAsync(string argument, SocketMessage message = null)
+        {           
+            if (message != null) await message.DeleteAsync();
 
-            if ((argument == "вкл") && (!Info.ChannelNameAutoChangingIsSwitchedOn))
+            var str = argument.Split(' ');
+            if (str.Length > 1)
             {
-                Info.ChannelNameAutoChangingIsSwitchedOn = true;
+                DataManager.ChannelNameAutoChangingId = ulong.Parse(str[1]);
+                argument = str[0];
+            }
+
+            if ((argument == "вкл") && (!DataManager.ChannelNameAutoChangingIsSwitchedOn))
+            {
+                DataManager.ChannelNameAutoChangingIsSwitchedOn = true;
+                await DataManager.SaveDataAsync();
                 Task.Run(() => LaunchChannelNameAutoChangingAsync()).GetAwaiter().GetResult();
             }
             else if (argument == "выкл") flag = false;
@@ -29,12 +37,12 @@ namespace BotAnbotip.Bot.Commands
             while (flag)
             {
                 if (!Info.BotLoaded) continue;
-                await Info.GroupGuild.GetChannel(427256775193133076).ModifyAsync((guildChannelProperties) =>
+                await Info.GroupGuild.GetChannel(DataManager.ChannelNameAutoChangingId).ModifyAsync((guildChannelProperties) =>
                 {
                     guildChannelProperties.Name = RandomString();
                 });
             }
-            Info.ChannelNameAutoChangingIsSwitchedOn = false;
+            DataManager.ChannelNameAutoChangingIsSwitchedOn = false;
         }
 
         public static string RandomString()

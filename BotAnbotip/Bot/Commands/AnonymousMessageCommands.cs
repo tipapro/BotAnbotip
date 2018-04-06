@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
+using System.Linq;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -21,7 +22,7 @@ namespace BotAnbotip.Bot.Commands
                 (messageProperties) => { messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("MessageID: " + sendedMessage.Id)).Build(); });
 
             DataManager.anonymousMessagesAndUsersIds.Add(sendedMessage.Id, message.Author.Id);
-            DataManager.SaveData();
+            await DataManager.SaveDataAsync();
         }
 
         public static async Task DeleteAsync(SocketMessage message, string argument)
@@ -33,6 +34,22 @@ namespace BotAnbotip.Bot.Commands
             {
                 var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
                 await foundedMessage.DeleteAsync();
+            }
+        }
+
+        public static async Task GetAnonymousUserAsync(SocketMessage message, string argument)
+        {
+            await message.DeleteAsync();
+
+            var userRoles = ((IGuildUser)message.Author).RoleIds;
+
+            if (userRoles.Contains((ulong)RoleIds.Основатель))
+            {
+                ulong messageId = ulong.Parse(argument);
+
+                ulong userId = DataManager.anonymousMessagesAndUsersIds[messageId];
+
+                await message.Author.SendMessageAsync(Info.GroupGuild.GetUser(userId).Mention);
             }
         }
     }

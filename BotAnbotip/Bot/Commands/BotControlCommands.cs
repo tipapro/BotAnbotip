@@ -17,9 +17,20 @@ namespace BotAnbotip.Bot.Commands
 
             if (((IGuildUser)message.Author).RoleIds.Contains((ulong)RoleIds.Основатель))
             {
-                DataManager.SaveData();
+                await DataManager.SaveDataAsync();
                 await client.StopAsync();
                 Environment.Exit(0);
+            }
+        }
+
+        public static async void ClearData(SocketMessage message, DiscordSocketClient client)
+        {
+            await message.DeleteAsync();
+
+            if (((IGuildUser)message.Author).RoleIds.Contains((ulong)RoleIds.Основатель))
+            {
+                DataManager.Clear();
+                await DataManager.SaveDataAsync();
             }
         }
     }

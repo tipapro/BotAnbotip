@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using System;
 using System.Collections.Generic;
+using Discord.Rest;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -61,7 +62,7 @@ namespace BotAnbotip.Bot.Commands
                     new RatingList(newRatingChannel.Id, newRatingChannel.Name, listType));
             }
 
-            DataManager.SaveData();
+            await DataManager.SaveDataAsync();
         }
 
         public static async Task RemoveListAsync(SocketMessage message, string argument)
@@ -79,7 +80,7 @@ namespace BotAnbotip.Bot.Commands
                 DataManager.RemoveRatingList(id);
             }
 
-            DataManager.SaveData();
+            await DataManager.SaveDataAsync();
         }
 
         public static async Task AddValueAsync(SocketMessage message, string argument)
@@ -120,7 +121,7 @@ namespace BotAnbotip.Bot.Commands
 
             await SortAsync(message.Channel,
                 DataManager.ratingChannels[message.Channel.Id].ListObjects[objName]); //не эффективно по аргументу
-            DataManager.SaveData();
+            await DataManager.SaveDataAsync();
         }
 
         public static async Task ChangeRatingAsync(IUserMessage message, ISocketMessageChannel channel,
@@ -146,7 +147,7 @@ namespace BotAnbotip.Bot.Commands
                     messageProperties.Embed = embedBuilder.Build();
                 });
                 await SortAsync(channel, likedObject);
-                DataManager.SaveData();
+                await DataManager.SaveDataAsync();
             }
         }
 
@@ -161,12 +162,16 @@ namespace BotAnbotip.Bot.Commands
                 await foundedMessage.DeleteAsync();
 
                 DataManager.ratingChannels[message.Channel.Id].ListObjects.Remove(argument);
-                DataManager.SaveData();
+                await DataManager.SaveDataAsync();
             }
         }
 
         private static async Task SortAsync(ISocketMessageChannel channel, ObjectOfRatingList obj)
         {
+            await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                    ((IGuildChannel)channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                        null, PermValue.Deny, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
+
             var bufMessage1 = await channel.GetMessageAsync(obj.MessageId);
 
             DataManager.ratingChannels[channel.Id].ListObjects.Sort(obj);
@@ -200,6 +205,9 @@ namespace BotAnbotip.Bot.Commands
 
             }
 
+            await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                    ((IGuildChannel)channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                        null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
         }
 
         private static async Task SwapTwoMessage(IMessage message1, IMessage message2)
