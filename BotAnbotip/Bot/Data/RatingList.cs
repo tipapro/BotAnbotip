@@ -90,10 +90,10 @@ namespace BotAnbotip.Bot.Data
             obj.PreviousPosition = previousPosition;
         }
 
-        public void Add(string name, ulong messageId)
+        public void Add(string name, ulong messageId, string url, string thumbnailUrl)
         {
             var newObject =
-                new ObjectOfRatingList(name, messageId)
+                new ObjectOfRatingList(name, messageId, url, thumbnailUrl)
                 {
                     PreviousPosition = _listOfObjectsOfRatingList.Count,
                     CurrentPosition = _listOfObjectsOfRatingList.Count
@@ -125,6 +125,8 @@ namespace BotAnbotip.Bot.Data
     public class ObjectOfRatingList : IComparable<ObjectOfRatingList>
     {
         public string Name { get; set; }
+        public string Url { get; set; }
+        public string ThumbnailUrl { get; set; }
         public List<ulong> LikedUsers { get; set; }
         public long NumberOfLikes { get; set; }
         public ulong MessageId { get; set; }
@@ -135,10 +137,12 @@ namespace BotAnbotip.Bot.Data
 
         private ObjectOfRatingList() { }
 
-        public ObjectOfRatingList(string name, ulong messageId)
+        public ObjectOfRatingList(string name, ulong messageId, string url = "", string thumbnailUrl = "")
         {
             Name = name;
             MessageId = messageId;
+            Url = url;
+            ThumbnailUrl = thumbnailUrl;
             UserEvaluation = new Dictionary<ulong, Evaluation>();
             LikedUsers = new List<ulong>();
             LastEvaluation = Evaluation.None;

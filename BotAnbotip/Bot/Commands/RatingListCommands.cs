@@ -112,7 +112,8 @@ namespace BotAnbotip.Bot.Commands
             await sendedMessage.AddReactionAsync(new Emoji("❌"));
 
             var ratingList = DataManager.ratingChannels[message.Channel.Id];
-            ratingList.ListObjects.Add(objName, sendedMessage.Id);
+            if (flag) ratingList.ListObjects.Add(objName, sendedMessage.Id, url, thumbnailUrl);
+            else ratingList.ListObjects.Add(objName, sendedMessage.Id);
 
             if (ratingList.Type != RatingListType.Other)
             {
@@ -183,15 +184,17 @@ namespace BotAnbotip.Bot.Commands
 
                 for (int i = obj.PreviousPosition; i != obj.CurrentPosition; i -= eval)
                 {
+                    var firstObject = DataManager.ratingChannels[channel.Id].ListObjects[i];
                     var firstMessage =
-                        await channel.GetMessageAsync(DataManager.ratingChannels[channel.Id].ListObjects[i].MessageId);
-                    await Task.Delay(300);
-                    var secondMessage =
-                        await channel.GetMessageAsync(DataManager.ratingChannels[channel.Id].ListObjects[i - eval]
-                            .MessageId);
+                        await channel.GetMessageAsync(firstObject.MessageId);
                     await Task.Delay(300);
 
-                    await SwapTwoMessage(firstMessage, secondMessage);
+                    var secondObject = DataManager.ratingChannels[channel.Id].ListObjects[i - eval];
+                    var secondMessage =
+                        await channel.GetMessageAsync(secondObject.MessageId);
+                    await Task.Delay(300);
+
+                    await SwapTwoMessage(firstMessage, firstObject, secondMessage, secondObject);
 
                 }
 
@@ -199,8 +202,14 @@ namespace BotAnbotip.Bot.Commands
                     .ListObjects[obj.CurrentPosition].MessageId);
                 await ((IUserMessage) bufMessage2).ModifyAsync((messageProperties) =>
                 {
-                    messageProperties.Embed = (Embed) bufMessage1.Embeds.First();
-                    messageProperties.Content = bufMessage1.Content;
+                    var embedBuilder = new EmbedBuilder()
+                .WithDescription("**" + obj.Name + "**")
+                .WithFooter($"Количество лайков: {obj.NumberOfLikes} ❤️")
+                .WithColor(Color.Green);
+                    if (obj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(obj.ThumbnailUrl);
+                    if (obj.Url != "") embedBuilder.WithUrl(obj.Url);
+
+                    messageProperties.Embed = embedBuilder.Build();
                 });
 
             }
@@ -210,27 +219,37 @@ namespace BotAnbotip.Bot.Commands
                         null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
         }
 
-        private static async Task SwapTwoMessage(IMessage message1, IMessage message2)
+        private static async Task SwapTwoMessage(IMessage firstMessage, ObjectOfRatingList firstObject, IMessage secondMessage, ObjectOfRatingList secondObject)
         {
-            string contentBuf = message1.Content;
-            var embedsBuf = message1.Embeds;
-
-            await ((IUserMessage) message1).ModifyAsync((messageProperties) =>
+            await ((IUserMessage)firstMessage).ModifyAsync((messageProperties) =>
             {
-                messageProperties.Embed = (Embed) message2.Embeds.First();
-                messageProperties.Content = message2.Content;
+                var embedBuilder = new EmbedBuilder()
+                .WithDescription("**" + firstObject.Name + "**")
+                .WithFooter($"Количество лайков: {firstObject.NumberOfLikes} ❤️")
+                .WithColor(Color.Green);
+                if (firstObject.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(firstObject.ThumbnailUrl);
+                if (firstObject.Url != "") embedBuilder.WithUrl(firstObject.Url);
+
+                messageProperties.Embed = embedBuilder.Build();
             });
 
             await Task.Delay(300);
 
-            await ((IUserMessage) message2).ModifyAsync((messageProperties) =>
+            await ((IUserMessage)secondMessage).ModifyAsync((messageProperties) =>
             {
-                messageProperties.Embed = (Embed) embedsBuf.First();
-                messageProperties.Content = contentBuf;
+                var embedBuilder = new EmbedBuilder()
+                .WithDescription("**" + secondObject.Name + "**")
+                .WithFooter($"Количество лайков: {secondObject.NumberOfLikes} ❤️")
+                .WithColor(Color.Green);
+                if (secondObject.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(secondObject.ThumbnailUrl);
+                if (secondObject.Url != "") embedBuilder.WithUrl(secondObject.Url);
+
+                messageProperties.Embed = embedBuilder.Build();
             });
 
             await Task.Delay(300);
         }
+
 
         public static string ConvertMessageToRatingListObject(IUserMessage message)
         {
