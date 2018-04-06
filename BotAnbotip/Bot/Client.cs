@@ -16,7 +16,7 @@ namespace BotAnbotip.Bot
     public class Client
     {
         private DiscordSocketClient _client;
-        private const char Prefix = '*';
+        private const char Prefix = '=';
         
 
         public async Task MainAsync()

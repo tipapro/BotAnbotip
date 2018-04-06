@@ -90,7 +90,7 @@ namespace BotAnbotip.Bot.Data
             obj.PreviousPosition = previousPosition;
         }
 
-        public void Add(string name, ulong messageId, string url, string thumbnailUrl)
+        public void Add(string name, ulong messageId, string url = "", string thumbnailUrl = "")
         {
             var newObject =
                 new ObjectOfRatingList(name, messageId, url, thumbnailUrl)
