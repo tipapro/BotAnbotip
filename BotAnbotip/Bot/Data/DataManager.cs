@@ -52,7 +52,7 @@ namespace BotAnbotip.Bot.Data
 
 
         public static async void ReadData()
-        {            
+        {
             DropboxIntegration.Authorization(Environment.GetEnvironmentVariable("dropboxToken"));
 
             string json = await DropboxIntegration.DownloadAsync(FileName);

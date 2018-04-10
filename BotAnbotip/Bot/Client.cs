@@ -16,7 +16,7 @@ namespace BotAnbotip.Bot
     public class Client
     {
         private DiscordSocketClient _client;
-        private const char Prefix = '*';
+        private const char Prefix = '=';
         
 
         public async Task MainAsync()
@@ -36,6 +36,7 @@ namespace BotAnbotip.Bot
 
             await _client.SetGameAsync("Pro Group");
             await _client.SetStatusAsync(UserStatus.Online);
+
 
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("botToken"));
             await _client.StartAsync();
