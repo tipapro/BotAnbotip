@@ -31,7 +31,12 @@ namespace BotAnbotip.Bot.Commands
                 await DataManager.SaveDataAsync();
                 Task.Run(() => LaunchRoleColorAutoChangingAsync()).GetAwaiter().GetResult();
             }
-            else if (argument == "выкл") flag = false;
+            else if (argument == "выкл")
+            {
+                flag = false;
+                DataManager.RoleColorAutoChangingIsSwitchedOn = false;
+                await DataManager.SaveDataAsync();
+            }
         }
 
         private static async void LaunchRoleColorAutoChangingAsync()

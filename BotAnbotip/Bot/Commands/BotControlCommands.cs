@@ -29,7 +29,7 @@ namespace BotAnbotip.Bot.Commands
 
             if (((IGuildUser)message.Author).RoleIds.Contains((ulong)RoleIds.Основатель))
             {
-                DataManager.Clear();
+                DataManager.ClearAndCreateNewData();
                 await DataManager.SaveDataAsync();
             }
         }

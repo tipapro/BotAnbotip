@@ -28,7 +28,12 @@ namespace BotAnbotip.Bot.Commands
                 await DataManager.SaveDataAsync();
                 Task.Run(() => LaunchChannelNameAutoChangingAsync()).GetAwaiter().GetResult();
             }
-            else if (argument == "выкл") flag = false;
+            else if (argument == "выкл")
+            {
+                flag = false;
+                DataManager.ChannelNameAutoChangingIsSwitchedOn = false;
+                await DataManager.SaveDataAsync();
+            }
         }
         
         private static async void LaunchChannelNameAutoChangingAsync()

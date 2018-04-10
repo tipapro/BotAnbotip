@@ -11,7 +11,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class WantPlayMessageCommands
     {
-        public static async Task SenAsync(string game, SocketMessage message = null, IUser user = null, string gamePictureUrl = null, string url = null)
+        public static async Task SendAsync(string game, SocketMessage message = null, IUser user = null, string gamePictureUrl = null, string url = null)
         {
             if (game.Length > 64) return;
             string username = "";

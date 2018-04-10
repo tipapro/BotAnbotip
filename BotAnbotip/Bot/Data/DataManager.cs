@@ -19,6 +19,8 @@ namespace BotAnbotip.Bot.Data
         [JsonProperty]
         public static Dictionary<ulong, List<ulong>> agreeingToPlayUsers;    //MessageId -- List of UserIds
         [JsonProperty]
+        public static Dictionary<ulong, List<Tuple<string, int>>> votingLists;
+        [JsonProperty]
         public static bool RoleColorAutoChangingIsSwitchedOn;
         [JsonProperty]
         public static ulong RoleColorAutoChangingId;
@@ -27,14 +29,15 @@ namespace BotAnbotip.Bot.Data
         [JsonProperty]
         public static ulong ChannelNameAutoChangingId;
 
-        internal static void Clear()
+        internal static void ClearAndCreateNewData()
         {
             anonymousMessagesAndUsersIds = new Dictionary<ulong, ulong>();
             ratingChannels = new Dictionary<ulong, RatingList>();
             agreeingToPlayUsers = new Dictionary<ulong, List<ulong>>();
-            RoleColorAutoChangingIsSwitchedOn = false; ;
-            RoleColorAutoChangingId = 0;
+            votingLists = new Dictionary<ulong, List<Tuple<string, int>>>();
+            RoleColorAutoChangingIsSwitchedOn = false;
             ChannelNameAutoChangingIsSwitchedOn = false;
+            RoleColorAutoChangingId = 0;
             ChannelNameAutoChangingId = 0;
         }
 
@@ -49,8 +52,7 @@ namespace BotAnbotip.Bot.Data
 
 
         public static async void ReadData()
-        {
-            
+        {            
             DropboxIntegration.Authorization(Environment.GetEnvironmentVariable("dropboxToken"));
 
             string json = await DropboxIntegration.DownloadAsync(FileName);
@@ -59,16 +61,7 @@ namespace BotAnbotip.Bot.Data
             {
                 var dataManager = JsonConvert.DeserializeObject<DataManager>(json);
             }
-            else
-            {
-                anonymousMessagesAndUsersIds = new Dictionary<ulong, ulong>();
-                ratingChannels = new Dictionary<ulong, RatingList>();
-                agreeingToPlayUsers = new Dictionary<ulong, List<ulong>>();
-                RoleColorAutoChangingIsSwitchedOn = false;
-                ChannelNameAutoChangingIsSwitchedOn = false;
-                RoleColorAutoChangingId = 0;
-                ChannelNameAutoChangingId = 0;
-            }
+            else ClearAndCreateNewData();
         }
 
         public static void RemoveRatingList(string name)

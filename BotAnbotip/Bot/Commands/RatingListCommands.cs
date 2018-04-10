@@ -85,6 +85,10 @@ namespace BotAnbotip.Bot.Commands
 
         public static async Task AddValueAsync(SocketMessage message, string argument)
         {
+            await ((IGuildChannel)message.Channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                       ((IGuildChannel)message.Channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                           null, PermValue.Deny, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
+
             await message.DeleteAsync();
             string[] bufStr = argument.Split(' ');
             const int numOfSpaces = 3;
@@ -120,14 +124,20 @@ namespace BotAnbotip.Bot.Commands
                 await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
             }
 
-            await SortAsync(message.Channel,
-                DataManager.ratingChannels[message.Channel.Id].ListObjects[objName]); //не эффективно по аргументу
+            await SortAsync(message.Channel, DataManager.ratingChannels[message.Channel.Id].ListObjects[objName]); //не эффективно по аргументу
             await DataManager.SaveDataAsync();
+
+            await ((IGuildChannel)message.Channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                       ((IGuildChannel)message.Channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                           null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
         }
 
-        public static async Task ChangeRatingAsync(IUserMessage message, ISocketMessageChannel channel,
-            SocketReaction reaction)
+        public static async Task ChangeRatingAsync(IUserMessage message, ISocketMessageChannel channel, SocketReaction reaction)
         {
+            await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                    ((IGuildChannel)channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                        null, PermValue.Deny, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
+
             var objName = ConvertMessageToRatingListObject(message);
 
             var likedObject = DataManager.ratingChannels[channel.Id].ListObjects[objName];
@@ -149,6 +159,10 @@ namespace BotAnbotip.Bot.Commands
                 });
                 await SortAsync(channel, likedObject);
                 await DataManager.SaveDataAsync();
+
+                await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
+                    ((IGuildChannel)channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
+                        null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
             }
         }
 

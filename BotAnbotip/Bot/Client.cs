@@ -16,7 +16,7 @@ namespace BotAnbotip.Bot
     public class Client
     {
         private DiscordSocketClient _client;
-        private const char Prefix = '=';
+        private const char Prefix = '*';
         
 
         public async Task MainAsync()
@@ -36,7 +36,7 @@ namespace BotAnbotip.Bot
 
             await _client.SetGameAsync("Pro Group");
             await _client.SetStatusAsync(UserStatus.Online);
-            
+
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("botToken"));
             await _client.StartAsync();
             await Task.Delay(-1);
@@ -50,8 +50,16 @@ namespace BotAnbotip.Bot
 
         private async Task LaunchAutoChanging(SocketGuild guild)
         {
-            if (DataManager.ChannelNameAutoChangingIsSwitchedOn) await ChangeTheChannelCommands.SetTheChannelNameAutoChangingAsync("вкл");
-            if (DataManager.ChannelNameAutoChangingIsSwitchedOn) await ChangeTheRoleCommands.SetTheRoleColorAutoChangingAsync("вкл");
+            if (DataManager.ChannelNameAutoChangingIsSwitchedOn)
+            {
+                DataManager.ChannelNameAutoChangingIsSwitchedOn = false;
+                await ChangeTheChannelCommands.SetTheChannelNameAutoChangingAsync("вкл");
+            }
+            if (DataManager.RoleColorAutoChangingIsSwitchedOn)
+            {
+                DataManager.RoleColorAutoChangingIsSwitchedOn = false;
+                await ChangeTheRoleCommands.SetTheRoleColorAutoChangingAsync("вкл");
+            }
         }
 
         private async Task ReactionRemoved(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
@@ -121,7 +129,7 @@ namespace BotAnbotip.Bot
                         {
                             if (reaction.Emote.Name == "🎮")
                             {
-                                await WantPlayMessageCommands.SenAsync(RatingListCommands.ConvertMessageToRatingListObject(message),
+                                await WantPlayMessageCommands.SendAsync(RatingListCommands.ConvertMessageToRatingListObject(message),
                                     null, reaction.User.Value, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url);
                             }
                         }
@@ -164,7 +172,12 @@ namespace BotAnbotip.Bot
                         case "удалианон": await Task.Run(() => AnonymousMessageCommands.DeleteAsync(message, argument)); break;
                         case "ктоанон": await Task.Run(() => AnonymousMessageCommands.GetAnonymousUserAsync(message, argument)); break;
 
-                        case "хочуиграть": await Task.Run(() => WantPlayMessageCommands.SenAsync(argument, message)); break;
+                        case "объяви": await Task.Run(() => AnnouncementCommands.SendAsync(message, argument)); break;
+
+                        case "хочуиграть": await Task.Run(() => WantPlayMessageCommands.SendAsync(argument, message)); break;
+
+                        case "голосование": await Task.Run(() => VotingCommands.AddVotingdAsync(message, argument)); break;
+                        case "удалиголосование": await Task.Run(() => VotingCommands.DeleteVotingAsync(message, argument)); break;
 
                         case "радуга": await Task.Run(() => ChangeTheRoleCommands.SetTheRoleColorAutoChangingAsync(argument, message)); break;
                         case "хакерканал": await Task.Run(() => ChangeTheChannelCommands.SetTheChannelNameAutoChangingAsync(argument, message)); break;

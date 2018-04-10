@@ -13,7 +13,7 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
 
             var embedBuilder = new EmbedBuilder()
-                .WithTitle("Анонимное сообщение")
+                .WithTitle(":spy:Анонимное сообщение:spy:")
                 .WithDescription(argument)
                 .WithColor(Color.Green);
 
