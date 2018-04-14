@@ -15,7 +15,7 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(":spy:Анонимное сообщение:spy:")
                 .WithDescription(argument)
-                .WithColor(Color.Green);
+                .WithColor(Color.DarkGrey);
 
             var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
             await sendedMessage.ModifyAsync(

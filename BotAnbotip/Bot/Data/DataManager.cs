@@ -4,14 +4,14 @@ using System.IO;
 using Newtonsoft.Json;
 using Dropbox.Api;
 using System.Threading.Tasks;
+using System.Net;
+using System.Text;
 
 namespace BotAnbotip.Bot.Data
 {
     [JsonObject]
     public class DataManager
     {
-        [JsonIgnore]
-        private const string FileName = "BotAnbotipData";
         [JsonProperty]
         public static Dictionary<ulong, ulong> anonymousMessagesAndUsersIds;    //MessageId -- UserId
         [JsonProperty]
@@ -47,21 +47,23 @@ namespace BotAnbotip.Bot.Data
         public static async Task SaveDataAsync()
         {
             string json = JsonConvert.SerializeObject(new DataManager());
-            await DropboxIntegration.UploadAsync(FileName, json);
+            await DropboxIntegration.UploadAsync(PrivateData.FileName, json);
         }
 
 
         public static async void ReadData()
         {
-            DropboxIntegration.Authorization(Environment.GetEnvironmentVariable("dropboxToken"));
+            PrivateData.Read();
+            DropboxIntegration.Authorization(PrivateData.DropboxApiKey);
 
-            string json = await DropboxIntegration.DownloadAsync(FileName);
+            string json = await DropboxIntegration.DownloadAsync(PrivateData.FileName);
 
             if (json != "")
             {
                 var dataManager = JsonConvert.DeserializeObject<DataManager>(json);
             }
             else ClearAndCreateNewData();
+
         }
 
         public static void RemoveRatingList(string name)

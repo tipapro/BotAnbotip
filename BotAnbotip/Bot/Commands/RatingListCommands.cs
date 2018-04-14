@@ -49,9 +49,17 @@ namespace BotAnbotip.Bot.Commands
 
                 await newRatingChannel.AddPermissionOverwriteAsync(Info.GroupGuild.GetRole((ulong) RoleIds.Главный_Бот),
                     OverwritePermissions.AllowAll(newRatingChannel));
+
                 await newRatingChannel.AddPermissionOverwriteAsync(
                     Info.GroupGuild.GetRole((ulong) RoleIds.Музыкальный_Бот),
                     OverwritePermissions.DenyAll(newRatingChannel));
+                await newRatingChannel.AddPermissionOverwriteAsync(
+                    Info.GroupGuild.GetRole((ulong)RoleIds.Чат_Бот),
+                    OverwritePermissions.DenyAll(newRatingChannel));
+                await newRatingChannel.AddPermissionOverwriteAsync(
+                    Info.GroupGuild.GetRole((ulong)RoleIds._Бот),
+                    OverwritePermissions.DenyAll(newRatingChannel));
+
                 await newRatingChannel.AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
                     OverwritePermissions.DenyAll(newRatingChannel));
                 await newRatingChannel.AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
@@ -132,6 +140,21 @@ namespace BotAnbotip.Bot.Commands
                            null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
         }
 
+        public static async Task RemoveValueAsync(SocketMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (DataManager.ratingChannels[message.Channel.Id].ListObjects[argument] != null)
+            {
+                var foundedMessage =
+                    await message.Channel.GetMessageAsync(DataManager.ratingChannels[message.Channel.Id]
+                        .ListObjects[argument].MessageId);
+                await foundedMessage.DeleteAsync();
+
+                DataManager.ratingChannels[message.Channel.Id].ListObjects.Remove(argument);
+                await DataManager.SaveDataAsync();
+            }
+        }
+
         public static async Task ChangeRatingAsync(IUserMessage message, ISocketMessageChannel channel, SocketReaction reaction)
         {
             await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
@@ -163,21 +186,6 @@ namespace BotAnbotip.Bot.Commands
                 await ((IGuildChannel)channel).AddPermissionOverwriteAsync(Info.GroupGuild.EveryoneRole,
                     ((IGuildChannel)channel).GetPermissionOverwrite(Info.GroupGuild.EveryoneRole).Value.Modify(PermValue.Allow,
                         null, PermValue.Allow, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-            }
-        }
-
-        public static async Task RemoveValueAsync(SocketMessage message, string argument)
-        {
-            await message.DeleteAsync();
-            if (DataManager.ratingChannels[message.Channel.Id].ListObjects[argument] != null)
-            {
-                var foundedMessage =
-                    await message.Channel.GetMessageAsync(DataManager.ratingChannels[message.Channel.Id]
-                        .ListObjects[argument].MessageId);
-                await foundedMessage.DeleteAsync();
-
-                DataManager.ratingChannels[message.Channel.Id].ListObjects.Remove(argument);
-                await DataManager.SaveDataAsync();
             }
         }
 
@@ -263,7 +271,6 @@ namespace BotAnbotip.Bot.Commands
 
             await Task.Delay(300);
         }
-
 
         public static string ConvertMessageToRatingListObject(IUserMessage message)
         {
