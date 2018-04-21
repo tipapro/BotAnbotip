@@ -47,23 +47,30 @@ namespace BotAnbotip.Bot.Commands
         
         private static async void RunHackerChannelAsync()
         {
-            flag = true;
-
-            if (!BotClient.BotLoaded)
+            try
             {
-                return;
-            }
-
-            while (flag)
-            {
-                await Task.Delay(DelayTime);
-                await ConstInfo.GroupGuild.GetChannel(DataManager.HackerChannelId).ModifyAsync((channelProperties) =>
+                if (!BotClient.BotLoaded)
                 {
-                    channelProperties.Name = GetRandomString(Length);
-                });
+                    return;
+                }
+
+                flag = true;
+
+                while (flag)
+                {
+                    await Task.Delay(DelayTime);
+                    await ConstInfo.GroupGuild.GetChannel(DataManager.HackerChannelId).ModifyAsync((channelProperties) =>
+                    {
+                        channelProperties.Name = GetRandomString(Length);
+                    });
+                }
+                DataManager.HackerChannelIsRunning = false;
             }
-            DataManager.HackerChannelIsRunning = false;
-        }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+}
 
         public static string GetRandomString(int lenght)
         {

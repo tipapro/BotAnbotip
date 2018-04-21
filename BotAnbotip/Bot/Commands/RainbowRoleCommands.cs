@@ -51,25 +51,32 @@ namespace BotAnbotip.Bot.Commands
 
         private static async void RunRainbowRoleAsync()
         {
-            if (!BotClient.BotLoaded)
+            try
             {
-                return;
-            }
-
-            SetDefault();
-            flag = true;
-            
-
-            while (flag)
-            {
-                await Task.Delay(DelayTime);
-                await ConstInfo.GroupGuild.GetRole(DataManager.RainbowRoleId).ModifyAsync((roleProperties) =>
+                if (!BotClient.BotLoaded)
                 {
-                    roleProperties.Color = GetNextColor(); ;
-                });
+                    return;
+                }
+
+                SetDefault();
+                flag = true;
+
+
+                while (flag)
+                {
+                    await Task.Delay(DelayTime);
+                    await ConstInfo.GroupGuild.GetRole(DataManager.RainbowRoleId).ModifyAsync((roleProperties) =>
+                    {
+                        roleProperties.Color = GetNextColor(); ;
+                    });
+                }
+                DataManager.RainbowRoleIsRunning = false;
             }
-            DataManager.RainbowRoleIsRunning = false;
-        }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+}
 
         private static Color GetNextColor()
         {

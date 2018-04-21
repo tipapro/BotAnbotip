@@ -53,8 +53,8 @@ namespace BotAnbotip.Bot.CyclicActions
                     {
                         ulong winner = DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP][random.Next(DataManager.ParticipantsOfTheGiveaway.Count - 1)];
                         await ConstInfo.GroupGuild.GetUser(winner).AddRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
-                        await ConstInfo.GroupGuild.GetUser(DataManager.LastWinner[GiveawayType.VIP])
-                            .RemoveRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
+                        if (DataManager.LastWinner[GiveawayType.VIP] != 0) await ConstInfo.GroupGuild.GetUser(DataManager.LastWinner[GiveawayType.VIP])
+                             .RemoveRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
                         DataManager.LastWinner[GiveawayType.VIP] = winner;
 
                         embedBuilder2
