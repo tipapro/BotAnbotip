@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using Discord;
 using Discord.WebSocket;
+using BotAnbotip.Bot.Data.Group;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -34,27 +35,27 @@ namespace BotAnbotip.Bot.Commands
             if (gamePictureUrl != null) embedBuilder.WithThumbnailUrl(gamePictureUrl);
             if (url != null) embedBuilder.WithUrl(url);
 
-            embedBuilder.WithTitle("Приглашение в игру").WithDescription("Пользователь " + username + " приглашает в игру **" + game + "**.");
+            embedBuilder.WithTitle(":video_game:Приглашение в игру:video_game:").WithDescription("Пользователь " + username + " приглашает в игру **" + game + "**.");
 
-            var sendedMessage = await ((ISocketMessageChannel)Info.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
+            var sendedMessage = await ((ISocketMessageChannel)ConstInfo.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
 
-            DataManager.agreeingToPlayUsers.Add(sendedMessage.Id, new List<ulong> { userId });
-            await DataManager.SaveDataAsync();
+            DataManager.AgreeingToPlayUsers.Add(sendedMessage.Id, new Tuple<DateTimeOffset, List<ulong>>(sendedMessage.Timestamp, new List<ulong> { userId }));
+            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
         }
 
         public static async Task AddUserAcceptedAsync(IUserMessage message, IUser user)
         {
-            if (!DataManager.agreeingToPlayUsers.ContainsKey(message.Id)) return;
-            if (DataManager.agreeingToPlayUsers[message.Id][0] == user.Id) return;
-            if (DataManager.agreeingToPlayUsers[message.Id].Contains(user.Id)) return;
-            DataManager.agreeingToPlayUsers[message.Id].Add(user.Id);
-            await DataManager.SaveDataAsync();
+            if (!DataManager.AgreeingToPlayUsers.ContainsKey(message.Id)) return;
+            if (DataManager.AgreeingToPlayUsers[message.Id].Item2[0] == user.Id) return;
+            if (DataManager.AgreeingToPlayUsers[message.Id].Item2.Contains(user.Id)) return;
+            DataManager.AgreeingToPlayUsers[message.Id].Item2.Add(user.Id);
+            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
             string str = "";
-            foreach(var userId in DataManager.agreeingToPlayUsers[message.Id])
+            foreach(var userId in DataManager.AgreeingToPlayUsers[message.Id].Item2)
             {
-                if (userId == DataManager.agreeingToPlayUsers[message.Id][0]) continue;
+                if (userId == DataManager.AgreeingToPlayUsers[message.Id].Item2[0]) continue;
                 str += "<@!" + userId + ">, ";
             }
             if (str.Length > 2)
@@ -70,15 +71,15 @@ namespace BotAnbotip.Bot.Commands
 
         public static async Task RemoveUserAcceptedAsync(IUserMessage message, IUser user)
         {
-            if (!DataManager.agreeingToPlayUsers.ContainsKey(message.Id)) return;
-            if (DataManager.agreeingToPlayUsers[message.Id][0] == user.Id) return;
-            if (!DataManager.agreeingToPlayUsers[message.Id].Contains(user.Id)) return;
-            DataManager.agreeingToPlayUsers[message.Id].Remove(user.Id);
-            await DataManager.SaveDataAsync();
+            if (!DataManager.AgreeingToPlayUsers.ContainsKey(message.Id)) return;
+            if (DataManager.AgreeingToPlayUsers[message.Id].Item2[0] == user.Id) return;
+            if (!DataManager.AgreeingToPlayUsers[message.Id].Item2.Contains(user.Id)) return;
+            DataManager.AgreeingToPlayUsers[message.Id].Item2.Remove(user.Id);
+            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
             string str = "";
-            foreach (var userId in DataManager.agreeingToPlayUsers[message.Id])
+            foreach (var userId in DataManager.AgreeingToPlayUsers[message.Id].Item2)
             {
-                if (userId == DataManager.agreeingToPlayUsers[message.Id][0]) continue;
+                if (userId == DataManager.AgreeingToPlayUsers[message.Id].Item2[0]) continue;
                 str += "<@!" + userId + ">, ";
             }
             if (str.Length > 2)

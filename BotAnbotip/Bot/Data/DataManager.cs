@@ -1,82 +1,114 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Newtonsoft.Json;
-using Dropbox.Api;
 using System.Threading.Tasks;
-using System.Net;
-using System.Text;
+using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Data
 {
     [JsonObject]
     public class DataManager
     {
-        [JsonProperty]
-        public static Dictionary<ulong, ulong> anonymousMessagesAndUsersIds;    //MessageId -- UserId
-        [JsonProperty]
-        public static Dictionary<ulong, RatingList> ratingChannels;  //ChannelId -- UserId -- Object'sName -- IsLiked
-        [JsonProperty]
-        public static Dictionary<ulong, List<ulong>> agreeingToPlayUsers;    //MessageId -- List of UserIds
-        [JsonProperty]
-        public static Dictionary<ulong, List<Tuple<string, int>>> votingLists;
-        [JsonProperty]
-        public static bool RoleColorAutoChangingIsSwitchedOn;
-        [JsonProperty]
-        public static ulong RoleColorAutoChangingId;
-        [JsonProperty]
-        public static bool ChannelNameAutoChangingIsSwitchedOn;
-        [JsonProperty]
-        public static ulong ChannelNameAutoChangingId;
+        public static Dictionary<ulong, ulong> AnonymousMessages;    //MessageId -- UserId
+        public static Dictionary<ulong, RatingList> RatingChannels;    //ChannelId -- Rating List
+        public static Dictionary<ulong, Tuple<DateTimeOffset, List<ulong>>> AgreeingToPlayUsers;    //MessageId -- List of UserIds
+        public static Dictionary<ulong, List<Tuple<string, int>>> VotingLists;     //
+        public static Dictionary<GiveawayType, List<ulong>> ParticipantsOfTheGiveaway;     //GiveawayType -- List of UserIds
+        public static Dictionary<GiveawayType, ulong> LastWinner;   //GiveawayType -- UserId
+        public static bool RainbowRoleIsRunning;
+        public static ulong RainbowRoleId;
+        public static bool HackerChannelIsRunning;
+        public static ulong HackerChannelId;
+        
 
-        internal static void ClearAndCreateNewData()
+        [JsonIgnore]
+        public static bool[] DebugTriger = new bool[5];
+
+
+        public static void InitializeAllVariables()
         {
-            anonymousMessagesAndUsersIds = new Dictionary<ulong, ulong>();
-            ratingChannels = new Dictionary<ulong, RatingList>();
-            agreeingToPlayUsers = new Dictionary<ulong, List<ulong>>();
-            votingLists = new Dictionary<ulong, List<Tuple<string, int>>>();
-            RoleColorAutoChangingIsSwitchedOn = false;
-            ChannelNameAutoChangingIsSwitchedOn = false;
-            RoleColorAutoChangingId = 0;
-            ChannelNameAutoChangingId = 0;
+            AnonymousMessages = InitializeVariable(AnonymousMessages);
+            RatingChannels = InitializeVariable(RatingChannels);
+            AgreeingToPlayUsers = InitializeVariable(AgreeingToPlayUsers);
+            VotingLists = InitializeVariable(VotingLists);
+            ParticipantsOfTheGiveaway = InitializeVariable(ParticipantsOfTheGiveaway);
+            LastWinner = InitializeVariable(LastWinner);
+
+            RainbowRoleIsRunning = InitializeVariable(RainbowRoleIsRunning);
+            HackerChannelIsRunning = InitializeVariable(HackerChannelIsRunning);
+            RainbowRoleId = InitializeVariable(RainbowRoleId);
+            HackerChannelId = InitializeVariable(HackerChannelId);
+        }
+
+        public static T InitializeVariable<T>(T obj)
+        {
+            var constructor = typeof(T).GetConstructor(Type.EmptyTypes);
+            if (constructor == null) return default(T);
+            else return (T)constructor.Invoke(new object[0]);
         }
 
 
-        public DataManager() { }
-
-        public static async Task SaveDataAsync()
+        public static async Task SaveDataAsync<T>(T obj, string objName)
         {
-            string json = JsonConvert.SerializeObject(new DataManager());
-            await DropboxIntegration.UploadAsync(PrivateData.FileName, json);
+            string json = JsonConvert.SerializeObject(obj);
+            await DropboxIntegration.UploadAsync(PrivateData.FileNamePrefix + objName + ".json", json);
         }
 
-
-        public static async void ReadData()
-        {
-            PrivateData.Read();
+        public static async Task<T> ReadDataAsync<T>(T obj, string objName)
+        {            
             DropboxIntegration.Authorization(PrivateData.DropboxApiKey);
 
-            string json = await DropboxIntegration.DownloadAsync(PrivateData.FileName);
+            string json = await DropboxIntegration.DownloadAsync(PrivateData.FileNamePrefix + objName + ".json");
 
             if (json != "")
             {
-                var dataManager = JsonConvert.DeserializeObject<DataManager>(json);
+                return JsonConvert.DeserializeObject<T>(json);
             }
-            else ClearAndCreateNewData();
+            else return InitializeVariable(obj);
 
+        }
+
+        public static async Task SaveAllDataAsync()
+        {
+            await SaveDataAsync(AnonymousMessages, nameof(AnonymousMessages));
+            await SaveDataAsync(RatingChannels, nameof(RatingChannels));
+            await SaveDataAsync(AgreeingToPlayUsers, nameof(AgreeingToPlayUsers));
+            await SaveDataAsync(VotingLists, nameof(VotingLists));
+            await SaveDataAsync(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
+            await SaveDataAsync(LastWinner, nameof(LastWinner));
+
+            await SaveDataAsync(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
+            await SaveDataAsync(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
+            await SaveDataAsync(RainbowRoleId, nameof(RainbowRoleId));
+            await SaveDataAsync(HackerChannelId, nameof(HackerChannelId));
+        }
+
+        public static async Task ReadAllDataAsync()
+        {
+            AnonymousMessages = await ReadDataAsync(AnonymousMessages, nameof(AnonymousMessages));
+            RatingChannels = await ReadDataAsync(RatingChannels, nameof(RatingChannels));
+            AgreeingToPlayUsers = await ReadDataAsync(AgreeingToPlayUsers, nameof(AgreeingToPlayUsers));
+            VotingLists = await ReadDataAsync(VotingLists, nameof(VotingLists));
+            ParticipantsOfTheGiveaway = await ReadDataAsync(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
+            LastWinner = await ReadDataAsync(LastWinner, nameof(LastWinner));
+            RainbowRoleIsRunning = await ReadDataAsync(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
+            HackerChannelIsRunning = await ReadDataAsync(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
+            RainbowRoleId = await ReadDataAsync(RainbowRoleId, nameof(RainbowRoleId));
+            HackerChannelId = await ReadDataAsync(HackerChannelId, nameof(HackerChannelId));
         }
 
         public static void RemoveRatingList(string name)
         {
-            foreach(var ratingList in ratingChannels)
+            foreach(var ratingList in RatingChannels)
             {
-                if (ratingList.Value.Name == name) ratingChannels.Remove(ratingList.Key);
+                if (ratingList.Value.Name == name) RatingChannels.Remove(ratingList.Key);
             }
         }
 
         public static void RemoveRatingList(ulong id)
         {
-            ratingChannels.Remove(id);
+            RatingChannels.Remove(id);
         }
 
     }

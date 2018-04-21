@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using System.Linq;
+using BotAnbotip.Bot.Data.Group;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -21,8 +22,8 @@ namespace BotAnbotip.Bot.Commands
             await sendedMessage.ModifyAsync(
                 (messageProperties) => { messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("MessageID: " + sendedMessage.Id)).Build(); });
 
-            DataManager.anonymousMessagesAndUsersIds.Add(sendedMessage.Id, message.Author.Id);
-            await DataManager.SaveDataAsync();
+            DataManager.AnonymousMessages.Add(sendedMessage.Id, message.Author.Id);
+            await DataManager.SaveDataAsync(DataManager.AnonymousMessages, nameof(DataManager.AnonymousMessages));
         }
 
         public static async Task DeleteAsync(SocketMessage message, string argument)
@@ -30,7 +31,7 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
 
             ulong soughtForMessage = ulong.Parse(argument);
-            if (DataManager.anonymousMessagesAndUsersIds[soughtForMessage] == message.Author.Id)
+            if (DataManager.AnonymousMessages[soughtForMessage] == message.Author.Id)
             {
                 var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
                 await foundedMessage.DeleteAsync();
@@ -40,17 +41,11 @@ namespace BotAnbotip.Bot.Commands
         public static async Task GetAnonymousUserAsync(SocketMessage message, string argument)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            var userRoles = ((IGuildUser)message.Author).RoleIds;
-
-            if (userRoles.Contains((ulong)RoleIds.Основатель))
-            {
-                ulong messageId = ulong.Parse(argument);
-
-                ulong userId = DataManager.anonymousMessagesAndUsersIds[messageId];
-
-                await message.Author.SendMessageAsync(Info.GroupGuild.GetUser(userId).Mention);
-            }
+            ulong messageId = ulong.Parse(argument);
+            ulong userId = DataManager.AnonymousMessages[messageId];
+            await message.Author.SendMessageAsync(ConstInfo.GroupGuild.GetUser(userId).Mention);
         }
     }
 }

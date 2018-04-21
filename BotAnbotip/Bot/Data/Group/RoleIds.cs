@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.Data
+namespace BotAnbotip.Bot.Data.Group
 {
     public enum RoleIds : ulong
     {
+        VIP = 434769334527721473,
         Основатель = 384404017167728640,
         Заместитель = 422488912993189888,
         Динамический_цвет = 422841190971342849,

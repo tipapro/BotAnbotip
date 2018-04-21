@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
+using BotAnbotip.Bot.Data.Group;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -14,24 +15,21 @@ namespace BotAnbotip.Bot.Commands
         public static async void Stop(SocketMessage message, DiscordSocketClient client)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            if (((IGuildUser)message.Author).RoleIds.Contains((ulong)RoleIds.Основатель))
-            {
-                await DataManager.SaveDataAsync();
-                await client.StopAsync();
-                Environment.Exit(0);
-            }
+            await DataManager.SaveAllDataAsync();
+            await client.StopAsync();
+            Environment.Exit(0);
         }
 
         public static async void ClearData(SocketMessage message, DiscordSocketClient client)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            if (((IGuildUser)message.Author).RoleIds.Contains((ulong)RoleIds.Основатель))
-            {
-                DataManager.ClearAndCreateNewData();
-                await DataManager.SaveDataAsync();
-            }
+            DataManager.InitializeAllVariables();
+            await DataManager.SaveAllDataAsync();
+
         }
     }
 }

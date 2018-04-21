@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace BotAnbotip.Bot.Data
+namespace BotAnbotip.Bot.Data.CustomClasses
 {
     [JsonObject]
     public class RatingList
@@ -32,32 +32,29 @@ namespace BotAnbotip.Bot.Data
     public class ObjectsOfRatingList:IEnumerable
     {
         [JsonProperty]
-        private List<ObjectOfRatingList> _listOfObjectsOfRatingList;
+        private List<RatingListObject> _listOfObjectsOfRatingList;
         public int Count => _listOfObjectsOfRatingList.Count;
 
         public ObjectsOfRatingList()
         {
-            _listOfObjectsOfRatingList = new List<ObjectOfRatingList>();
+            _listOfObjectsOfRatingList = new List<RatingListObject>();
         }
 
-        public ObjectOfRatingList this[string name] => FindByName(name);
+        public RatingListObject this[string name] => FindByName(name);
 
-        public ObjectOfRatingList this[int position] => _listOfObjectsOfRatingList[position];
+        public RatingListObject this[int position] => _listOfObjectsOfRatingList[position];
 
 
-        private ObjectOfRatingList FindByName(string name)
+        private RatingListObject FindByName(string name)
         {
             foreach (var objectOfRatingList in _listOfObjectsOfRatingList)
             {
-                if (name == objectOfRatingList.Name)
-                {
-                    return objectOfRatingList;
-                }
+                if (name == objectOfRatingList.Name) return objectOfRatingList;
             }
             return null;
         }
 
-        public void Sort(ObjectOfRatingList obj)
+        public void Sort(RatingListObject obj)
         {
             int i, endValue, eval, previousPosition;
 
@@ -67,7 +64,7 @@ namespace BotAnbotip.Bot.Data
             if (obj.LastEvaluation == Evaluation.Dislike) endValue = _listOfObjectsOfRatingList.Count-1;
             else endValue = 0;
 
-            for (i = obj.CurrentPosition - eval; i != endValue - eval; i-= eval)//eval
+            for (i = obj.CurrentPosition - eval; i != endValue - eval; i-= eval)
             {
                 if (obj.CompareTo(_listOfObjectsOfRatingList[i]) == eval)
                 {
@@ -78,8 +75,7 @@ namespace BotAnbotip.Bot.Data
                 {
                     _listOfObjectsOfRatingList[i + eval] = obj;
                     break;
-                }
-                
+                }               
             }
 
             if ((i == endValue - eval))
@@ -93,7 +89,7 @@ namespace BotAnbotip.Bot.Data
         public void Add(string name, ulong messageId, string url = "", string thumbnailUrl = "")
         {
             var newObject =
-                new ObjectOfRatingList(name, messageId, url, thumbnailUrl)
+                new RatingListObject(name, messageId, url, thumbnailUrl)
                 {
                     PreviousPosition = _listOfObjectsOfRatingList.Count,
                     CurrentPosition = _listOfObjectsOfRatingList.Count
@@ -122,7 +118,7 @@ namespace BotAnbotip.Bot.Data
     }
 
     [JsonObject]
-    public class ObjectOfRatingList : IComparable<ObjectOfRatingList>
+    public class RatingListObject : IComparable<RatingListObject>
     {
         public string Name { get; set; }
         public string Url { get; set; }
@@ -135,9 +131,9 @@ namespace BotAnbotip.Bot.Data
         public Dictionary<ulong, Evaluation> UserEvaluation { get; set; }
         public Evaluation LastEvaluation { get; set; }
 
-        private ObjectOfRatingList() { }
+        private RatingListObject() { }
 
-        public ObjectOfRatingList(string name, ulong messageId, string url = "", string thumbnailUrl = "")
+        public RatingListObject(string name, ulong messageId, string url = "", string thumbnailUrl = "")
         {
             Name = name;
             MessageId = messageId;
@@ -148,7 +144,7 @@ namespace BotAnbotip.Bot.Data
             LastEvaluation = Evaluation.None;
         }
 
-        public int CompareTo(ObjectOfRatingList obj)
+        public int CompareTo(RatingListObject obj)
         {
             var result = this.NumberOfLikes.CompareTo(obj.NumberOfLikes);
             if (result == 0) result = obj.Name.CompareTo(this.Name);
@@ -163,7 +159,7 @@ namespace BotAnbotip.Bot.Data
             UserEvaluation[userId] = eval;
         }
 
-        public void SwapWith(ObjectOfRatingList obj)
+        public void SwapWith(RatingListObject obj)
         {
             this.PreviousPosition = this.CurrentPosition;
             obj.PreviousPosition = obj.CurrentPosition;

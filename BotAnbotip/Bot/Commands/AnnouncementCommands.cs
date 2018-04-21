@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using BotAnbotip.Bot.Data.Group;
+using Discord;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace BotAnbotip.Bot.Commands
         public static async Task SendAsync(SocketMessage message, string argument)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Администратор)) return;
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(":loudspeaker:Объявление:loudspeaker:")

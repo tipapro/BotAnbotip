@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using Discord.WebSocket;
+using BotAnbotip.Bot.Data.Group;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -26,7 +27,7 @@ namespace BotAnbotip.Bot.Commands
 
             if (CheckTheRole(roleId))
             {
-                await ((SocketGuildUser)message.Author).AddRoleAsync(Info.GroupGuild.GetRole(roleId));
+                await ((SocketGuildUser)message.Author).AddRoleAsync(ConstInfo.GroupGuild.GetRole(roleId));
             }
         }
 

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BotAnbotip.Bot.Data.Group;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Client
 {
@@ -14,18 +16,18 @@ namespace BotAnbotip.Bot.Client
     {
         public async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (reaction.UserId != Client.BotClient.CurrentUser.Id)
+            if (reaction.UserId != BotClient.Client.CurrentUser.Id)
             {
                 var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                 var message = await messageWithReaction.DownloadAsync();
+                var user = reaction.User.Value;
 
-                if (message.Author.Id == Client.BotClient.CurrentUser.Id)
+                if (message.Author.Id == BotClient.Client.CurrentUser.Id)
                 {
                     //для рейтингового листа
                     if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы)
                     {
-
-                        await message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
+                        await message.RemoveReactionAsync(reaction.Emote, user);
 
                         if ((reaction.Emote.Name == "💙") || (reaction.Emote.Name == "❌"))
                         {
@@ -36,7 +38,7 @@ namespace BotAnbotip.Bot.Client
                             if (reaction.Emote.Name == "🎮")
                             {
                                 await WantPlayMessageCommands.SendAsync(RatingListCommands.ConvertMessageToRatingListObject(message),
-                                    null, reaction.User.Value, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url);
+                                    null, user, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url);
                             }
                         }
                     }
@@ -44,12 +46,15 @@ namespace BotAnbotip.Bot.Client
                     //для остального
                     if (message.Embeds.Count != 0)
                     {
-                        if (message.Embeds.First().Title == "Приглашение в игру")
+                        if (message.Embeds.First().Title == ":video_game:Приглашение в игру:video_game:")
                         {
-                            if ((message.Timestamp.DateTime - DateTime.Now) < new TimeSpan(1, 0, 0, 0))
-                            {
-                                await WantPlayMessageCommands.AddUserAcceptedAsync(message, reaction.User.Value);
-                            }
+                            await WantPlayMessageCommands.AddUserAcceptedAsync(message, user);
+                        }
+                        if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:"
+                            && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
+                        {
+                            DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Add(user.Id);
+                            await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
                         }
                     }
                 }
@@ -58,12 +63,13 @@ namespace BotAnbotip.Bot.Client
 
         public async Task ReactionRemoved(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
-            if (reaction.UserId != Client.BotClient.CurrentUser.Id)
+            if (reaction.UserId != BotClient.Client.CurrentUser.Id)
             {
                 var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                 var message = await messageWithReaction.DownloadAsync();
+                var user = reaction.User.Value;
 
-                if (message.Author.Id == Client.BotClient.CurrentUser.Id)
+                if (message.Author.Id == BotClient.Client.CurrentUser.Id)
                 {
                     //для рейтингового листа
                     if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы)
@@ -74,12 +80,15 @@ namespace BotAnbotip.Bot.Client
                     //для остального
                     if (message.Embeds.Count != 0)
                     {
-                        if (message.Embeds.First().Title == "Приглашение в игру")
+                        if (message.Embeds.First().Title == ":video_game:Приглашение в игру:video_game:")
                         {
-                            if ((message.Timestamp.DateTime - DateTime.Now) < new TimeSpan(1, 0, 0, 0))
-                            {
-                                await WantPlayMessageCommands.RemoveUserAcceptedAsync(message, reaction.User.Value);
-                            }
+                            await WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user);
+                        }
+                        if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:" 
+                            && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
+                        {
+                            DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Remove(user.Id);
+                            await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
                         }
                     }
                 }

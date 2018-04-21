@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.Data
+namespace BotAnbotip.Bot.Data.Group
 {
     public enum CategoryIds : ulong
     {

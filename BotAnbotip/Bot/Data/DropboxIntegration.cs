@@ -28,12 +28,11 @@ namespace BotAnbotip.Bot.Data
                 {
                     var rest = await DBClient.Files.UploadAsync("/" + UploadfileName, WriteMode.Overwrite.Instance, body: stream);
                 }
-
                 return true;
             }
             catch (Exception)
             {
-                Console.WriteLine("UploadAsync Error");
+                Console.WriteLine("UploadAsync Error: " + UploadfileName);
                 return false;
             }
 
@@ -45,11 +44,12 @@ namespace BotAnbotip.Bot.Data
             {
                 var response = await DBClient.Files.DownloadAsync("/" + DropboxFileName);
                 string result = await response.GetContentAsStringAsync();
+                Console.WriteLine("DownloadAsync Success: " + DropboxFileName);
                 return result;
             }
             catch (Exception)
             {
-                Console.WriteLine("DownloadAsync Error");
+                Console.WriteLine("DownloadAsync Error: " + DropboxFileName);
                 return "";
             }
 
