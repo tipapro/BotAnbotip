@@ -46,7 +46,7 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
 
                     var embedBuilder2 = new EmbedBuilder();
-                    if (DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Count == 0)
+                    if (!DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP) || DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Count == 0)
                     {
                         embedBuilder2
                             .WithTitle(":gift:Итоги еженедельного розыгрыша VIP роли:gift:")
