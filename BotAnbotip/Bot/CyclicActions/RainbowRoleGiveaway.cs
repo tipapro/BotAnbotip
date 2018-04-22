@@ -55,7 +55,10 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                     else
                     {
-                        ulong winner = DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP][random.Next(DataManager.ParticipantsOfTheGiveaway.Count - 1)];
+                        var maxRand = DataManager.ParticipantsOfTheGiveaway.Count - 1;
+                        var randomNum = random.Next(maxRand);
+                        Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
+                        ulong winner = DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP][randomNum];
                         await ConstInfo.GroupGuild.GetUser(winner).AddRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
                         if (DataManager.LastWinner.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner[GiveawayType.VIP] != 0) await ConstInfo.GroupGuild.GetUser(DataManager.LastWinner[GiveawayType.VIP])
                              .RemoveRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));

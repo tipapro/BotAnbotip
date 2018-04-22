@@ -53,7 +53,7 @@ namespace BotAnbotip.Bot.Client
                         if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:"
                             && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
                         {
-                            DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Add(user.Id);
+                            if (!DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Contains(user.Id)) DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Add(user.Id);
                             await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
                         }
                     }
