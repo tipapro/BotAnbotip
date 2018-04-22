@@ -20,11 +20,11 @@ namespace BotAnbotip.Bot.Data
         public static ulong RainbowRoleId;
         public static bool HackerChannelIsRunning;
         public static ulong HackerChannelId;
-        
+        public static bool DidRoleGiveawayBegin;
 
         [JsonIgnore]
         public static bool[] DebugTriger = new bool[5];
-
+       
 
         public static void InitializeAllVariables()
         {
@@ -39,6 +39,7 @@ namespace BotAnbotip.Bot.Data
             HackerChannelIsRunning = InitializeVariable(HackerChannelIsRunning);
             RainbowRoleId = InitializeVariable(RainbowRoleId);
             HackerChannelId = InitializeVariable(HackerChannelId);
+            DidRoleGiveawayBegin = InitializeVariable(DidRoleGiveawayBegin);
         }
 
         public static T InitializeVariable<T>(T obj)
@@ -82,6 +83,7 @@ namespace BotAnbotip.Bot.Data
             await SaveDataAsync(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
             await SaveDataAsync(RainbowRoleId, nameof(RainbowRoleId));
             await SaveDataAsync(HackerChannelId, nameof(HackerChannelId));
+            await SaveDataAsync(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
         }
 
         public static async Task ReadAllDataAsync()
@@ -96,6 +98,7 @@ namespace BotAnbotip.Bot.Data
             HackerChannelIsRunning = await ReadDataAsync(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
             RainbowRoleId = await ReadDataAsync(RainbowRoleId, nameof(RainbowRoleId));
             HackerChannelId = await ReadDataAsync(HackerChannelId, nameof(HackerChannelId));
+            DidRoleGiveawayBegin = await ReadDataAsync(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
         }
 
         public static void RemoveRatingList(string name)

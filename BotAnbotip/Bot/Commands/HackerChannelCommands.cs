@@ -69,6 +69,8 @@ namespace BotAnbotip.Bot.Commands
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                if (ex.InnerException != null) Console.WriteLine(ex.InnerException.Message);
+                Task.Run(() => RunHackerChannelAsync()).GetAwaiter().GetResult();
             }
 }
 
@@ -82,7 +84,7 @@ namespace BotAnbotip.Bot.Commands
             return resultString;
         }
 
-        private static string GetRandomChar()
+        public static string GetRandomChar()
         {
             return char.ConvertFromUtf32(random.Next(400));
         }

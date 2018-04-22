@@ -15,8 +15,6 @@ namespace BotAnbotip.Bot.Commands
     {
         public static async Task RunCommand(string command, string argument, SocketMessage message)
         {
-
-
             if (argument != "")
             {
                 switch (command)

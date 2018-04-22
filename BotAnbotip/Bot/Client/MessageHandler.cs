@@ -11,6 +11,7 @@ namespace BotAnbotip.Bot.Client
 {
     class MessageHandler
     {
+        //private static Dictionary<ulong, DateTimeOffset> User
         public async Task MessageReceived(SocketMessage message)
         {
             if (message.Author.Id == BotClient.Client.CurrentUser.Id) return;
@@ -26,6 +27,11 @@ namespace BotAnbotip.Bot.Client
                 }
                 await CommandManager.RunCommand(command, argument, message);
             }
+        }
+
+        public void AntiSpam(IUser user)
+        {
+
         }
     }
 }

@@ -73,8 +73,10 @@ namespace BotAnbotip.Bot.Commands
                 DataManager.RainbowRoleIsRunning = false;
             }
             catch (Exception ex)
-            {
+            {    
                 Console.WriteLine(ex.Message);
+                if(ex.InnerException != null) Console.WriteLine(ex.InnerException.Message);
+                Task.Run(() => RunRainbowRoleAsync()).GetAwaiter().GetResult();
             }
 }
 

@@ -31,14 +31,14 @@ namespace BotAnbotip.Bot.Client
 
                         if ((reaction.Emote.Name == "💙") || (reaction.Emote.Name == "❌"))
                         {
-                            await RatingListCommands.ChangeRatingAsync(message, channel, reaction);
+                            await Task.Run(() => RatingListCommands.ChangeRatingAsync(message, channel, reaction));
                         }
                         else
                         {
                             if (reaction.Emote.Name == "🎮")
                             {
-                                await WantPlayMessageCommands.SendAsync(RatingListCommands.ConvertMessageToRatingListObject(message),
-                                    null, user, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url);
+                                await Task.Run(() => WantPlayMessageCommands.SendAsync(RatingListCommands.ConvertMessageToRatingListObject(message),
+                                    null, user, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url));
                             }
                         }
                     }
@@ -48,7 +48,7 @@ namespace BotAnbotip.Bot.Client
                     {
                         if (message.Embeds.First().Title == ":video_game:Приглашение в игру:video_game:")
                         {
-                            await WantPlayMessageCommands.AddUserAcceptedAsync(message, user);
+                            await Task.Run(() => WantPlayMessageCommands.AddUserAcceptedAsync(message, user));
                         }
                         if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:"
                             && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
@@ -82,7 +82,7 @@ namespace BotAnbotip.Bot.Client
                     {
                         if (message.Embeds.First().Title == ":video_game:Приглашение в игру:video_game:")
                         {
-                            await WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user);
+                            await Task.Run(() => WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user));
                         }
                         if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:" 
                             && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))

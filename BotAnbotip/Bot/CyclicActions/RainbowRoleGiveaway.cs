@@ -23,23 +23,27 @@ namespace BotAnbotip.Bot.CyclicActions
             {
                 while (flag)
                 {
-                    await Task.Delay(new TimeSpan(0, 0, 0, 1));
-                    if (DateTime.Now.DayOfWeek != DayOfWeek.Friday && !DataManager.DebugTriger[0]) continue;
+                    if (!DataManager.DidRoleGiveawayBegin)
+                    {
+                        await Task.Delay(new TimeSpan(0, 0, 0, 1));
+                        if (DateTime.Now.DayOfWeek != DayOfWeek.Friday && !DataManager.DebugTriger[0]) continue;
 
-                    var embedBuilder1 = new EmbedBuilder()
-                        .WithTitle(":gift:Еженедельный розыгрыш VIP роли:gift:")
-                        .WithDescription("Правила розыгрыша таковы:\n" +
-                        "```1) Поставьте лайк этому посту;\n" +
-                        "2) Ждать понедельника.\n```" +
-                        "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.")
-                        .WithColor(Color.Blue);
-                    var sendedMessage = await ConstInfo.GroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder1.Build());
-                    await sendedMessage.AddReactionAsync(new Emoji("💙"));
+                        var embedBuilder1 = new EmbedBuilder()
+                            .WithTitle(":gift:Еженедельный розыгрыш VIP роли:gift:")
+                            .WithDescription("Правила розыгрыша таковы:\n" +
+                            "```1) Поставьте лайк этому посту;\n" +
+                            "2) Ждать понедельника.\n```" +
+                            "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.")
+                            .WithColor(Color.Blue);
+                        var sendedMessage = await ConstInfo.GroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder1.Build());
+                        await sendedMessage.AddReactionAsync(new Emoji("💙"));
 
-                    DataManager.ParticipantsOfTheGiveaway.Add(GiveawayType.VIP, new List<ulong>());
+                        DataManager.DidRoleGiveawayBegin = true;
+                        DataManager.ParticipantsOfTheGiveaway.Add(GiveawayType.VIP, new List<ulong>());
+                        await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
 
-                    while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 0, 1));
-
+                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 0, 1));
+                    }
 
                     var embedBuilder2 = new EmbedBuilder();
                     if (DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Count == 0)
@@ -66,12 +70,13 @@ namespace BotAnbotip.Bot.CyclicActions
                     DataManager.ParticipantsOfTheGiveaway.Remove(GiveawayType.VIP);
                     await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
                     await ConstInfo.GroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
+                    DataManager.DidRoleGiveawayBegin = false;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                States.WantPlayAutoRemovingIsRunning = false;
+                States.RainbowRoleGiveawayIsRunning = false;
                 CyclicalMethodsManager.RunRainbowRoleGiveaway();
             }
             States.RainbowRoleGiveawayIsRunning = false;
