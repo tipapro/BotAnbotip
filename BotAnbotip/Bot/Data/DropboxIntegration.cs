@@ -14,10 +14,12 @@ namespace BotAnbotip.Bot.Data
     class DropboxIntegration
     {
         private static DropboxClient DBClient;
+        public static bool IsAuthorized;
 
-        public static void Authorization(string apiKey)
+        public static void Authorize(string apiKey)
         {
             DBClient = new DropboxClient(apiKey);
+            IsAuthorized = true;
         }
 
         public static async Task<bool> UploadAsync(string UploadfileName, string str)

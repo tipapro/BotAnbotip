@@ -29,6 +29,7 @@ namespace BotAnbotip.Bot.Data
             AnonymousMessages = InitializeDropboxData(AnonymousMessages, nameof(AnonymousMessages));
             RatingChannels = InitializeDropboxData(RatingChannels, nameof(RatingChannels));
             AgreeingToPlayUsers = InitializeDropboxData(AgreeingToPlayUsers, nameof(AgreeingToPlayUsers));
+            VotingLists = InitializeDropboxData(VotingLists, nameof(VotingLists));
             ParticipantsOfTheGiveaway = InitializeDropboxData(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
             LastWinner = InitializeDropboxData(LastWinner, nameof(LastWinner));
             RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
@@ -55,18 +56,26 @@ namespace BotAnbotip.Bot.Data
 
         public static async Task ReadAllDataAsync()
         {
-            InitializeAllVariables();
-            await AnonymousMessages.ReadAsync();
-            await RatingChannels.ReadAsync();
-            await AgreeingToPlayUsers.ReadAsync();
-            await VotingLists.ReadAsync();
-            await ParticipantsOfTheGiveaway.ReadAsync();
-            await LastWinner.ReadAsync();
-            await RainbowRoleIsRunning.ReadAsync();
-            await HackerChannelIsRunning.ReadAsync();
-            await RainbowRoleId.ReadAsync();
-            await HackerChannelId.ReadAsync();
-            await DidRoleGiveawayBegin.ReadAsync();
+            try
+            {
+                InitializeAllVariables();
+                await AnonymousMessages.ReadAsync();
+                await RatingChannels.ReadAsync();
+                await AgreeingToPlayUsers.ReadAsync();
+                await VotingLists.ReadAsync();
+                await ParticipantsOfTheGiveaway.ReadAsync();
+                await LastWinner.ReadAsync();
+                await RainbowRoleIsRunning.ReadAsync();
+                await HackerChannelIsRunning.ReadAsync();
+                await RainbowRoleId.ReadAsync();
+                await HackerChannelId.ReadAsync();
+                await DidRoleGiveawayBegin.ReadAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Read data error");
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public static void RemoveRatingList(ulong id) => RatingChannels.Value.Remove(id);

@@ -21,7 +21,7 @@ namespace BotAnbotip.Bot.Data
 
         public async Task ReadAsync()
         {
-            DropboxIntegration.Authorization(PrivateData.DropboxApiKey);
+            if (!DropboxIntegration.IsAuthorized) DropboxIntegration.Authorize(PrivateData.DropboxApiKey);
 
             string json = await DropboxIntegration.DownloadAsync(PrivateData.FileNamePrefix + _fileName + ".json");
 
@@ -44,9 +44,17 @@ namespace BotAnbotip.Bot.Data
 
         private void InitializeVariable()
         {
-            var constructor = typeof(T).GetConstructor(Type.EmptyTypes);
-            if (constructor == null) _value  = default(T);
-            else _value = (T)constructor.Invoke(new object[0]);
+            try
+            {
+                var constructor = typeof(T).GetConstructor(Type.EmptyTypes);
+                if (constructor == null) _value = default(T);
+                else _value = (T)constructor.Invoke(new object[0]);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(_fileName);
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
