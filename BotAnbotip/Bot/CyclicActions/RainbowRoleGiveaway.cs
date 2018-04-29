@@ -59,7 +59,7 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                     else if (DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count > 0)
                     {
-                        var maxRand = DataManager.ParticipantsOfTheGiveaway.Value.Count - 1;
+                        var maxRand = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count - 1;
 
 
                         var randomNum = await GetRandomNumber(0, maxRand);
