@@ -47,7 +47,7 @@ namespace BotAnbotip.Bot.CyclicActions
                         await DataManager.ParticipantsOfTheGiveaway.SaveAsync();                       
                     }
 
-                    while (DateTime.Now.DayOfWeek != DayOfWeek.Monday || !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
+                    while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
                     var embedBuilder2 = new EmbedBuilder();
                     if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP) 
                         || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0)
