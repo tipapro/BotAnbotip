@@ -41,21 +41,21 @@ namespace BotAnbotip.Bot.Commands
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
 
-            DataManager.AgreeingToPlayUsers.Add(sendedMessage.Id, new Tuple<DateTimeOffset, List<ulong>>(sendedMessage.Timestamp, new List<ulong> { userId }));
-            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
+            DataManager.AgreeingToPlayUsers.Value.Add(sendedMessage.Id, new Tuple<DateTimeOffset, List<ulong>>(sendedMessage.Timestamp, new List<ulong> { userId }));
+            await DataManager.AgreeingToPlayUsers.SaveAsync();
         }
 
         public static async Task AddUserAcceptedAsync(IUserMessage message, IUser user)
         {
-            if (!DataManager.AgreeingToPlayUsers.ContainsKey(message.Id)) return;
-            if (DataManager.AgreeingToPlayUsers[message.Id].Item2[0] == user.Id) return;
-            if (DataManager.AgreeingToPlayUsers[message.Id].Item2.Contains(user.Id)) return;
-            DataManager.AgreeingToPlayUsers[message.Id].Item2.Add(user.Id);
-            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
+            if (!DataManager.AgreeingToPlayUsers.Value.ContainsKey(message.Id)) return;
+            if (DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0] == user.Id) return;
+            if (DataManager.AgreeingToPlayUsers.Value[message.Id].Item2.Contains(user.Id)) return;
+            DataManager.AgreeingToPlayUsers.Value[message.Id].Item2.Add(user.Id);
+            await DataManager.AgreeingToPlayUsers.SaveAsync();
             string str = "";
-            foreach(var userId in DataManager.AgreeingToPlayUsers[message.Id].Item2)
+            foreach(var userId in DataManager.AgreeingToPlayUsers.Value[message.Id].Item2)
             {
-                if (userId == DataManager.AgreeingToPlayUsers[message.Id].Item2[0]) continue;
+                if (userId == DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0]) continue;
                 str += "<@!" + userId + ">, ";
             }
             if (str.Length > 2)
@@ -71,15 +71,15 @@ namespace BotAnbotip.Bot.Commands
 
         public static async Task RemoveUserAcceptedAsync(IUserMessage message, IUser user)
         {
-            if (!DataManager.AgreeingToPlayUsers.ContainsKey(message.Id)) return;
-            if (DataManager.AgreeingToPlayUsers[message.Id].Item2[0] == user.Id) return;
-            if (!DataManager.AgreeingToPlayUsers[message.Id].Item2.Contains(user.Id)) return;
-            DataManager.AgreeingToPlayUsers[message.Id].Item2.Remove(user.Id);
-            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
+            if (!DataManager.AgreeingToPlayUsers.Value.ContainsKey(message.Id)) return;
+            if (DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0] == user.Id) return;
+            if (!DataManager.AgreeingToPlayUsers.Value[message.Id].Item2.Contains(user.Id)) return;
+            DataManager.AgreeingToPlayUsers.Value[message.Id].Item2.Remove(user.Id);
+            await DataManager.AgreeingToPlayUsers.SaveAsync();
             string str = "";
-            foreach (var userId in DataManager.AgreeingToPlayUsers[message.Id].Item2)
+            foreach (var userId in DataManager.AgreeingToPlayUsers.Value[message.Id].Item2)
             {
-                if (userId == DataManager.AgreeingToPlayUsers[message.Id].Item2[0]) continue;
+                if (userId == DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0]) continue;
                 str += "<@!" + userId + ">, ";
             }
             if (str.Length > 2)

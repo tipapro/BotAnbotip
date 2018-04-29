@@ -30,22 +30,22 @@ namespace BotAnbotip.Bot.Commands
             var str = argument.Split(' ');
             if (str.Length > 1)
             {
-                DataManager.RainbowRoleId = ulong.Parse(str[1]);
+                DataManager.RainbowRoleId.Value = ulong.Parse(str[1]);
                 argument = str[0];
-                await DataManager.SaveDataAsync(DataManager.RainbowRoleId, nameof(DataManager.RainbowRoleId));
+                await DataManager.RainbowRoleId.SaveAsync();
             }
 
-            if ((argument == "вкл") && (!DataManager.RainbowRoleIsRunning))
+            if ((argument == "вкл") && (!DataManager.RainbowRoleIsRunning.Value))
             {
-                DataManager.RainbowRoleIsRunning = true;
-                await DataManager.SaveDataAsync(DataManager.RainbowRoleIsRunning, nameof(DataManager.RainbowRoleIsRunning));
+                DataManager.RainbowRoleIsRunning.Value = true;
+                await DataManager.RainbowRoleIsRunning.SaveAsync();
                 Task.Run(() => RunRainbowRoleAsync()).GetAwaiter().GetResult();
             }
             else if (argument == "выкл")
             {
                 flag = false;
-                DataManager.RainbowRoleIsRunning = false;
-                await DataManager.SaveDataAsync(DataManager.RainbowRoleIsRunning, nameof(DataManager.RainbowRoleIsRunning));
+                DataManager.RainbowRoleIsRunning.Value = false;
+                await DataManager.RainbowRoleIsRunning.SaveAsync();
             }
         }
 
@@ -65,12 +65,12 @@ namespace BotAnbotip.Bot.Commands
                 while (flag)
                 {
                     await Task.Delay(DelayTime);
-                    await ConstInfo.GroupGuild.GetRole(DataManager.RainbowRoleId).ModifyAsync((roleProperties) =>
+                    await ConstInfo.GroupGuild.GetRole(DataManager.RainbowRoleId.Value).ModifyAsync((roleProperties) =>
                     {
                         roleProperties.Color = GetNextColor(); ;
                     });
                 }
-                DataManager.RainbowRoleIsRunning = false;
+                DataManager.RainbowRoleIsRunning.Value = false;
             }
             catch (Exception ex)
             {    

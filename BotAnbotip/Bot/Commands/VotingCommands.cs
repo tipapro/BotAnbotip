@@ -45,8 +45,8 @@ namespace BotAnbotip.Bot.Commands
             }
             
 
-            DataManager.VotingLists.Add(sendedMessage.Id, new List<Tuple<string, int>>());
-            await DataManager.SaveDataAsync(DataManager.VotingLists, nameof(DataManager.RatingChannels));
+            DataManager.VotingLists.Value.Add(sendedMessage.Id, new List<Tuple<string, int>>());
+            await DataManager.VotingLists.SaveAsync();
         }
 
         public static async Task DeleteVotingAsync(SocketMessage message, string argument)
@@ -60,8 +60,8 @@ namespace BotAnbotip.Bot.Commands
             {
                 var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
                 await foundedMessage.DeleteAsync();
-                DataManager.VotingLists.Remove(foundedMessage.Id);
-                await DataManager.SaveDataAsync(DataManager.VotingLists, nameof(DataManager.RatingChannels));
+                DataManager.VotingLists.Value.Remove(foundedMessage.Id);
+                await DataManager.VotingLists.SaveAsync();
             }
         }
     }

@@ -26,22 +26,22 @@ namespace BotAnbotip.Bot.Commands
             var str = argument.Split(' ');
             if (str.Length > 1)
             {
-                DataManager.HackerChannelId = ulong.Parse(str[1]);
+                DataManager.HackerChannelId.Value = ulong.Parse(str[1]);
                 argument = str[0];
-                await DataManager.SaveDataAsync(DataManager.HackerChannelId, nameof(DataManager.HackerChannelId));
+                await DataManager.HackerChannelId.SaveAsync();
             }
 
-            if ((argument == "вкл") && (!DataManager.HackerChannelIsRunning))
+            if ((argument == "вкл") && (!DataManager.HackerChannelIsRunning.Value))
             {
-                DataManager.HackerChannelIsRunning = true;
-                await DataManager.SaveDataAsync(DataManager.HackerChannelIsRunning, nameof(DataManager.HackerChannelIsRunning));
+                DataManager.HackerChannelIsRunning.Value = true;
+                await DataManager.HackerChannelIsRunning.SaveAsync();
                 Task.Run(() => RunHackerChannelAsync()).GetAwaiter().GetResult();
             }
             else if (argument == "выкл")
             {
                 flag = false;
-                DataManager.HackerChannelIsRunning = false;
-                await DataManager.SaveDataAsync(DataManager.HackerChannelIsRunning, nameof(DataManager.HackerChannelIsRunning));
+                DataManager.HackerChannelIsRunning.Value = false;
+                await DataManager.HackerChannelIsRunning.SaveAsync();
             }
         }
         
@@ -59,12 +59,12 @@ namespace BotAnbotip.Bot.Commands
                 while (flag)
                 {
                     await Task.Delay(DelayTime);
-                    await ConstInfo.GroupGuild.GetChannel(DataManager.HackerChannelId).ModifyAsync((channelProperties) =>
+                    await ConstInfo.GroupGuild.GetChannel(DataManager.HackerChannelId.Value).ModifyAsync((channelProperties) =>
                     {
                         channelProperties.Name = GetRandomString(Length);
                     });
                 }
-                DataManager.HackerChannelIsRunning = false;
+                DataManager.HackerChannelIsRunning.Value = false;
             }
             catch (Exception ex)
             {

@@ -51,10 +51,10 @@ namespace BotAnbotip.Bot.Client
                             await Task.Run(() => WantPlayMessageCommands.AddUserAcceptedAsync(message, user));
                         }
                         if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:"
-                            && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
+                            && DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP))
                         {
-                            if (!DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Contains(user.Id)) DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Add(user.Id);
-                            await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
+                            if (!DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Contains(user.Id)) DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Add(user.Id);
+                            await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
                         }
                     }
                 }
@@ -85,10 +85,10 @@ namespace BotAnbotip.Bot.Client
                             await Task.Run(() => WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user));
                         }
                         if (message.Embeds.First().Title == ":gift:Еженедельный розыгрыш VIP роли:gift:" 
-                            && DataManager.ParticipantsOfTheGiveaway.ContainsKey(GiveawayType.VIP))
+                            && DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP))
                         {
-                            DataManager.ParticipantsOfTheGiveaway[GiveawayType.VIP].Remove(user.Id);
-                            await DataManager.SaveDataAsync(DataManager.ParticipantsOfTheGiveaway, nameof(DataManager.ParticipantsOfTheGiveaway));
+                            DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Remove(user.Id);
+                            await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
                         }
                     }
                 }

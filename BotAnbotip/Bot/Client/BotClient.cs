@@ -58,14 +58,14 @@ namespace BotAnbotip.Bot.Client
 
         private async Task RunCyclicalMethods(SocketGuild guild)
         {
-            if (DataManager.HackerChannelIsRunning)
+            if (DataManager.HackerChannelIsRunning.Value)
             {
-                DataManager.HackerChannelIsRunning = false;
+                DataManager.HackerChannelIsRunning.Value = false;
                 await HackerChannelCommands.ChangeStateOfTheHackerChannelAsync("вкл");
             }
-            if (DataManager.RainbowRoleIsRunning)
+            if (DataManager.RainbowRoleIsRunning.Value)
             {
-                DataManager.RainbowRoleIsRunning = false;
+                DataManager.RainbowRoleIsRunning.Value = false;
                 await RainbowRoleCommands.ChangeStateOfTheRainbowRoleAsync("вкл");
             }
             CyclicalMethodsManager.RunAll();
@@ -73,6 +73,7 @@ namespace BotAnbotip.Bot.Client
 
         private Task SetInfo(SocketGuild guild)
         {
+            ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Бот запущен");
             ConstInfo.GroupGuild = guild;
             BotLoaded = true;            
             return Task.CompletedTask;

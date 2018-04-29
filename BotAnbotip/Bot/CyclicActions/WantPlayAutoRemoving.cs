@@ -23,14 +23,14 @@ namespace BotAnbotip.Bot.CyclicActions
                 {
 
                     await Task.Delay(new TimeSpan(0, 5, 0));
-                    foreach (var pair in DataManager.AgreeingToPlayUsers)
+                    foreach (var pair in DataManager.AgreeingToPlayUsers.Value)
                     {
                         if ((pair.Value.Item1.DateTime - DateTime.Now) > new TimeSpan(1, 0, 0, 0))
                         {
                             var message = await ((IMessageChannel)ConstInfo.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             await message.DeleteAsync();
-                            DataManager.AgreeingToPlayUsers.Remove(pair.Key);
-                            await DataManager.SaveDataAsync(DataManager.AgreeingToPlayUsers, nameof(DataManager.AgreeingToPlayUsers));
+                            DataManager.AgreeingToPlayUsers.Value.Remove(pair.Key);
+                            await DataManager.AgreeingToPlayUsers.SaveAsync();
                         }
                     }
                 }
@@ -39,7 +39,7 @@ namespace BotAnbotip.Bot.CyclicActions
             {
                 Console.WriteLine(ex.Message);
                 States.WantPlayAutoRemovingIsRunning = false;
-                CyclicalMethodsManager.RunWantPlayAutoRemoving();
+                if (!DataManager.DebugTriger[4]) CyclicalMethodsManager.RunWantPlayAutoRemoving();
             }
             States.WantPlayAutoRemovingIsRunning = false;
         }

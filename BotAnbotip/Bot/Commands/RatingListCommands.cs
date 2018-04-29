@@ -80,10 +80,10 @@ namespace BotAnbotip.Bot.Commands
                     OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
                         null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
 
-                DataManager.RatingChannels.Add(newRatingChannel.Id,
+                DataManager.RatingChannels.Value.Add(newRatingChannel.Id,
                     new RatingList(newRatingChannel.Id, newRatingChannel.Name, listType));
 
-                await DataManager.SaveDataAsync(DataManager.RatingChannels, nameof(DataManager.RatingChannels));
+                await DataManager.RatingChannels.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -107,7 +107,7 @@ namespace BotAnbotip.Bot.Commands
                 DataManager.RemoveRatingList(id);
             }
 
-            await DataManager.SaveDataAsync(DataManager.RatingChannels, nameof(DataManager.RatingChannels));
+            await DataManager.RatingChannels.SaveAsync();
         }
 
         public static async Task AddValueAsync(SocketMessage message, string argument)
@@ -140,7 +140,7 @@ namespace BotAnbotip.Bot.Commands
             await sendedMessage.AddReactionAsync(new Emoji("💙"));
             await sendedMessage.AddReactionAsync(new Emoji("❌"));
 
-            var ratingList = DataManager.RatingChannels[message.Channel.Id];
+            var ratingList = DataManager.RatingChannels.Value[message.Channel.Id];
             if (flag) ratingList.ListObjects.Add(objName, sendedMessage.Id, url, thumbnailUrl);
             else ratingList.ListObjects.Add(objName, sendedMessage.Id);
 
@@ -149,8 +149,8 @@ namespace BotAnbotip.Bot.Commands
                 await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
             }
 
-            await SortAsync(message.Channel, DataManager.RatingChannels[message.Channel.Id].ListObjects[objName]); //не эффективно по аргументу
-            await DataManager.SaveDataAsync(DataManager.RatingChannels, nameof(DataManager.RatingChannels));
+            await SortAsync(message.Channel, DataManager.RatingChannels.Value[message.Channel.Id].ListObjects[objName]); //не эффективно по аргументу
+            await DataManager.RatingChannels.SaveAsync();
         }
 
         public static async Task RemoveValueAsync(SocketMessage message, string argument)
@@ -158,15 +158,15 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            if (DataManager.RatingChannels[message.Channel.Id].ListObjects[argument] != null)
+            if (DataManager.RatingChannels.Value[message.Channel.Id].ListObjects[argument] != null)
             {
                 var foundedMessage =
-                    await message.Channel.GetMessageAsync(DataManager.RatingChannels[message.Channel.Id]
+                    await message.Channel.GetMessageAsync(DataManager.RatingChannels.Value[message.Channel.Id]
                         .ListObjects[argument].MessageId);
                 await foundedMessage.DeleteAsync();
 
-                DataManager.RatingChannels[message.Channel.Id].ListObjects.Remove(argument);
-                await DataManager.SaveDataAsync(DataManager.RatingChannels, nameof(DataManager.RatingChannels));
+                DataManager.RatingChannels.Value[message.Channel.Id].ListObjects.Remove(argument);
+                await DataManager.RatingChannels.SaveAsync();
             }
         }
 
@@ -176,7 +176,7 @@ namespace BotAnbotip.Bot.Commands
 
             var objName = ConvertMessageToRatingListObject(message);
 
-            var likedObject = DataManager.RatingChannels[channel.Id].ListObjects[objName];
+            var likedObject = DataManager.RatingChannels.Value[channel.Id].ListObjects[objName];
             Evaluation eval = reaction.Emote.Name == "💙" ? Evaluation.Like : Evaluation.Dislike;
 
             //Проверка на наличие пользователя в массиве и сравнение его оценки
@@ -194,7 +194,7 @@ namespace BotAnbotip.Bot.Commands
                     messageProperties.Embed = embedBuilder.Build();
                 });
                 await SortAsync(channel, likedObject);
-                await DataManager.SaveDataAsync(DataManager.RatingChannels, nameof(DataManager.RatingChannels));
+                await DataManager.RatingChannels.SaveAsync();
             }
         }
 
@@ -202,7 +202,7 @@ namespace BotAnbotip.Bot.Commands
         {
             var bufMessage1 = await channel.GetMessageAsync(obj.MessageId);
 
-            DataManager.RatingChannels[channel.Id].ListObjects.Sort(obj);
+            DataManager.RatingChannels.Value[channel.Id].ListObjects.Sort(obj);
 
 
             if (obj.CurrentPosition != obj.PreviousPosition)
@@ -211,12 +211,12 @@ namespace BotAnbotip.Bot.Commands
 
                 for (int i = obj.PreviousPosition; i != obj.CurrentPosition; i -= eval)
                 {
-                    var firstObject = DataManager.RatingChannels[channel.Id].ListObjects[i];
+                    var firstObject = DataManager.RatingChannels.Value[channel.Id].ListObjects[i];
                     var firstMessage =
                         await channel.GetMessageAsync(firstObject.MessageId);
                     await Task.Delay(300);
 
-                    var secondObject = DataManager.RatingChannels[channel.Id].ListObjects[i - eval];
+                    var secondObject = DataManager.RatingChannels.Value[channel.Id].ListObjects[i - eval];
                     var secondMessage =
                         await channel.GetMessageAsync(secondObject.MessageId);
                     await Task.Delay(300);
@@ -225,7 +225,7 @@ namespace BotAnbotip.Bot.Commands
 
                 }
 
-                var bufMessage2 = await channel.GetMessageAsync(DataManager.RatingChannels[channel.Id]
+                var bufMessage2 = await channel.GetMessageAsync(DataManager.RatingChannels.Value[channel.Id]
                     .ListObjects[obj.CurrentPosition].MessageId);
                 await ((IUserMessage) bufMessage2).ModifyAsync((messageProperties) =>
                 {

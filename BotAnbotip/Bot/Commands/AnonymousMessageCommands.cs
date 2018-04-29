@@ -22,8 +22,8 @@ namespace BotAnbotip.Bot.Commands
             await sendedMessage.ModifyAsync(
                 (messageProperties) => { messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("MessageID: " + sendedMessage.Id)).Build(); });
 
-            DataManager.AnonymousMessages.Add(sendedMessage.Id, message.Author.Id);
-            await DataManager.SaveDataAsync(DataManager.AnonymousMessages, nameof(DataManager.AnonymousMessages));
+            DataManager.AnonymousMessages.Value.Add(sendedMessage.Id, message.Author.Id);
+            await DataManager.AnonymousMessages.SaveAsync();
         }
 
         public static async Task DeleteAsync(SocketMessage message, string argument)
@@ -31,7 +31,7 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
 
             ulong soughtForMessage = ulong.Parse(argument);
-            if (DataManager.AnonymousMessages[soughtForMessage] == message.Author.Id)
+            if (DataManager.AnonymousMessages.Value[soughtForMessage] == message.Author.Id)
             {
                 var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
                 await foundedMessage.DeleteAsync();
@@ -44,7 +44,7 @@ namespace BotAnbotip.Bot.Commands
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
             ulong messageId = ulong.Parse(argument);
-            ulong userId = DataManager.AnonymousMessages[messageId];
+            ulong userId = DataManager.AnonymousMessages.Value[messageId];
             await message.Author.SendMessageAsync(ConstInfo.GroupGuild.GetUser(userId).Mention);
         }
     }
