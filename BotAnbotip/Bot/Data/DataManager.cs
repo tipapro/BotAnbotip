@@ -55,6 +55,7 @@ namespace BotAnbotip.Bot.Data
 
         public static async Task ReadAllDataAsync()
         {
+            InitializeAllVariables();
             await AnonymousMessages.ReadAsync();
             await RatingChannels.ReadAsync();
             await AgreeingToPlayUsers.ReadAsync();
