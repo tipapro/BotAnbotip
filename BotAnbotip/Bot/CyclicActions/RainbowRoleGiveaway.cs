@@ -43,9 +43,10 @@ namespace BotAnbotip.Bot.CyclicActions
 
                         DataManager.DidRoleGiveawayBegin.Value = true;
                         DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
+                        await DataManager.DidRoleGiveawayBegin.SaveAsync();
                         await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
-                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
+                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday || !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
                     }
 
                     var embedBuilder2 = new EmbedBuilder();
