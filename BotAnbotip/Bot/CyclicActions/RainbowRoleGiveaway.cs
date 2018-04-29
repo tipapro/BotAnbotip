@@ -27,7 +27,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 {
                     if (!DataManager.DidRoleGiveawayBegin.Value)
                     {
-                        await Task.Delay(new TimeSpan(0, 1, 0, 0));
+                        await Task.Delay(new TimeSpan(0, 0, 10, 0));
                         if (DateTime.Now.DayOfWeek != DayOfWeek.Friday && !DataManager.DebugTriger[0]) continue;
                         DataManager.DebugTriger[0] = false;
 
@@ -45,7 +45,7 @@ namespace BotAnbotip.Bot.CyclicActions
                         DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
                         await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
-                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 0, 1));
+                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
                     }
 
                     var embedBuilder2 = new EmbedBuilder();
