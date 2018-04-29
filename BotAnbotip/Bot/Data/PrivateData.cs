@@ -12,7 +12,7 @@ namespace BotAnbotip.Bot.Data
         private static string _botToken;
         private static char _prefix;
 
-        public static bool Debug = false;
+        public static bool Debug = true;
         
 
         public static string FileNamePrefix => _fileNamePrefix;

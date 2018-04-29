@@ -44,11 +44,10 @@ namespace BotAnbotip.Bot.CyclicActions
                         DataManager.DidRoleGiveawayBegin.Value = true;
                         DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
                         await DataManager.DidRoleGiveawayBegin.SaveAsync();
-                        await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
-
-                        while (DateTime.Now.DayOfWeek != DayOfWeek.Monday || !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
+                        await DataManager.ParticipantsOfTheGiveaway.SaveAsync();                       
                     }
 
+                    while (DateTime.Now.DayOfWeek != DayOfWeek.Monday || !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 0, 10, 0));
                     var embedBuilder2 = new EmbedBuilder();
                     if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP) 
                         || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0)
@@ -111,18 +110,26 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             int counter = 0;
             int randomNum = 0;
-            while (counter < 5)
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(
+                "https://" + $"www.random.org/integers/?num=1&min={min}&max={max}&col=1&base=10&format=plain&rnd=new");
+            try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://" + $"www.random.org/integers/?num=1&min={min}&max={max}&col=1&base=10&format=plain&rnd=new");
-                HttpWebResponse resp = (HttpWebResponse)await request.GetResponseAsync();
-                using (StreamReader sr = new StreamReader(resp.GetResponseStream()))
+                while (counter < 5)
                 {
-                    if (int.TryParse(sr.ReadToEnd().Trim(), out randomNum))
+                    HttpWebResponse resp = (HttpWebResponse)await request.GetResponseAsync();
+                    using (StreamReader sr = new StreamReader(resp.GetResponseStream()))
                     {
-                        counter++;
-                        continue;
+                        if (!int.TryParse(sr.ReadToEnd().Trim(), out randomNum))
+                        {
+                            counter++;
+                            continue;
+                        }
                     }
                 }
+            }
+            catch(Exception)
+            {
+                return random.Next(min, max + 1);
             }
             if (counter > 4) randomNum = random.Next(min, max + 1);
             return randomNum;
