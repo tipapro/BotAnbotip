@@ -12,22 +12,26 @@ namespace BotAnbotip.Bot.Data
         private static string _botToken;
         private static char _prefix;
 
-        public static bool Debug = true;
-        
+        public static bool Debug = false;
+
 
         public static string FileNamePrefix => _fileNamePrefix;
         public static string DropboxApiKey => _dropboxApiKey;
-        public static string BotToken=> _botToken;
+        public static string BotToken => _botToken;
         public static char Prefix => _prefix;
 
         public static void Read()
         {
+#if DEBUG
+            Debug = true;
+#endif
+
             if (Debug)
             {
                 using (FileStream testData = new FileStream("B:\\Projects\\testData", FileMode.Open, FileAccess.Read))
                 {
                     using (StreamReader reader = new StreamReader(testData))
-                    {                       
+                    {
                         _dropboxApiKey = reader.ReadLine();
                         _botToken = reader.ReadLine();
                         _prefix = reader.ReadLine().ToCharArray()[0];
