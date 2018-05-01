@@ -19,33 +19,48 @@ namespace BotAnbotip.Bot.Commands
             {
                 switch (command)
                 {
-                    case "ктоанон": await Task.Run(() => AnonymousMessageCommands.GetAnonymousUserAsync(message, argument)); break;
+                    case "ктоанон":
+                    case "whoisanon": await Task.Run(() => AnonymousMessageCommands.GetAnonymousUserAsync(message, argument)); break;
 
-                    case "добавьлист": await Task.Run(() => RatingListCommands.AddListAsync(message, argument)); break;
-                    case "удалилист": await Task.Run(() => RatingListCommands.RemoveListAsync(message, argument)); break;
+                    case "добавьлист":
+                    case "addlist": await Task.Run(() => RatingListCommands.AddListAsync(message, argument)); break;
+                    case "удалилист":
+                    case "removelist": await Task.Run(() => RatingListCommands.RemoveListAsync(message, argument)); break;
 
-                    case "радуга": await Task.Run(() => RainbowRoleCommands.ChangeStateOfTheRainbowRoleAsync(argument, message)); break;
-                    case "хакерканал": await Task.Run(() => HackerChannelCommands.ChangeStateOfTheHackerChannelAsync(argument, message)); break;
+                    case "добавьоб":
+                    case "addobj": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument)); break;
+                    case "удалиоб":
+                    case "removeobj": await Task.Run(() => RatingListCommands.RemoveValueAsync(message, argument)); break;
 
-                    case "добавьоб": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument)); break;
-                    case "удалиоб": await Task.Run(() => RatingListCommands.RemoveValueAsync(message, argument)); break;
-
-                    case "новость": await Task.Run(() => NewsCommands.SendAsync(message, argument)); break;
-                    case "новость+к": await Task.Run(() => NewsCommands.SendAsync(message, argument, true)); break;
+                    case "новость": 
+                    case "news": await Task.Run(() => NewsCommands.SendAsync(message, argument)); break;
+                    case "новость+к":
+                    case "news+p": await Task.Run(() => NewsCommands.SendAsync(message, argument, true)); break;
+                    case "news+y":
                     case "новость+ю": await Task.Run(() => NewsCommands.SendAsync(message, argument, false, true)); break;
 
-                    case "голосование": await Task.Run(() => VotingCommands.AddVotingdAsync(message, argument)); break;
+                    case "голосование":
+                    case "voting": await Task.Run(() => VotingCommands.AddVotingdAsync(message, argument)); break;
+                    case "deletevoting":
                     case "удалиголосование": await Task.Run(() => VotingCommands.DeleteVotingAsync(message, argument)); break;
 
                     case "анон":
-                    case "анонимно": await Task.Run(() => AnonymousMessageCommands.SendAsync(message, argument)); break;
-                    case "удалианон": await Task.Run(() => AnonymousMessageCommands.DeleteAsync(message, argument)); break;
+                    case "анонимно":
+                    case "anon":
+                    case "anonymously": await Task.Run(() => AnonymousMessageCommands.SendAsync(message, argument)); break;
+                    case "удалианон":
+                    case "deleteanon":
+                    case "deleteanonymousmessage": await Task.Run(() => AnonymousMessageCommands.DeleteAsync(message, argument)); break;
 
-                    case "объяви": await Task.Run(() => AnnouncementCommands.SendAsync(message, argument)); break;
+                    case "объяви":
+                    case "announce": await Task.Run(() => AnnouncementCommands.SendAsync(message, argument)); break;
 
-                    case "дайроль": await Task.Run(() => ManageTheRolesCommands.GetAsync(message, argument)); break;
+                    case "дайроль":
+                    case "giveme":
+                    case "giverole": await Task.Run(() => ManageTheRolesCommands.GetAsync(message, argument)); break;
 
-                    case "хочуиграть": await Task.Run(() => WantPlayMessageCommands.SendAsync(argument, message)); break;
+                    case "хочуиграть":
+                    case "wantplay": await Task.Run(() => WantPlayMessageCommands.SendAsync(argument, message)); break;
 
                     default:
                         await message.DeleteAsync();
@@ -57,8 +72,10 @@ namespace BotAnbotip.Bot.Commands
             {
                 switch (command)
                 {
-                    case "стоп": await Task.Run(() => BotControlCommands.Stop(message, BotClient.Client)); break;
-                    case "удалиданные": await Task.Run(() => BotControlCommands.ClearData(message, BotClient.Client)); break;
+                    case "стоп":
+                    case "stop": await Task.Run(() => BotControlCommands.Stop(message, BotClient.Client)); break;
+                    case "удалиданные":
+                    case "cleardata": await Task.Run(() => BotControlCommands.ClearData(message, BotClient.Client)); break;
 
                     case "debug0": DebugCommands.ChangeFlag(message, 0); break;
                     case "debug1": DebugCommands.ChangeFlag(message, 1); break;

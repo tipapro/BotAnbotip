@@ -41,7 +41,7 @@ namespace BotAnbotip.Bot.Commands
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
 
-            DataManager.AgreeingToPlayUsers.Value.Add(sendedMessage.Id, new Tuple<DateTimeOffset, List<ulong>>(sendedMessage.Timestamp, new List<ulong> { userId }));
+            DataManager.AgreeingToPlayUsers.Value.Add(sendedMessage.Id, (sendedMessage.Timestamp, new List<ulong> { userId }));
             await DataManager.AgreeingToPlayUsers.SaveAsync();
         }
 

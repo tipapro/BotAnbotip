@@ -10,14 +10,10 @@ namespace BotAnbotip.Bot.Data
     {
         public static DropboxData<Dictionary<ulong, ulong>> AnonymousMessages;    //MessageId -- UserId
         public static DropboxData<Dictionary<ulong, RatingList>> RatingChannels;    //ChannelId -- Rating List
-        public static DropboxData<Dictionary<ulong, Tuple<DateTimeOffset, List<ulong>>>> AgreeingToPlayUsers;    //MessageId -- List of UserIds
-        public static DropboxData<Dictionary<ulong, List<Tuple<string, int>>>> VotingLists;     //
+        public static DropboxData<Dictionary<ulong, (DateTimeOffset, List<ulong>)>> AgreeingToPlayUsers;    //MessageId -- List of UserIds
+        public static DropboxData<Dictionary<ulong, List<(string, int)>>> VotingLists;     //
         public static DropboxData<Dictionary<GiveawayType, List<ulong>>> ParticipantsOfTheGiveaway;     //GiveawayType -- List of UserIds
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
-        public static DropboxData<bool> RainbowRoleIsRunning;
-        public static DropboxData<ulong> RainbowRoleId;
-        public static DropboxData<bool> HackerChannelIsRunning;
-        public static DropboxData<ulong> HackerChannelId;
         public static DropboxData<bool> DidRoleGiveawayBegin;
 
         public static bool[] DebugTriger = new bool[5];
@@ -32,10 +28,6 @@ namespace BotAnbotip.Bot.Data
             VotingLists = InitializeDropboxData(VotingLists, nameof(VotingLists));
             ParticipantsOfTheGiveaway = InitializeDropboxData(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
             LastWinner = InitializeDropboxData(LastWinner, nameof(LastWinner));
-            RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
-            RainbowRoleId = InitializeDropboxData(RainbowRoleId, nameof(RainbowRoleId));
-            HackerChannelIsRunning = InitializeDropboxData(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
-            HackerChannelId = InitializeDropboxData(HackerChannelId, nameof(HackerChannelId));
             DidRoleGiveawayBegin = InitializeDropboxData(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
         }       
 
@@ -47,10 +39,6 @@ namespace BotAnbotip.Bot.Data
             await VotingLists.SaveAsync();
             await ParticipantsOfTheGiveaway.SaveAsync();
             await LastWinner.SaveAsync();
-            await RainbowRoleIsRunning.SaveAsync();
-            await HackerChannelIsRunning.SaveAsync();
-            await RainbowRoleId.SaveAsync();
-            await HackerChannelId.SaveAsync();
             await DidRoleGiveawayBegin.SaveAsync();
         }
 
@@ -65,10 +53,6 @@ namespace BotAnbotip.Bot.Data
                 await VotingLists.ReadAsync();
                 await ParticipantsOfTheGiveaway.ReadAsync();
                 await LastWinner.ReadAsync();
-                await RainbowRoleIsRunning.ReadAsync();
-                await HackerChannelIsRunning.ReadAsync();
-                await RainbowRoleId.ReadAsync();
-                await HackerChannelId.ReadAsync();
                 await DidRoleGiveawayBegin.ReadAsync();
             }
             catch (Exception ex)

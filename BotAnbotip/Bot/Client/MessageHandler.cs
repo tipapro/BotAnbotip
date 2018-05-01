@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 using BotAnbotip.Bot.Commands;
 using Discord;
 using BotAnbotip.Bot.Data;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Client
 {
     class MessageHandler
     {
-        //private static Dictionary<ulong, DateTimeOffset> User
+        private AntiSpam antiSpam;
+
+        public MessageHandler()
+        {
+            antiSpam = new AntiSpam(SpamType.Message);
+        }
+
         public async Task MessageReceived(SocketMessage message)
         {
             if (message.Author.Id == BotClient.Client.CurrentUser.Id) return;
-
+            if (antiSpam.Check(message.Author.Id)) return;
             if (message.Content.ToCharArray()[0] == PrivateData.Prefix)
             {
                 string[] buf = message.Content.Substring(1).Split(' ');
@@ -29,9 +36,6 @@ namespace BotAnbotip.Bot.Client
             }
         }
 
-        public void AntiSpam(IUser user)
-        {
 
-        }
     }
 }

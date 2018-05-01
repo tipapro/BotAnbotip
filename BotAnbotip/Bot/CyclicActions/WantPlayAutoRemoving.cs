@@ -25,7 +25,7 @@ namespace BotAnbotip.Bot.CyclicActions
                     await Task.Delay(new TimeSpan(0, 5, 0));
                     foreach (var pair in DataManager.AgreeingToPlayUsers.Value)
                     {
-                        if ((pair.Value.Item1.DateTime - DateTime.Now) > new TimeSpan(1, 0, 0, 0))
+                        if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                         {
                             var message = await ((IMessageChannel)ConstInfo.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             await message.DeleteAsync();

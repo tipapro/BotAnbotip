@@ -14,14 +14,23 @@ namespace BotAnbotip.Bot.Client
 {
     class ReactionHandler
     {
+        private AntiSpam antiSpam;
+
+        public ReactionHandler()
+        {
+            antiSpam = new AntiSpam(SpamType.Message);
+        }
+
         public async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             if (reaction.UserId != BotClient.Client.CurrentUser.Id)
             {
+                var user = reaction.User.Value;
+                if (antiSpam.Check(user.Id)) return;
+
                 var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                 var message = await messageWithReaction.DownloadAsync();
-                var user = reaction.User.Value;
-
+                
                 if (message.Author.Id == BotClient.Client.CurrentUser.Id)
                 {
                     //для рейтингового листа
@@ -65,9 +74,12 @@ namespace BotAnbotip.Bot.Client
         {
             if (reaction.UserId != BotClient.Client.CurrentUser.Id)
             {
+                
+                var user = reaction.User.Value;
+                if (antiSpam.Check(user.Id)) return;
+
                 var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                 var message = await messageWithReaction.DownloadAsync();
-                var user = reaction.User.Value;
 
                 if (message.Author.Id == BotClient.Client.CurrentUser.Id)
                 {

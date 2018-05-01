@@ -22,6 +22,7 @@ namespace BotAnbotip.Bot.Client
         public static DiscordSocketClient Client => _client;  
         private MessageHandler _msgHandler;
         private ReactionHandler _reactionHandler;
+        private static bool IsLoaded;
         
 
         public async Task MainAsync()
@@ -43,7 +44,7 @@ namespace BotAnbotip.Bot.Client
             _client.GuildAvailable += RunCyclicalMethods;
             _client.UserJoined += UserJoinedTheGroup;
 
-            await _client.SetGameAsync("Pro Group");
+            await _client.SetGameAsync("ANBOTIP Group");
             await _client.SetStatusAsync(UserStatus.Online);
 
             await _client.LoginAsync(TokenType.Bot, PrivateData.BotToken);
@@ -56,24 +57,21 @@ namespace BotAnbotip.Bot.Client
             await user.AddRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Участник));
         }
 
-        private async Task RunCyclicalMethods(SocketGuild guild)
+        private Task RunCyclicalMethods(SocketGuild guild)
         {
-            if (DataManager.HackerChannelIsRunning.Value)
-            {
-                DataManager.HackerChannelIsRunning.Value = false;
-                await HackerChannelCommands.ChangeStateOfTheHackerChannelAsync("вкл");
-            }
-            if (DataManager.RainbowRoleIsRunning.Value)
-            {
-                DataManager.RainbowRoleIsRunning.Value = false;
-                await RainbowRoleCommands.ChangeStateOfTheRainbowRoleAsync("вкл");
-            }
             CyclicalMethodsManager.RunAll();
+            return Task.CompletedTask;
         }
 
         private Task SetInfo(SocketGuild guild)
         {
-            ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Бот запущен");
+            var channel = ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test));
+            if (!IsLoaded)
+            {
+                IsLoaded = true;
+                channel.SendMessageAsync("Бот запущен " + DateTime.Now);
+            }
+            ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Бот авторизован " + DateTime.Now);
             ConstInfo.GroupGuild = guild;
             BotLoaded = true;            
             return Task.CompletedTask;

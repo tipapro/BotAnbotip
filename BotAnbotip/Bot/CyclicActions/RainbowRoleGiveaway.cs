@@ -129,6 +129,7 @@ namespace BotAnbotip.Bot.CyclicActions
             }
             catch(Exception)
             {
+                Console.WriteLine("Random.Next()");
                 return random.Next(min, max + 1);
             }
             if (counter > 4) randomNum = random.Next(min, max + 1);

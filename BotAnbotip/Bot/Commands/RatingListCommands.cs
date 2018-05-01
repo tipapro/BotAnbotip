@@ -62,6 +62,9 @@ namespace BotAnbotip.Bot.Commands
                 await newRatingChannel.AddPermissionOverwriteAsync(
                     ConstInfo.GroupGuild.GetRole((ulong)RoleIds._Бот),
                     OverwritePermissions.DenyAll(newRatingChannel));
+                await newRatingChannel.AddPermissionOverwriteAsync(
+                    ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Backend_Bot),
+                    OverwritePermissions.DenyAll(newRatingChannel));
 
                 await newRatingChannel.AddPermissionOverwriteAsync(
                     ConstInfo.GroupGuild.EveryoneRole,

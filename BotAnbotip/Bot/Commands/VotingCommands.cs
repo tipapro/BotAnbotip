@@ -45,7 +45,7 @@ namespace BotAnbotip.Bot.Commands
             }
             
 
-            DataManager.VotingLists.Value.Add(sendedMessage.Id, new List<Tuple<string, int>>());
+            DataManager.VotingLists.Value.Add(sendedMessage.Id, new List<(string, int)>());
             await DataManager.VotingLists.SaveAsync();
         }
 
