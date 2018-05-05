@@ -29,6 +29,7 @@ namespace BotAnbotip.Bot.CyclicActions
                     {
                         if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                         {
+                            Console.WriteLine(pair.Key);
                             var message = ((ISocketMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetCachedMessage(pair.Key);
                             await message.DeleteAsync();
                             DataManager.AgreeingToPlayUsers.Value.Remove(pair.Key);
