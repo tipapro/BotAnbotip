@@ -25,6 +25,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 while (States.WantPlayAutoRemovingIsRunning)
                 {
                     await Task.Delay(new TimeSpan(0, 5, 0));
+                    List<ulong> toDelete = new List<ulong>();
                     foreach (var pair in DataManager.AgreeingToPlayUsers.Value)
                     {
                         if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
@@ -32,7 +33,14 @@ namespace BotAnbotip.Bot.CyclicActions
                             Console.WriteLine(pair.Key);
                             var message = await ((IMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             if (message != null) await message.DeleteAsync();
-                            DataManager.AgreeingToPlayUsers.Value.Remove(pair.Key);
+                            toDelete.Add(pair.Key);
+                        }
+                    }
+                    foreach (var id in toDelete)
+                    {
+                        if (DataManager.AgreeingToPlayUsers.Value.ContainsKey(id))
+                        {
+                            DataManager.AgreeingToPlayUsers.Value.Remove(id);
                             await DataManager.AgreeingToPlayUsers.SaveAsync();
                         }
                     }
