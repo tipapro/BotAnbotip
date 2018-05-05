@@ -75,7 +75,7 @@ namespace BotAnbotip.Bot.Clients
 
         private Task SetInfo(SocketGuild guild)
         {
-            _msgHandler = new MessageHandler(_client.CurrentUser.Id, '=');
+            _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.MainPrefix);
             _client.MessageReceived += _msgHandler.MessageReceived;
             var channel = ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test));
             if (!BotLoaded)

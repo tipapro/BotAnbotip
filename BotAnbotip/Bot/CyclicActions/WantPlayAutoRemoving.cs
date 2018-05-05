@@ -2,6 +2,7 @@
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.Group;
 using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -23,13 +24,12 @@ namespace BotAnbotip.Bot.CyclicActions
 
                 while (States.WantPlayAutoRemovingIsRunning)
                 {
-
                     await Task.Delay(new TimeSpan(0, 5, 0));
                     foreach (var pair in DataManager.AgreeingToPlayUsers.Value)
                     {
                         if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                         {
-                            var message = await ((IMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
+                            var message = await ((ISocketMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             await message.DeleteAsync();
                             DataManager.AgreeingToPlayUsers.Value.Remove(pair.Key);
                             await DataManager.AgreeingToPlayUsers.SaveAsync();
