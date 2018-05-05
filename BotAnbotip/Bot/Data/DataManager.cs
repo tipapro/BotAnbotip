@@ -15,6 +15,10 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<GiveawayType, List<ulong>>> ParticipantsOfTheGiveaway;     //GiveawayType -- List of UserIds
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
         public static DropboxData<bool> DidRoleGiveawayBegin;
+        public static DropboxData<bool> RainbowRoleIsRunning;
+        public static DropboxData<ulong> RainbowRoleId;
+        public static DropboxData<bool> HackerChannelIsRunning;
+        public static DropboxData<ulong> HackerChannelId;
 
         public static bool[] DebugTriger = new bool[5];
 
@@ -29,17 +33,32 @@ namespace BotAnbotip.Bot.Data
             ParticipantsOfTheGiveaway = InitializeDropboxData(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
             LastWinner = InitializeDropboxData(LastWinner, nameof(LastWinner));
             DidRoleGiveawayBegin = InitializeDropboxData(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
+            RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
+            RainbowRoleId = InitializeDropboxData(RainbowRoleId, nameof(RainbowRoleId));
+            HackerChannelIsRunning = InitializeDropboxData(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
+            HackerChannelId = InitializeDropboxData(HackerChannelId, nameof(HackerChannelId));
         }       
 
         public static async Task SaveAllDataAsync()
         {
-            await AnonymousMessages.SaveAsync();
-            await RatingChannels.SaveAsync();
-            await AgreeingToPlayUsers.SaveAsync();
-            await VotingLists.SaveAsync();
-            await ParticipantsOfTheGiveaway.SaveAsync();
-            await LastWinner.SaveAsync();
-            await DidRoleGiveawayBegin.SaveAsync();
+            try
+            {
+                await AnonymousMessages.SaveAsync();
+                await RatingChannels.SaveAsync();
+                await AgreeingToPlayUsers.SaveAsync();
+                await VotingLists.SaveAsync();
+                await ParticipantsOfTheGiveaway.SaveAsync();
+                await LastWinner.SaveAsync();
+                await DidRoleGiveawayBegin.SaveAsync();
+                await RainbowRoleIsRunning.SaveAsync();
+                await HackerChannelIsRunning.SaveAsync();
+                await RainbowRoleId.SaveAsync();
+                await HackerChannelId.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Save data error: " + ex.Message);
+            }
         }
 
         public static async Task ReadAllDataAsync()
@@ -54,11 +73,14 @@ namespace BotAnbotip.Bot.Data
                 await ParticipantsOfTheGiveaway.ReadAsync();
                 await LastWinner.ReadAsync();
                 await DidRoleGiveawayBegin.ReadAsync();
+                await RainbowRoleIsRunning.ReadAsync();
+                await HackerChannelIsRunning.ReadAsync();
+                await RainbowRoleId.ReadAsync();
+                await HackerChannelId.ReadAsync();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Read data error");
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("Read data error: " + ex.Message);
             }
         }
 

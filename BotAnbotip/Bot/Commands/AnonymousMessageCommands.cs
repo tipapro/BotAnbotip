@@ -45,7 +45,7 @@ namespace BotAnbotip.Bot.Commands
 
             ulong messageId = ulong.Parse(argument);
             ulong userId = DataManager.AnonymousMessages.Value[messageId];
-            await message.Author.SendMessageAsync(ConstInfo.GroupGuild.GetUser(userId).Mention);
+            await message.Author.SendMessageAsync(ConstInfo.MainGroupGuild.GetUser(userId).Mention);
         }
     }
 }

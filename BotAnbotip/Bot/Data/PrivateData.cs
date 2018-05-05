@@ -9,16 +9,20 @@ namespace BotAnbotip.Bot.Data
     {
         private static string _fileNamePrefix;
         private static string _dropboxApiKey;
-        private static string _botToken;
-        private static char _prefix;
+        private static string _mainBotToken;
+        private static string _auxiliaryBotToken;
+        private static char _mainPrefix;
+        private static char _auxiliaryPrefix;
 
         public static bool Debug = false;
 
 
         public static string FileNamePrefix => _fileNamePrefix;
         public static string DropboxApiKey => _dropboxApiKey;
-        public static string BotToken => _botToken;
-        public static char Prefix => _prefix;
+        public static string MainBotToken => _mainBotToken;
+        public static string AuxiliaryBotToken => _auxiliaryBotToken;
+        public static char MainPrefix => _mainPrefix;
+        public static char AuxiliaryPrefix => _auxiliaryPrefix;
 
         public static void Read()
         {
@@ -33,8 +37,10 @@ namespace BotAnbotip.Bot.Data
                     using (StreamReader reader = new StreamReader(testData))
                     {
                         _dropboxApiKey = reader.ReadLine();
-                        _botToken = reader.ReadLine();
-                        _prefix = reader.ReadLine().ToCharArray()[0];
+                        _mainBotToken = reader.ReadLine();
+                        _auxiliaryBotToken = reader.ReadLine();
+                        _mainPrefix = reader.ReadLine().ToCharArray()[0];
+                        _auxiliaryPrefix = reader.ReadLine().ToCharArray()[0];
                         _fileNamePrefix = "Debug";
                     }
                 }
@@ -42,9 +48,11 @@ namespace BotAnbotip.Bot.Data
             else
             {
                 _fileNamePrefix = "";
-                _dropboxApiKey = Environment.GetEnvironmentVariable("dropboxToken");
-                _botToken = Environment.GetEnvironmentVariable("botToken");
-                _prefix = '=';
+                _dropboxApiKey = Environment.GetEnvironmentVariable("DropboxToken");
+                _mainBotToken = Environment.GetEnvironmentVariable("MainBotToken");
+                _auxiliaryBotToken = Environment.GetEnvironmentVariable("AuxiliaryBotToken");
+                _mainPrefix = '=';
+                _auxiliaryPrefix = '}';
             }
         }
     }

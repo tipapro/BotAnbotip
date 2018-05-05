@@ -5,7 +5,8 @@ namespace BotAnbotip
     {
         public static void Main(string[] args)
         {
-            new Bot.Client.BotClient().MainAsync().GetAwaiter().GetResult();
+            new Bot.Clients.MainBotClient().MainAsync().GetAwaiter().GetResult();
+            
         }
 
     }

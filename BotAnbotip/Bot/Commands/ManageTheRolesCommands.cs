@@ -15,19 +15,11 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
 
             ulong roleId = 0;
-            try
-            {
-                roleId = ulong.Parse(argument.Substring(3, argument.Length - 4));
-            }
-            catch
-            {
-                Console.WriteLine("Роль.....");
-                return;
-            }
+            roleId = ulong.Parse(argument.Substring(3, argument.Length - 4));
 
             if (CheckTheRole(roleId))
             {
-                await ((SocketGuildUser)message.Author).AddRoleAsync(ConstInfo.GroupGuild.GetRole(roleId));
+                await ((SocketGuildUser)message.Author).AddRoleAsync(ConstInfo.MainGroupGuild.GetRole(roleId));
             }
         }
 

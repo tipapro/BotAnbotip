@@ -12,30 +12,33 @@ using BotAnbotip.Bot.Commands;
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.CyclicActions;
+using BotAnbotip.Bot.Handlers;
 
-namespace BotAnbotip.Bot.Client
+namespace BotAnbotip.Bot.Clients
 {
-    public class BotClient
+    public class MainBotClient
     {
-        public static bool BotLoaded;
+        private static bool _botLoaded;
+        private static ulong _id;
         private static DiscordSocketClient _client;
-        public static DiscordSocketClient Client => _client;  
+                
+        public static bool BotLoaded => _botLoaded;
+        public static ulong Id => _id;
+        public static DiscordSocketClient Client => _client;
+
         private MessageHandler _msgHandler;
         private ReactionHandler _reactionHandler;
-        private static bool IsLoaded;
         
-
         public async Task MainAsync()
         {
             _client = new DiscordSocketClient();
-            _msgHandler = new MessageHandler();
             _reactionHandler = new ReactionHandler();
 
             PrivateData.Read();
             await DataManager.ReadAllDataAsync();
 
             _client.Log += Log;
-            _client.MessageReceived += _msgHandler.MessageReceived;
+            
             _client.ReactionAdded += _reactionHandler.ReactionAdded;
             _client.ReactionRemoved += _reactionHandler.ReactionRemoved;
 
@@ -47,14 +50,15 @@ namespace BotAnbotip.Bot.Client
             await _client.SetGameAsync("ANBOTIP Group");
             await _client.SetStatusAsync(UserStatus.Online);
 
-            await _client.LoginAsync(TokenType.Bot, PrivateData.BotToken);
+            await _client.LoginAsync(TokenType.Bot, PrivateData.MainBotToken);
             await _client.StartAsync();
+            new AuxiliaryBotClient().MainAsync().GetAwaiter().GetResult();
             await Task.Delay(-1);
         }
 
         private async Task UserJoinedTheGroup(SocketGuildUser user)
         {
-            await user.AddRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Участник));
+            await user.AddRoleAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Участник));
         }
 
         private Task RunCyclicalMethods(SocketGuild guild)
@@ -63,17 +67,25 @@ namespace BotAnbotip.Bot.Client
             return Task.CompletedTask;
         }
 
+        private async Task Disconnected(Exception ex)
+        {
+            await CyclicalMethodsManager.TurnOffMain();
+            new ExceptionLogger().Log(ex, "Главный бот отключён");
+        }
+
         private Task SetInfo(SocketGuild guild)
         {
+            _msgHandler = new MessageHandler(_client.CurrentUser.Id, '=');
+            _client.MessageReceived += _msgHandler.MessageReceived;
             var channel = ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test));
-            if (!IsLoaded)
+            if (!BotLoaded)
             {
-                IsLoaded = true;
+                _botLoaded = true;
+                _id = _client.CurrentUser.Id;
                 channel.SendMessageAsync("Бот запущен " + DateTime.Now);
             }
             ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Бот авторизован " + DateTime.Now);
-            ConstInfo.GroupGuild = guild;
-            BotLoaded = true;            
+            ConstInfo.MainGroupGuild = guild;                       
             return Task.CompletedTask;
         }
 
@@ -84,7 +96,7 @@ namespace BotAnbotip.Bot.Client
 
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            Console.WriteLine("MainBot: " + msg.ToString());
             return Task.CompletedTask;
         }
 

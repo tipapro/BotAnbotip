@@ -28,7 +28,7 @@ namespace BotAnbotip.Bot.Data
             {
                 using (var stream = GenerateStreamFromString(str))
                 {
-                    var rest = await DBClient.Files.UploadAsync("/" + UploadfileName, WriteMode.Overwrite.Instance, body: stream);
+                    await DBClient.Files.UploadAsync("/" + UploadfileName, WriteMode.Overwrite.Instance, body: stream);
                 }
                 return true;
             }

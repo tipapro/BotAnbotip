@@ -44,42 +44,42 @@ namespace BotAnbotip.Bot.Commands
                     }
                 }
 
-                var newRatingChannel = await ConstInfo.GroupGuild.CreateTextChannelAsync(listName);
+                var newRatingChannel = await ConstInfo.MainGroupGuild.CreateTextChannelAsync(listName);
                 await newRatingChannel.ModifyAsync((textChannelProperties) =>
                 {
                     textChannelProperties.CategoryId = (ulong)CategoryIds.Рейтинговые_Листы;
                 });
 
-                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Главный_Бот),
+                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Главный_Бот),
                     OverwritePermissions.AllowAll(newRatingChannel));
 
                 await newRatingChannel.AddPermissionOverwriteAsync(
-                    ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Музыкальный_Бот),
+                    ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Музыкальный_Бот),
                     OverwritePermissions.DenyAll(newRatingChannel));
                 await newRatingChannel.AddPermissionOverwriteAsync(
-                    ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Чат_Бот),
+                    ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Чат_Бот),
                     OverwritePermissions.DenyAll(newRatingChannel));
                 await newRatingChannel.AddPermissionOverwriteAsync(
-                    ConstInfo.GroupGuild.GetRole((ulong)RoleIds._Бот),
+                    ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds._Бот),
                     OverwritePermissions.DenyAll(newRatingChannel));
                 await newRatingChannel.AddPermissionOverwriteAsync(
-                    ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Backend_Bot),
+                    ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Backend_Bot),
                     OverwritePermissions.DenyAll(newRatingChannel));
 
                 await newRatingChannel.AddPermissionOverwriteAsync(
-                    ConstInfo.GroupGuild.EveryoneRole,
+                    ConstInfo.MainGroupGuild.EveryoneRole,
                     OverwritePermissions.DenyAll(newRatingChannel));
 
-                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Активный_Участник),
+                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Активный_Участник),
                     OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
                         null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Модератор),
+                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Модератор),
                     OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
                         null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Администратор),
+                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Администратор),
                     OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
                         null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.Заместитель),
+                await newRatingChannel.AddPermissionOverwriteAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.Заместитель),
                     OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
                         null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
 
@@ -104,7 +104,7 @@ namespace BotAnbotip.Bot.Commands
             if (userRoles.Contains((ulong) RoleIds.Основатель))
             {
                 ulong id = ulong.Parse(argument);
-                var ratingChannel = ConstInfo.GroupGuild.GetChannel(id);
+                var ratingChannel = ConstInfo.MainGroupGuild.GetChannel(id);
                 if (ratingChannel != null) await ratingChannel.DeleteAsync();
 
                 DataManager.RemoveRatingList(id);

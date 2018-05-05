@@ -37,7 +37,7 @@ namespace BotAnbotip.Bot.Commands
 
             embedBuilder.WithTitle(":video_game:Приглашение в игру:video_game:").WithDescription("Пользователь " + username + " приглашает в игру **" + game + "**.");
 
-            var sendedMessage = await ((ISocketMessageChannel)ConstInfo.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
+            var sendedMessage = await ((ISocketMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
 

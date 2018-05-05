@@ -1,25 +1,27 @@
-﻿using BotAnbotip.Bot.Data;
+﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.Group;
 using Discord;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.CyclicActions
 {
     class WantPlayAutoRemoving
     {
-        private static bool flag;
+        private static CancellationTokenSource cts;
 
         public static async void Run()
-        {
-            flag = true;
-            States.WantPlayAutoRemovingIsRunning = true;
-
+        {       
             try
             {
-                while (flag)
+                States.WantPlayAutoRemovingIsRunning = true;
+                cts = new CancellationTokenSource();
+
+                while (States.WantPlayAutoRemovingIsRunning)
                 {
 
                     await Task.Delay(new TimeSpan(0, 5, 0));
@@ -27,7 +29,7 @@ namespace BotAnbotip.Bot.CyclicActions
                     {
                         if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                         {
-                            var message = await ((IMessageChannel)ConstInfo.GroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
+                            var message = await ((IMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             await message.DeleteAsync();
                             DataManager.AgreeingToPlayUsers.Value.Remove(pair.Key);
                             await DataManager.AgreeingToPlayUsers.SaveAsync();
@@ -35,10 +37,17 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                 }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                Console.WriteLine(ex.Message);
+                cts = null;
                 States.WantPlayAutoRemovingIsRunning = false;
+                Console.WriteLine("Автоудаление приглашений в игру отменено.");
+            }
+            catch (Exception ex)
+            {                
+                cts = null;
+                States.WantPlayAutoRemovingIsRunning = false;
+                new ExceptionLogger().Log(ex, "Ошибка автоудаления приглашений");
                 if (!DataManager.DebugTriger[4]) CyclicalMethodsManager.RunWantPlayAutoRemoving();
             }
             States.WantPlayAutoRemovingIsRunning = false;
@@ -46,7 +55,7 @@ namespace BotAnbotip.Bot.CyclicActions
 
         public static void Stop()
         {
-            flag = false;
+            if (cts != null) cts.Cancel();
         }
     }
 }

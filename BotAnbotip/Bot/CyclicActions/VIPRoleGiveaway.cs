@@ -1,4 +1,5 @@
-﻿using BotAnbotip.Bot.Data;
+﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
 using Discord;
@@ -7,23 +8,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.CyclicActions
 {
-    class RainbowRoleGiveaway
+    class VIPRoleGiveaway
     {
-        private static bool flag;
         private static Random random = new Random();
         public static string RandomOrgURL = "";
+        private static CancellationTokenSource cts;
         public static async void Run()
-        {
-            flag = true;
-            States.RainbowRoleGiveawayIsRunning = true;
-
+        {            
             try
             {
-                while (flag)
+                States.RainbowRoleGiveawayIsRunning = true;
+                cts = new CancellationTokenSource();
+
+                while (States.RainbowRoleGiveawayIsRunning)
                 {
                     if (!DataManager.DidRoleGiveawayBegin.Value)
                     {
@@ -38,7 +40,7 @@ namespace BotAnbotip.Bot.CyclicActions
                             "2) Ждать понедельника.\n```" +
                             "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.")
                             .WithColor(Color.Blue);
-                        var sendedMessage = await ConstInfo.GroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder1.Build());
+                        var sendedMessage = await ConstInfo.MainGroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder1.Build());
                         await sendedMessage.AddReactionAsync(new Emoji("💙"));
 
                         DataManager.DidRoleGiveawayBegin.Value = true;
@@ -71,10 +73,10 @@ namespace BotAnbotip.Bot.CyclicActions
                             Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
                             winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
                         }
-                        await ConstInfo.GroupGuild.GetUser(winner).AddRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
+                        await ConstInfo.MainGroupGuild.GetUser(winner).AddRoleAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.VIP));
                         if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] != 0)
-                            await ConstInfo.GroupGuild.GetUser(DataManager.LastWinner.Value[GiveawayType.VIP])
-                             .RemoveRoleAsync(ConstInfo.GroupGuild.GetRole((ulong)RoleIds.VIP));
+                            await ConstInfo.MainGroupGuild.GetUser(DataManager.LastWinner.Value[GiveawayType.VIP])
+                             .RemoveRoleAsync(ConstInfo.MainGroupGuild.GetRole((ulong)RoleIds.VIP));
                         DataManager.LastWinner.Value[GiveawayType.VIP] = winner;
                         await DataManager.LastWinner.SaveAsync();
 
@@ -88,22 +90,29 @@ namespace BotAnbotip.Bot.CyclicActions
                     await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
                     await DataManager.DidRoleGiveawayBegin.SaveAsync();
 
-                    await ConstInfo.GroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
+                    await ConstInfo.MainGroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
 
                 }
             }
+            catch (OperationCanceledException)
+            {
+                cts = null;
+                States.RainbowRoleGiveawayIsRunning = false;
+                Console.WriteLine("Авторозыгрыш отменён.");
+            }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                cts = null;
                 States.RainbowRoleGiveawayIsRunning = false;
-                if (!DataManager.DebugTriger[3]) CyclicalMethodsManager.RunRainbowRoleGiveaway();
+                new ExceptionLogger().Log(ex, "Ошибка авторозыгрыша VIP роли");                
+                if (!DataManager.DebugTriger[3]) CyclicalMethodsManager.RunVIPGiveaway();
             }
             States.RainbowRoleGiveawayIsRunning = false;
         }
 
         public static void Stop()
         {
-            flag = false;           
+            if (cts != null) cts.Cancel();
         }
 
         public static async Task<int> GetRandomNumber(int min, int max)
