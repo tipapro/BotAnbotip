@@ -22,7 +22,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
-                if ((DataManager.HackerChannelIsRunning.Value)|| (cts != null)) return;
+                if ((DataManager.HackerChannelIsRunning.Value) || (cts != null)) return;
                 DataManager.HackerChannelIsRunning.Value = true;
                 await DataManager.HackerChannelIsRunning.SaveAsync();
 
@@ -40,14 +40,17 @@ namespace BotAnbotip.Bot.CyclicActions
                 }
                 DataManager.HackerChannelIsRunning.Value = false;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                Console.WriteLine("Автосмена названия отменена.");
+                DataManager.HackerChannelIsRunning.Value = false;
+                cts = null;
+                new ExceptionLogger().Log(ex, "Автосмена названия отменена");
             }
             catch (Exception ex)
             {
-                new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");
                 DataManager.HackerChannelIsRunning.Value = false;
+                cts = null;
+                new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");                
                 CyclicalMethodsManager.RunHackerChannelAutoChange();
             }
         }

@@ -22,6 +22,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {            
             try
             {
+                if ((States.RainbowRoleGiveawayIsRunning) || (cts != null)) return;
                 States.RainbowRoleGiveawayIsRunning = true;
                 cts = new CancellationTokenSource();
 
@@ -91,14 +92,13 @@ namespace BotAnbotip.Bot.CyclicActions
                     await DataManager.DidRoleGiveawayBegin.SaveAsync();
 
                     await ConstInfo.MainGroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
-
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 cts = null;
                 States.RainbowRoleGiveawayIsRunning = false;
-                Console.WriteLine("Авторозыгрыш отменён.");
+                new ExceptionLogger().Log(ex, "Авторозыгрыш отменён");
             }
             catch (Exception ex)
             {

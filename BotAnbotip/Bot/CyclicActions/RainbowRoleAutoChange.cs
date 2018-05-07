@@ -24,7 +24,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
-                if ((DataManager.RainbowRoleIsRunning.Value)||(cts != null)) return;
+                if ((DataManager.RainbowRoleIsRunning.Value) || (cts != null)) return;
                 DataManager.RainbowRoleIsRunning.Value = true;
                 await DataManager.RainbowRoleIsRunning.SaveAsync();
 
@@ -43,11 +43,12 @@ namespace BotAnbotip.Bot.CyclicActions
                     });
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
+                //
                 DataManager.RainbowRoleIsRunning.Value = false;
                 cts = null;
-                Console.WriteLine("Автосмена цвета отменена.");
+                new ExceptionLogger().Log(ex, "Автосмена цвета отменена");
             }
             catch (Exception ex)
             {               

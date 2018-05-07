@@ -19,6 +19,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {       
             try
             {
+                if ((States.WantPlayAutoRemovingIsRunning) || (cts != null)) return;
                 States.WantPlayAutoRemovingIsRunning = true;
                 cts = new CancellationTokenSource();
 
@@ -30,7 +31,6 @@ namespace BotAnbotip.Bot.CyclicActions
                     {
                         if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                         {
-                            Console.WriteLine(pair.Key);
                             var message = await ((IMessageChannel)ConstInfo.MainGroupGuild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
                             if (message != null) await message.DeleteAsync();
                             toDelete.Add(pair.Key);
@@ -46,11 +46,11 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                 }
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
                 cts = null;
                 States.WantPlayAutoRemovingIsRunning = false;
-                Console.WriteLine("Автоудаление приглашений в игру отменено.");
+                new ExceptionLogger().Log(ex, "Автоудаление приглашений в игру отменено");
             }
             catch (Exception ex)
             {                
