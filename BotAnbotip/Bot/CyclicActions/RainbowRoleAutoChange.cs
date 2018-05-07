@@ -45,18 +45,27 @@ namespace BotAnbotip.Bot.CyclicActions
             }
             catch (OperationCanceledException ex)
             {
-                //
+                bool isDeliberately;
+                if (cts != null)
+                {
+                    if (ex.CancellationToken == cts.Token) isDeliberately = true;
+                    else isDeliberately = false;
+                }
+                else isDeliberately = false;
                 DataManager.RainbowRoleIsRunning.Value = false;
                 cts = null;
                 new ExceptionLogger().Log(ex, "Автосмена цвета отменена");
+                if (!isDeliberately) CyclicalMethodsManager.RunRainbowRoleAutoChange();
             }
             catch (Exception ex)
-            {               
-                DataManager.RainbowRoleIsRunning.Value = false;
+            {                              
                 cts = null;
+                DataManager.RainbowRoleIsRunning.Value = false;
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене роли");
                 CyclicalMethodsManager.RunRainbowRoleAutoChange();
             }
+            DataManager.RainbowRoleIsRunning.Value = false;
+            await DataManager.RainbowRoleIsRunning.SaveAsync();
         }
 
         public static void Stop()

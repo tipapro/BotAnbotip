@@ -83,7 +83,7 @@ namespace BotAnbotip.Bot.CyclicActions
 
                         embedBuilder2
                             .WithTitle(":gift:Итоги еженедельного розыгрыша VIP роли:gift: ")
-                            .WithDescription("Победитель этой недели: <@!" + winner + ">, ")
+                            .WithDescription("Победитель этой недели: <@!" + winner + ">.")
                             .WithColor(Color.Blue);
                     }
                     DataManager.ParticipantsOfTheGiveaway.Value.Remove(GiveawayType.VIP);
@@ -96,16 +96,24 @@ namespace BotAnbotip.Bot.CyclicActions
             }
             catch (OperationCanceledException ex)
             {
+                bool isDeliberately;
+                if (cts != null)
+                {
+                    if (ex.CancellationToken == cts.Token) isDeliberately = true;
+                    else isDeliberately = false;
+                }
+                else isDeliberately = false;
                 cts = null;
                 States.RainbowRoleGiveawayIsRunning = false;
                 new ExceptionLogger().Log(ex, "Авторозыгрыш отменён");
+                if (!isDeliberately) CyclicalMethodsManager.RunVIPGiveaway();
             }
             catch (Exception ex)
             {
                 cts = null;
                 States.RainbowRoleGiveawayIsRunning = false;
                 new ExceptionLogger().Log(ex, "Ошибка авторозыгрыша VIP роли");                
-                if (!DataManager.DebugTriger[3]) CyclicalMethodsManager.RunVIPGiveaway();
+                CyclicalMethodsManager.RunVIPGiveaway();
             }
             States.RainbowRoleGiveawayIsRunning = false;
         }
@@ -136,9 +144,9 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-                Console.WriteLine("Random.Next()");
+                new ExceptionLogger().Log(ex, "Ошибка при запросе к Random.org, будет использован метод Random.Next()");
                 return random.Next(min, max + 1);
             }
             if (counter > 4) randomNum = random.Next(min, max + 1);

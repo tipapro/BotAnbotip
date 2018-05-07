@@ -32,8 +32,9 @@ namespace BotAnbotip.Bot.Handlers
         {
             try
             {
+                if ((message.Content == "") || (message.Content == null)) return;
                 if (message.Author.Id == botId) return;
-                if (antiSpam.Check(message.Author.Id, message.Content)) return;
+                //if (antiSpam.Check(message.Author.Id, message.Content)) return;
                 if (message.Content.ToCharArray()[0] == prefix)
                 {
                     string[] buf = message.Content.Substring(1).Split(' ');

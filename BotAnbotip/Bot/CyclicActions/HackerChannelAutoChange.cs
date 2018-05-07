@@ -38,21 +38,30 @@ namespace BotAnbotip.Bot.CyclicActions
                         channelProperties.Name = GetRandomString(Length);
                     });
                 }
-                DataManager.HackerChannelIsRunning.Value = false;
             }
             catch (OperationCanceledException ex)
             {
+                bool isDeliberately;
+                if (cts != null)
+                {
+                    if (ex.CancellationToken == cts.Token) isDeliberately = true;
+                    else isDeliberately = false;
+                }
+                else isDeliberately = false;
                 DataManager.HackerChannelIsRunning.Value = false;
                 cts = null;
                 new ExceptionLogger().Log(ex, "Автосмена названия отменена");
+                if (!isDeliberately) CyclicalMethodsManager.RunHackerChannelAutoChange();
             }
             catch (Exception ex)
-            {
-                DataManager.HackerChannelIsRunning.Value = false;
+            {               
                 cts = null;
+                DataManager.HackerChannelIsRunning.Value = false;
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");                
                 CyclicalMethodsManager.RunHackerChannelAutoChange();
             }
+            DataManager.HackerChannelIsRunning.Value = false;
+            await DataManager.HackerChannelIsRunning.SaveAsync();
         }
 
         public static void Stop()
