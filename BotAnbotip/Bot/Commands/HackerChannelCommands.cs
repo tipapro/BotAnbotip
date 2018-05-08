@@ -31,10 +31,13 @@ namespace BotAnbotip.Bot.Commands
 
             if (argument == "вкл")
             {
-                Task.Run(() => HackerChannelAutoChange.Run()).GetAwaiter().GetResult();
+                CyclicalMethodsManager.RunHackerChannelAutoChange();
+                DataManager.HackerChannelIsRunning.Value = true;
+                await DataManager.HackerChannelIsRunning.SaveAsync();
             }
             else if (argument == "выкл")
             {
+                CyclicalMethodsManager.StopHackerChannelAutoChange();
                 DataManager.HackerChannelIsRunning.Value = false;
                 await DataManager.HackerChannelIsRunning.SaveAsync();
             }

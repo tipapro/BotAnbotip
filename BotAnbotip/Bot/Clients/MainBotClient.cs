@@ -63,12 +63,13 @@ namespace BotAnbotip.Bot.Clients
 
         private Task RunCyclicalMethods(SocketGuild guild)
         {
-            CyclicalMethodsManager.RunAll();
+            CyclicalMethodsManager.RunAllMain();
             return Task.CompletedTask;
         }
 
         private async Task Disconnected(Exception ex)
         {
+            _botLoaded = false;
             await CyclicalMethodsManager.TurnOffMain();
             new ExceptionLogger().Log(ex, "Главный бот отключён");
         }

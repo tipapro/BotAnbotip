@@ -57,8 +57,16 @@ namespace BotAnbotip.Bot.CyclicActions
                 else isDeliberately = false;
                 cts = null;
                 States.WantPlayAutoRemovingIsRunning = false;
-                new ExceptionLogger().Log(ex, "Автоудаление приглашений в игру отменено");
-                if (!isDeliberately) CyclicalMethodsManager.RunWantPlayAutoRemoving();
+                            
+                if (isDeliberately)
+                {
+                    new ExceptionLogger().Log(ex, "Автоудаление приглашений в игру отменено");
+                }
+                else
+                {
+                    new ExceptionLogger().Log(ex, "Ошибка автоудаления приглашений");
+                    CyclicalMethodsManager.RunWantPlayAutoRemoving();
+                }
             }
             catch (Exception ex)
             {                
@@ -67,6 +75,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 new ExceptionLogger().Log(ex, "Ошибка автоудаления приглашений");
                 CyclicalMethodsManager.RunWantPlayAutoRemoving();
             }
+            cts = null;
             States.WantPlayAutoRemovingIsRunning = false;
         }
 

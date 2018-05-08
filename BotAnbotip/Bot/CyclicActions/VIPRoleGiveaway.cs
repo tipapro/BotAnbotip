@@ -22,11 +22,11 @@ namespace BotAnbotip.Bot.CyclicActions
         {            
             try
             {
-                if ((States.RainbowRoleGiveawayIsRunning) || (cts != null)) return;
-                States.RainbowRoleGiveawayIsRunning = true;
+                if ((States.VIPRoleGiveawayIsRunning) || (cts != null)) return;
+                States.VIPRoleGiveawayIsRunning = true;
                 cts = new CancellationTokenSource();
 
-                while (States.RainbowRoleGiveawayIsRunning)
+                while (States.VIPRoleGiveawayIsRunning)
                 {
                     if (!DataManager.DidRoleGiveawayBegin.Value)
                     {
@@ -104,18 +104,27 @@ namespace BotAnbotip.Bot.CyclicActions
                 }
                 else isDeliberately = false;
                 cts = null;
-                States.RainbowRoleGiveawayIsRunning = false;
-                new ExceptionLogger().Log(ex, "Авторозыгрыш отменён");
-                if (!isDeliberately) CyclicalMethodsManager.RunVIPGiveaway();
+                States.VIPRoleGiveawayIsRunning = false;
+                
+                if (isDeliberately)
+                {
+                    new ExceptionLogger().Log(ex, "Авторозыгрыш отменён");
+                }
+                else
+                {
+                    new ExceptionLogger().Log(ex, "Ошибка авторозыгрыша VIP роли");
+                    CyclicalMethodsManager.RunVIPGiveaway();
+                }
             }
             catch (Exception ex)
             {
                 cts = null;
-                States.RainbowRoleGiveawayIsRunning = false;
+                States.VIPRoleGiveawayIsRunning = false;
                 new ExceptionLogger().Log(ex, "Ошибка авторозыгрыша VIP роли");                
                 CyclicalMethodsManager.RunVIPGiveaway();
             }
-            States.RainbowRoleGiveawayIsRunning = false;
+            cts = null;
+            States.VIPRoleGiveawayIsRunning = false;
         }
 
         public static void Stop()

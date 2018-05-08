@@ -10,7 +10,7 @@ namespace BotAnbotip.Bot.CyclicActions
 {
     class CyclicalMethodsManager
     {       
-        public static void RunAll()
+        public static void RunAllMain()
         {
             RunWantPlayAutoRemoving();
             RunVIPGiveaway();
@@ -30,7 +30,7 @@ namespace BotAnbotip.Bot.CyclicActions
         public static Task TurnOffMain()
         {
             VIPRoleGiveaway.Stop();
-            States.RainbowRoleGiveawayIsRunning = false;
+            States.VIPRoleGiveawayIsRunning = false;
 
             WantPlayAutoRemoving.Stop();
             States.WantPlayAutoRemovingIsRunning = false;
@@ -38,12 +38,14 @@ namespace BotAnbotip.Bot.CyclicActions
             return Task.CompletedTask;
         }
 
-        public static void RunWantPlayAutoRemoving() => Task.Run(() => WantPlayAutoRemoving.Run()).GetAwaiter().GetResult();
-        
+        public static void RunWantPlayAutoRemoving() => Task.Run(() => WantPlayAutoRemoving.Run()).GetAwaiter().GetResult();        
         public static void RunVIPGiveaway() => Task.Run(() => VIPRoleGiveaway.Run()).GetAwaiter().GetResult();
-
         public static void RunRainbowRoleAutoChange() => Task.Run(() => RainbowRoleAutoChange.Run()).GetAwaiter().GetResult();
-
         public static void RunHackerChannelAutoChange() => Task.Run(() => HackerChannelAutoChange.Run()).GetAwaiter().GetResult();
+
+        public static void StopWantPlayAutoRemoving() => Task.Run(() => WantPlayAutoRemoving.Stop()).GetAwaiter().GetResult();
+        public static void StopVIPGiveaway() => Task.Run(() => VIPRoleGiveaway.Stop()).GetAwaiter().GetResult();
+        public static void StopRainbowRoleAutoChange() => Task.Run(() => RainbowRoleAutoChange.Stop()).GetAwaiter().GetResult();
+        public static void StopHackerChannelAutoChange() => Task.Run(() => HackerChannelAutoChange.Stop()).GetAwaiter().GetResult();
     }
 }

@@ -7,6 +7,7 @@ using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Commands;
 using BotAnbotip.Bot.Handlers;
 using BotAnbotip.Bot.CyclicActions;
+using System.Linq;
 
 namespace BotAnbotip.Bot.Clients
 {
@@ -46,6 +47,7 @@ namespace BotAnbotip.Bot.Clients
 
         private async Task Disconnected(Exception ex)
         {
+            _botLoaded = false;
             await CyclicalMethodsManager.TurnOffAuxiliary();
             new ExceptionLogger().Log(ex, "Вспомогательный бот отключён");
         }

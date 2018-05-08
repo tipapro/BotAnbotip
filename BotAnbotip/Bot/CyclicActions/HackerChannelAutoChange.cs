@@ -22,15 +22,14 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
-                if ((DataManager.HackerChannelIsRunning.Value) || (cts != null)) return;
-                DataManager.HackerChannelIsRunning.Value = true;
-                await DataManager.HackerChannelIsRunning.SaveAsync();
+                if ((States.HackerChannelAutoChangeIsRunning) || (cts != null)) return;
+                States.HackerChannelAutoChangeIsRunning = true;
 
                 while (!AuxiliaryBotClient.BotLoaded) await Task.Delay(1000);
 
                 cts = new CancellationTokenSource();
                 await ((ITextChannel)ConstInfo.AuxiliaryGroupGuild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Автосмена названия запущена " + DateTime.Now);
-                while (DataManager.HackerChannelIsRunning.Value)
+                while (States.HackerChannelAutoChangeIsRunning)
                 {
                     await Task.Delay(DelayTime);
                     await ConstInfo.AuxiliaryGroupGuild.GetChannel(DataManager.HackerChannelId.Value).ModifyAsync((channelProperties) =>
@@ -48,20 +47,28 @@ namespace BotAnbotip.Bot.CyclicActions
                     else isDeliberately = false;
                 }
                 else isDeliberately = false;
-                DataManager.HackerChannelIsRunning.Value = false;
                 cts = null;
-                new ExceptionLogger().Log(ex, "Автосмена названия отменена");
-                if (!isDeliberately) CyclicalMethodsManager.RunHackerChannelAutoChange();
+                States.HackerChannelAutoChangeIsRunning = false;
+                
+                if (isDeliberately)
+                {
+                    new ExceptionLogger().Log(ex, "Автосмена названия отменена");
+                }
+                else
+                {
+                    new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");
+                    CyclicalMethodsManager.RunHackerChannelAutoChange();
+                }
             }
             catch (Exception ex)
             {               
                 cts = null;
-                DataManager.HackerChannelIsRunning.Value = false;
+                States.HackerChannelAutoChangeIsRunning = false;
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");                
                 CyclicalMethodsManager.RunHackerChannelAutoChange();
             }
-            DataManager.HackerChannelIsRunning.Value = false;
-            await DataManager.HackerChannelIsRunning.SaveAsync();
+            cts = null;
+            States.HackerChannelAutoChangeIsRunning = false;
         }
 
         public static void Stop()

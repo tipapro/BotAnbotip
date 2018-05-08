@@ -32,11 +32,14 @@ namespace BotAnbotip.Bot.Commands
             }
 
             if (argument == "вкл")
-            {               
-                Task.Run(() => RainbowRoleAutoChange.Run()).GetAwaiter().GetResult();
+            {
+                CyclicalMethodsManager.RunRainbowRoleAutoChange();
+                DataManager.RainbowRoleIsRunning.Value = true;
+                await DataManager.RainbowRoleIsRunning.SaveAsync();
             }
             else if (argument == "выкл")
             {
+                CyclicalMethodsManager.StopRainbowRoleAutoChange();
                 DataManager.RainbowRoleIsRunning.Value = false;
                 await DataManager.RainbowRoleIsRunning.SaveAsync();
             }

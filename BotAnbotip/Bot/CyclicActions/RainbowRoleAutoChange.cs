@@ -24,9 +24,8 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
-                if ((DataManager.RainbowRoleIsRunning.Value) || (cts != null)) return;
-                DataManager.RainbowRoleIsRunning.Value = true;
-                await DataManager.RainbowRoleIsRunning.SaveAsync();
+                if ((States.RainbowRoleAutoChangeIsRunning) || (cts != null)) return;
+                States.RainbowRoleAutoChangeIsRunning = true;
 
                 while (!AuxiliaryBotClient.BotLoaded) await Task.Delay(1000);
 
@@ -34,7 +33,7 @@ namespace BotAnbotip.Bot.CyclicActions
 
                 cts = new CancellationTokenSource();
                 await ((ITextChannel)ConstInfo.AuxiliaryGroupGuild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Автосмена цвета запущена " + DateTime.Now);               
-                while (DataManager.RainbowRoleIsRunning.Value)
+                while (States.RainbowRoleAutoChangeIsRunning)
                 {
                     await Task.Delay(DelayTime);
                     await ConstInfo.AuxiliaryGroupGuild.GetRole(DataManager.RainbowRoleId.Value).ModifyAsync((roleProperties) =>
@@ -52,20 +51,28 @@ namespace BotAnbotip.Bot.CyclicActions
                     else isDeliberately = false;
                 }
                 else isDeliberately = false;
-                DataManager.RainbowRoleIsRunning.Value = false;
                 cts = null;
-                new ExceptionLogger().Log(ex, "Автосмена цвета отменена");
-                if (!isDeliberately) CyclicalMethodsManager.RunRainbowRoleAutoChange();
+                States.RainbowRoleAutoChangeIsRunning = false;
+                              
+                if (isDeliberately)
+                {
+                    new ExceptionLogger().Log(ex, "Автосмена цвета отменена");
+                }
+                else
+                {
+                    new ExceptionLogger().Log(ex, "Ошибка при автосмене роли");
+                    CyclicalMethodsManager.RunRainbowRoleAutoChange();
+                }               
             }
             catch (Exception ex)
             {                              
                 cts = null;
-                DataManager.RainbowRoleIsRunning.Value = false;
+                States.RainbowRoleAutoChangeIsRunning = false;
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене роли");
                 CyclicalMethodsManager.RunRainbowRoleAutoChange();
             }
-            DataManager.RainbowRoleIsRunning.Value = false;
-            await DataManager.RainbowRoleIsRunning.SaveAsync();
+            cts = null;
+            States.RainbowRoleAutoChangeIsRunning = false;
         }
 
         public static void Stop()
