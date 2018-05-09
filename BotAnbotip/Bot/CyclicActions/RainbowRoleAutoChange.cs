@@ -32,7 +32,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 globalX = 0;
 
                 cts = new CancellationTokenSource();
-                await ((ITextChannel)ConstInfo.AuxiliaryGroupGuild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Автосмена цвета запущена " + DateTime.Now);               
+                await ((ITextChannel)ConstInfo.AuxiliaryGroupGuild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Автосмена цвета запущена " + DateTime.Now);
                 while (States.RainbowRoleAutoChangeIsRunning)
                 {
                     await Task.Delay(DelayTime);
@@ -41,6 +41,8 @@ namespace BotAnbotip.Bot.CyclicActions
                         roleProperties.Color = GetNextColor();
                     });
                 }
+                cts = null;
+                States.RainbowRoleAutoChangeIsRunning = false;
             }
             catch (OperationCanceledException ex)
             {
@@ -71,8 +73,6 @@ namespace BotAnbotip.Bot.CyclicActions
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене роли");
                 CyclicalMethodsManager.RunRainbowRoleAutoChange();
             }
-            cts = null;
-            States.RainbowRoleAutoChangeIsRunning = false;
         }
 
         public static void Stop()

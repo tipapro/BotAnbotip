@@ -44,7 +44,7 @@ namespace BotAnbotip.Bot.Handlers
                     {
                         argument = message.Content.Substring((prefix + command + " ").ToCharArray().Length);
                     }
-                    await _cmdManager.RunCommand(command, argument, message);
+                    await _cmdManager.RunCommand(command.ToLower(), argument, message);
                 }
             }
             catch (Exception ex)

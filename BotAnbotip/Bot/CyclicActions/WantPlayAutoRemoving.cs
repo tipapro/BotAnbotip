@@ -45,6 +45,8 @@ namespace BotAnbotip.Bot.CyclicActions
                         }
                     }
                 }
+                cts = null;
+                States.WantPlayAutoRemovingIsRunning = false;
             }
             catch (OperationCanceledException ex)
             {
@@ -75,8 +77,6 @@ namespace BotAnbotip.Bot.CyclicActions
                 new ExceptionLogger().Log(ex, "Ошибка автоудаления приглашений");
                 CyclicalMethodsManager.RunWantPlayAutoRemoving();
             }
-            cts = null;
-            States.WantPlayAutoRemovingIsRunning = false;
         }
 
         public static void Stop()

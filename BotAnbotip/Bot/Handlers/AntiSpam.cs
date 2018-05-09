@@ -8,8 +8,9 @@ namespace BotAnbotip.Bot.Handlers
 {    
     class AntiSpam
     {
-        private const long CriticalScore = 1000;
-        private const long CostOfOneAction = 100;
+        private const long CriticalScore = 10;
+        private const long CostOfOneAction = 4;
+        private const long CostOfOneSecond = 1;
         private readonly SpamType _spamType;
         private Dictionary<ulong, (DateTimeOffset, ulong)> _spamCounter;
         //private Dictionary<ulong, (string, int)> _monotonousMessages;   //!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -41,11 +42,13 @@ namespace BotAnbotip.Bot.Handlers
             }
             else
             {
-                //!!!!!
-                //_spamCounter[userId] = (DateTime.Now, _spamCounter[userId].Item2 - (ulong)Math.Round(secondsPassed) + CostOfOneAction);
+                Console.WriteLine(_spamCounter[userId].Item2);
+                Console.WriteLine(secondsPassed);
+                //_spamCounter[userId] = (DateTime.Now, _spamCounter[userId].Item2 - (ulong)Math.Round(secondsPassed) * CostOfOneSecond + CostOfOneAction);
             }
             if (_spamCounter[userId].Item2 > CriticalScore)
             {
+                Console.WriteLine("Detected");
                 PunishmentModule.Punish(userId, PunishmentReason.Spam).GetAwaiter().GetResult();
                 return true;
             }

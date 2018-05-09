@@ -37,6 +37,8 @@ namespace BotAnbotip.Bot.CyclicActions
                         channelProperties.Name = GetRandomString(Length);
                     });
                 }
+                cts = null;
+                States.HackerChannelAutoChangeIsRunning = false;
             }
             catch (OperationCanceledException ex)
             {
@@ -67,8 +69,6 @@ namespace BotAnbotip.Bot.CyclicActions
                 new ExceptionLogger().Log(ex, "Ошибка при автосмене названия");                
                 CyclicalMethodsManager.RunHackerChannelAutoChange();
             }
-            cts = null;
-            States.HackerChannelAutoChangeIsRunning = false;
         }
 
         public static void Stop()

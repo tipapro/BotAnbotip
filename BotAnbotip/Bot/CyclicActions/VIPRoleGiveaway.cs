@@ -93,6 +93,8 @@ namespace BotAnbotip.Bot.CyclicActions
 
                     await ConstInfo.MainGroupGuild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
                 }
+                cts = null;
+                States.VIPRoleGiveawayIsRunning = false;
             }
             catch (OperationCanceledException ex)
             {
@@ -123,8 +125,6 @@ namespace BotAnbotip.Bot.CyclicActions
                 new ExceptionLogger().Log(ex, "Ошибка авторозыгрыша VIP роли");                
                 CyclicalMethodsManager.RunVIPGiveaway();
             }
-            cts = null;
-            States.VIPRoleGiveawayIsRunning = false;
         }
 
         public static void Stop()
