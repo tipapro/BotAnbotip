@@ -16,15 +16,15 @@ namespace BotAnbotip.Bot.CyclicActions
             RunVIPGiveaway();
         }
 
-        public static async Task TurnOffAuxiliary()
+        public static Task TurnOffAuxiliary()
         {
             HackerChannelAutoChange.Stop();
-            DataManager.HackerChannelIsRunning.Value = false;
-            await DataManager.HackerChannelIsRunning.SaveAsync();
+            States.HackerChannelAutoChangeIsRunning = false;
 
             RainbowRoleAutoChange.Stop();
-            DataManager.RainbowRoleIsRunning.Value = false;
-            await DataManager.RainbowRoleIsRunning.SaveAsync();
+            States.RainbowRoleAutoChangeIsRunning = false;
+
+            return Task.CompletedTask;
         }
 
         public static Task TurnOffMain()
