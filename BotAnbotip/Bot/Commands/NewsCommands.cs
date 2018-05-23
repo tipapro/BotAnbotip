@@ -47,7 +47,7 @@ namespace BotAnbotip.Bot.Commands
 
                 if (videoId == "") videoId = url.Split('=')[1].Substring(0, 11);
 
-                embedBuilder.WithImageUrl($"https://img.youtube.com/vi/{videoId}/hqdefault.jpg");
+                embedBuilder.WithImageUrl($"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg");
                 argument = argument.Substring(url.Length);
 
                 var newUrl = $"https://youtu.be/{videoId}";
