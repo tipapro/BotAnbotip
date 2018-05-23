@@ -121,6 +121,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
     [JsonObject]
     public class RatingListObject : IComparable<RatingListObject>
     {
+        [JsonProperty]
         private Evaluation _lastEvaluation;
         public string Name { get; set; }
         public string Url { get; set; }

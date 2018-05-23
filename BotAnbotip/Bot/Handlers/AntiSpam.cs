@@ -10,7 +10,7 @@ namespace BotAnbotip.Bot.Handlers
     {
         private readonly static TimeSpan CriticalTimeSpan = new TimeSpan(0, 3, 0);
         private static double CriticalScore = CriticalTimeSpan.TotalSeconds;
-        private const long CostOfOneAction = 20;
+        private const long CostOfOneAction = 10;
         private const long CostOfOneSecond = 5;
         private readonly SpamType _spamType;
         private Dictionary<ulong, (DateTimeOffset, double)> _spamCounter;
