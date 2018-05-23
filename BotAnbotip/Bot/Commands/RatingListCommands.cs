@@ -125,7 +125,7 @@ namespace BotAnbotip.Bot.Commands
 
             if ((hasLink) && (hasImage))
             {
-                url = bufStr[0];
+                url = bufStr[1];
                 thumbnailUrl = bufStr[0];
                 objName = argument.Substring(url.Count() + thumbnailUrl.Count() + 2);
             }
