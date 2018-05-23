@@ -8,84 +8,44 @@ using BotAnbotip.Bot.Commands;
 using BotAnbotip.Bot.Handlers;
 using BotAnbotip.Bot.CyclicActions;
 using System.Linq;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Clients
 {
-    public class AuxiliaryBotClient
+    public class AuxiliaryBotClient: BotClientBase
     {
-        private static bool _botLoaded;
-        private static ulong _id;
-        private static DiscordSocketClient _client;
-
-        public static bool BotLoaded => _botLoaded;
-        public static ulong Id => _id;
-        public static DiscordSocketClient Client => _client;
-
         private MessageHandler _msgHandler;
 
-
-        public async Task MainAsync()
+        public AuxiliaryBotClient(BotType type) : base(type)
         {
-            _client = new DiscordSocketClient();
-           
-            _client.Log += Log;
-            
+        }
 
-            _client.GuildAvailable += SetInfo;
+        public async Task PrepareAsync()
+        {            
             _client.GuildAvailable += RunCyclicalMethods;
-            _client.Disconnected += Disconnected;
+            _client.Disconnected += (ex) => {CyclicActionManager.TurnOffAuxiliary(); return Task.CompletedTask;};
+            _client.GuildAvailable += Method;
 
             await _client.SetGameAsync("ANBOTIP Group");
-
-
-            await _client.SetStatusAsync(UserStatus.Online);
-
-            await _client.LoginAsync(TokenType.Bot, PrivateData.AuxiliaryBotToken);
-            await _client.StartAsync();
-            await Task.Delay(-1);
         }
 
-        private async Task Disconnected(Exception ex)
-        {
-            _botLoaded = false;
-            await CyclicalMethodsManager.TurnOffAuxiliary();
-            new ExceptionLogger().Log(ex, "Вспомогательный бот отключён");
-        }
-
-        private Task RunCyclicalMethods(SocketGuild guild) => RunCyclicalMethods();
-
-        private static async Task RunCyclicalMethods()
-        {
-            if (DataManager.HackerChannelIsRunning.Value)
-            {
-                DataManager.HackerChannelIsRunning.Value = false;
-                await HackerChannelCommands.ChangeStateOfTheHackerChannelAsync("вкл");
-            }
-            if (DataManager.RainbowRoleIsRunning.Value)
-            {
-                DataManager.RainbowRoleIsRunning.Value = false;
-                await RainbowRoleCommands.ChangeRainbowRoleState("вкл");
-            }
-        }
-
-        private async Task SetInfo(SocketGuild guild)
+        private Task Method(SocketGuild arg)
         {
             _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.AuxiliaryPrefix);
             _client.MessageReceived += _msgHandler.MessageReceived;
-            var channel = ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test));
-            if (!BotLoaded)
-            {
-                _botLoaded = true;
-                _id = _client.CurrentUser.Id;
-                await channel.SendMessageAsync("Бот запущен " + DateTime.Now);
-            }
-            ConstInfo.AuxiliaryGroupGuild = guild;
-            await  ((ITextChannel)guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Бот авторизован " + DateTime.Now);
+            return Task.CompletedTask;
         }
 
-        private Task Log(LogMessage msg)
+        private Task MessageReceived(SocketMessage message)
         {
-            Console.WriteLine("AuxBot: " + msg.ToString());
+            _msgHandler.MessageReceived(message).GetAwaiter().GetResult();
+            return Task.CompletedTask;
+        }
+
+        private static Task RunCyclicalMethods(SocketGuild guild)
+        {
+            if (DataManager.HackerChannelIsRunning.Value) CyclicActionManager.HackerChannelAutoChange.Run();
+            if (DataManager.RainbowRoleIsRunning.Value) CyclicActionManager.RainbowRoleAutoChange.Run();
             return Task.CompletedTask;
         }
     }

@@ -24,7 +24,7 @@ namespace BotAnbotip.Bot.Commands
         {
             if (argument != "")
             {
-                if (botId == MainBotClient.Id)
+                if (botId == BotClientManager.MainBot.Id)
                 {
                     switch (command)
                     {
@@ -41,10 +41,33 @@ namespace BotAnbotip.Bot.Commands
                         case "-list":
                         case "removelist": await Task.Run(() => RatingListCommands.RemoveListAsync(message, argument)); break;
 
+                        //case "ревёрс":
+                        //case "ревёрслист":
+                        //case "reverselist": await Task.Run(() => RatingListCommands.ReverseAsync(message, argument)); break;
+
                         case "+об":
                         case "добавьоб":
                         case "+obj":
-                        case "addobj": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument)); break;
+                        case "addobj": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument, false, false)); break;
+
+                        case "+об+с":
+                        case "добавьоб+с":
+                        case "+obj+l":
+                        case "addobj+l": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument, true, false)); break;
+
+                        case "+об+к":
+                        case "добавьоб+к":
+                        case "+obj+i":
+                        case "addobj+i": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument, false, true)); break;
+
+                        case "+об+с+к":
+                        case "+об+к+с":
+                        case "добавьоб+с+к":
+                        case "добавьоб+к+с":
+                        case "+obj+l+i":
+                        case "+obj+i+l":
+                        case "addobj+i+l":
+                        case "addobj+l+i": await Task.Run(() => RatingListCommands.AddValueAsync(message, argument, true, true)); break;
 
                         case "-об":
                         case "удалиоб":
@@ -80,6 +103,7 @@ namespace BotAnbotip.Bot.Commands
                         case "deleteanonymousmessage": await Task.Run(() => AnonymousMessageCommands.DeleteAsync(message, argument)); break;
 
                         case "объяви":
+                        case "анонс":
                         case "announce": await Task.Run(() => AnnouncementCommands.SendAsync(message, argument)); break;
 
                         case "дайроль":
@@ -100,11 +124,11 @@ namespace BotAnbotip.Bot.Commands
                     switch (command)
                     {
                         case "радуга":
-                        case "rainbow": await Task.Run(() => RainbowRoleCommands.ChangeRainbowRoleState(argument, message)); break;
+                        case "rainbow": await Task.Run(() => RainbowRoleCommands.ChangeRainbowRoleState(message, argument)); break;
 
                         case "хакерканал":
                         case "hakerch":
-                        case "hakerchannel": await Task.Run(() => HackerChannelCommands.ChangeStateOfTheHackerChannelAsync(argument, message)); break;
+                        case "hakerchannel": await Task.Run(() => HackerChannelCommands.ChangeStateOfTheHackerChannelAsync(message, argument)); break;
 
                         default:
                             await message.DeleteAsync();
@@ -118,10 +142,10 @@ namespace BotAnbotip.Bot.Commands
                 switch (command)
                 {
                     case "стоп":
-                    case "stop": await Task.Run(() => BotControlCommands.Stop(message, MainBotClient.Client)); break;
+                    case "stop": await Task.Run(() => BotControlCommands.Stop(message, BotClientManager.MainBot.Client)); break;
 
                     case "удалиданные":
-                    case "cleardata": await Task.Run(() => BotControlCommands.ClearData(message, MainBotClient.Client)); break;
+                    case "cleardata": await Task.Run(() => BotControlCommands.ClearData(message, BotClientManager.MainBot.Client)); break;
 
                     case "debug0": DebugCommands.ChangeFlag(message, 0); break;
                     case "debug1": DebugCommands.ChangeFlag(message, 1); break;
@@ -149,7 +173,9 @@ namespace BotAnbotip.Bot.Commands
             else if (userRoles.Contains((ulong)RoleIds.Активный_Участник)) userPermLevel = (byte)PermLevelOfRole.Активный_Участник;
             else if (userRoles.Contains((ulong)RoleIds.Участник)) userPermLevel = (byte)PermLevelOfRole.Участник;
 
-            return reqPermLevel <= userPermLevel;
+            if (reqPermLevel <= userPermLevel) return true;
+            user.SendMessageAsync("У вас недостаточно прав: минимальный уровень - " + minimalRole).GetAwaiter().GetResult();
+            return false;
         }
 
         public static byte GetRequiredPermLevel(RoleIds minimalRole)
@@ -164,11 +190,6 @@ namespace BotAnbotip.Bot.Commands
                 case RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
                 default: return 0;
             }
-        }
-
-        internal static bool CheckPermission(IGuildUser author, object основатель)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using BotAnbotip.Bot.Data.Group;
+﻿using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
+using BotAnbotip.Bot.Data.Group;
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -16,7 +18,7 @@ namespace BotAnbotip.Bot.Commands
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Администратор)) return;
 
             var embedBuilder = new EmbedBuilder()
-                .WithTitle(":loudspeaker:Объявление:loudspeaker:")
+                .WithTitle(MessageTitles.Titles[TitleType.Announcement])
                 .WithDescription(argument)
                 .WithColor(Color.Magenta);
 

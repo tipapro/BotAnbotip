@@ -8,43 +8,41 @@ namespace BotAnbotip.Bot.Handlers
 {    
     class AntiSpam
     {
-        private const long CriticalScore = 10;
-        private const long CostOfOneAction = 4;
-        private const long CostOfOneSecond = 1;
+        private readonly static TimeSpan CriticalTimeSpan = new TimeSpan(0, 3, 0);
+        private static double CriticalScore = CriticalTimeSpan.TotalSeconds;
+        private const long CostOfOneAction = 20;
+        private const long CostOfOneSecond = 5;
         private readonly SpamType _spamType;
-        private Dictionary<ulong, (DateTimeOffset, ulong)> _spamCounter;
+        private Dictionary<ulong, (DateTimeOffset, double)> _spamCounter;
         //private Dictionary<ulong, (string, int)> _monotonousMessages;   //!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         public AntiSpam(SpamType type)
         {
             _spamType = type;
-            _spamCounter = new Dictionary<ulong, (DateTimeOffset, ulong)>();
+            _spamCounter = new Dictionary<ulong, (DateTimeOffset, double)>();
         }
 
         public bool Check(ulong userId, string message = null)
         {
+            DateTime currentTime = DateTime.Now;
             if (!_spamCounter.ContainsKey(userId))
             {
-                _spamCounter.Add(userId, (DateTime.Now, 0));
+                _spamCounter.Add(userId, (currentTime, 0));
                 return false;
             }
-            var fromLast = (_spamCounter[userId].Item1 - DateTime.Now).Duration();
-            if (fromLast > new TimeSpan(0, 10, 0))
+            var timePassed = (_spamCounter[userId].Item1 - currentTime).Duration();            
+            if (timePassed > new TimeSpan(0, 3, 0))
             {
-                _spamCounter[userId] = (DateTime.Now, CostOfOneAction);
-                return false;
-            }
-            double secondsPassed = fromLast.TotalSeconds;
-            if (_spamCounter[userId].Item2 < secondsPassed)
-            {
-                _spamCounter[userId] = (DateTime.Now, CostOfOneAction);
+                _spamCounter[userId] = (currentTime, CostOfOneAction);
                 return false;
             }
             else
             {
-                Console.WriteLine(_spamCounter[userId].Item2);
-                Console.WriteLine(secondsPassed);
-                //_spamCounter[userId] = (DateTime.Now, _spamCounter[userId].Item2 - (ulong)Math.Round(secondsPassed) * CostOfOneSecond + CostOfOneAction);
+                double secondsPassed = timePassed.TotalSeconds;
+                _spamCounter[userId] = (currentTime, _spamCounter[userId].Item2 + 
+                    CostOfOneAction / secondsPassed - Math.Log(1 + CostOfOneSecond * secondsPassed * secondsPassed));
+                if (_spamCounter[userId].Item2 < 0) _spamCounter[userId] = (currentTime, 0);
+                Console.WriteLine("Антиспам: " + _spamCounter[userId].Item2 + "||" + Math.Log(1 + CostOfOneSecond * secondsPassed * secondsPassed));
             }
             if (_spamCounter[userId].Item2 > CriticalScore)
             {

@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using System.Linq;
 using BotAnbotip.Bot.Data.Group;
+using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -14,7 +17,7 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
 
             var embedBuilder = new EmbedBuilder()
-                .WithTitle(":spy:Анонимное сообщение:spy:")
+                .WithTitle(MessageTitles.Titles[TitleType.Anonymous])
                 .WithDescription(argument)
                 .WithColor(Color.DarkGrey);
 
@@ -45,7 +48,7 @@ namespace BotAnbotip.Bot.Commands
 
             ulong messageId = ulong.Parse(argument);
             ulong userId = DataManager.AnonymousMessages.Value[messageId];
-            await message.Author.SendMessageAsync(ConstInfo.MainGroupGuild.GetUser(userId).Mention);
+            await message.Author.SendMessageAsync(BotClientManager.MainBot.Guild.GetUser(userId).Mention);
         }
     }
 }

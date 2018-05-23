@@ -32,6 +32,11 @@ namespace BotAnbotip.Bot.Data
             else InitializeVariable();
         }
 
+        public async Task SaveAsync(T newValue)
+        {
+            _value = newValue;
+            await SaveAsync();
+        }
         public async Task SaveAsync()
         {
             string json = "";
@@ -56,5 +61,7 @@ namespace BotAnbotip.Bot.Data
                 Console.WriteLine(ex.Message);
             }
         }
+
+        public static implicit operator T(DropboxData<T> obj) => obj._value;
     }
 }

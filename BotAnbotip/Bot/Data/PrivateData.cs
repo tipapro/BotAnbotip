@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Data
 {
@@ -53,6 +54,16 @@ namespace BotAnbotip.Bot.Data
                 _auxiliaryBotToken = Environment.GetEnvironmentVariable("AuxiliaryBotToken");
                 _mainPrefix = '=';
                 _auxiliaryPrefix = '}';
+            }
+        }
+
+        internal static string GetBotToken(BotType type)
+        {
+            switch (type)
+            {
+                case BotType.Main: return MainBotToken;
+                case BotType.Auxiliary: return AuxiliaryBotToken;
+                default: return "";
             }
         }
     }

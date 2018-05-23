@@ -14,11 +14,15 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<ulong, List<(string, int)>>> VotingLists;     //
         public static DropboxData<Dictionary<GiveawayType, List<ulong>>> ParticipantsOfTheGiveaway;     //GiveawayType -- List of UserIds
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
+        public static DropboxData<Dictionary<ulong, Dictionary<string, List<ulong>>>> Subscribers;    //User -- Games -- His subscribers
+
+        
         public static DropboxData<bool> DidRoleGiveawayBegin;
         public static DropboxData<bool> RainbowRoleIsRunning;
         public static DropboxData<ulong> RainbowRoleId;
         public static DropboxData<bool> HackerChannelIsRunning;
         public static DropboxData<ulong> HackerChannelId;
+        public static DropboxData<bool> ReverseSign { get; set; }
 
         public static bool[] DebugTriger = new bool[5];
 
@@ -32,11 +36,14 @@ namespace BotAnbotip.Bot.Data
             VotingLists = InitializeDropboxData(VotingLists, nameof(VotingLists));
             ParticipantsOfTheGiveaway = InitializeDropboxData(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
             LastWinner = InitializeDropboxData(LastWinner, nameof(LastWinner));
+            Subscribers = InitializeDropboxData(Subscribers, nameof(Subscribers));
+
             DidRoleGiveawayBegin = InitializeDropboxData(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
             RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
             RainbowRoleId = InitializeDropboxData(RainbowRoleId, nameof(RainbowRoleId));
             HackerChannelIsRunning = InitializeDropboxData(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
             HackerChannelId = InitializeDropboxData(HackerChannelId, nameof(HackerChannelId));
+            ReverseSign = InitializeDropboxData(ReverseSign, nameof(ReverseSign));
         }       
 
         public static async Task SaveAllDataAsync()
@@ -49,11 +56,14 @@ namespace BotAnbotip.Bot.Data
                 await VotingLists.SaveAsync();
                 await ParticipantsOfTheGiveaway.SaveAsync();
                 await LastWinner.SaveAsync();
+                await Subscribers.SaveAsync();
+
                 await DidRoleGiveawayBegin.SaveAsync();
                 await RainbowRoleIsRunning.SaveAsync();
                 await HackerChannelIsRunning.SaveAsync();
                 await RainbowRoleId.SaveAsync();
                 await HackerChannelId.SaveAsync();
+                await ReverseSign.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -72,11 +82,14 @@ namespace BotAnbotip.Bot.Data
                 await VotingLists.ReadAsync();
                 await ParticipantsOfTheGiveaway.ReadAsync();
                 await LastWinner.ReadAsync();
+                await Subscribers.ReadAsync();
+
                 await DidRoleGiveawayBegin.ReadAsync();
                 await RainbowRoleIsRunning.ReadAsync();
                 await HackerChannelIsRunning.ReadAsync();
                 await RainbowRoleId.ReadAsync();
                 await HackerChannelId.ReadAsync();
+                await ReverseSign.ReadAsync();
             }
             catch (Exception ex)
             {

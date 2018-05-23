@@ -13,33 +13,27 @@ namespace BotAnbotip.Bot.Commands
 {
     class HackerChannelCommands
     {
-        public static async Task ChangeStateOfTheHackerChannelAsync(string argument, SocketMessage message = null)
+        public static async Task ChangeStateOfTheHackerChannelAsync(SocketMessage message, string argument)
         {
-            if (message != null)
-            {
-                await message.DeleteAsync();
-                if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-            }
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
             var str = argument.Split(' ');
             if (str.Length > 1)
             {
-                DataManager.HackerChannelId.Value = ulong.Parse(str[1]);
                 argument = str[0];
-                await DataManager.HackerChannelId.SaveAsync();
+                await DataManager.HackerChannelId.SaveAsync(ulong.Parse(str[1]));
             }
 
             if (argument == "вкл")
             {
-                CyclicalMethodsManager.RunHackerChannelAutoChange();
-                DataManager.HackerChannelIsRunning.Value = true;
-                await DataManager.HackerChannelIsRunning.SaveAsync();
+                CyclicActionManager.HackerChannelAutoChange.Run();
+                await DataManager.HackerChannelIsRunning.SaveAsync(true);
             }
             else if (argument == "выкл")
             {
-                CyclicalMethodsManager.StopHackerChannelAutoChange();
-                DataManager.HackerChannelIsRunning.Value = false;
-                await DataManager.HackerChannelIsRunning.SaveAsync();
+                CyclicActionManager.HackerChannelAutoChange.Stop();
+                await DataManager.HackerChannelIsRunning.SaveAsync(false);
             }
         }
     }

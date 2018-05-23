@@ -56,16 +56,18 @@ namespace BotAnbotip.Bot.Data.CustomClasses
 
         public void Sort(RatingListObject obj)
         {
-            int i, endValue, eval, previousPosition;
+            int endValue, eval = (int)obj.LastEvaluation;
 
-            previousPosition = obj.CurrentPosition;
-            eval = (int)obj.LastEvaluation;
-
-            if (obj.LastEvaluation == Evaluation.Dislike) endValue = _listOfObjectsOfRatingList.Count-1;
+            if (eval == (int)Evaluation.Dislike) endValue = _listOfObjectsOfRatingList.Count-1;
             else endValue = 0;
 
-            for (i = obj.CurrentPosition - eval; i != endValue - eval; i-= eval)
+            for (int i = obj.Position - eval;; i-= eval)
             {
+                if ((i == endValue - eval))
+                {
+                    _listOfObjectsOfRatingList[endValue] = obj;
+                    break;
+                }
                 if (obj.CompareTo(_listOfObjectsOfRatingList[i]) == eval)
                 {
                     obj.SwapWith(_listOfObjectsOfRatingList[i]);
@@ -75,26 +77,26 @@ namespace BotAnbotip.Bot.Data.CustomClasses
                 {
                     _listOfObjectsOfRatingList[i + eval] = obj;
                     break;
-                }               
+                }
             }
+        }
 
-            if ((i == endValue - eval))
+        public void ReverseMessageIds()
+        {
+            int count = _listOfObjectsOfRatingList.Count;
+            for (int i = 0; i < count; i++)
             {
-                _listOfObjectsOfRatingList[endValue] = obj;
+                if (i >= count - 1 - i) break;
+                _listOfObjectsOfRatingList[i].SwapWith(_listOfObjectsOfRatingList[count - 1 - i]);
             }
-
-            obj.PreviousPosition = previousPosition;
         }
 
         public void Add(string name, ulong messageId, string url = "", string thumbnailUrl = "")
         {
-            var newObject =
-                new RatingListObject(name, messageId, url, thumbnailUrl)
-                {
-                    PreviousPosition = _listOfObjectsOfRatingList.Count,
-                    CurrentPosition = _listOfObjectsOfRatingList.Count
-                };
-
+            var newObject = new RatingListObject(name, messageId, url, thumbnailUrl)
+            {
+                Position = _listOfObjectsOfRatingList.Count
+            };
 
             _listOfObjectsOfRatingList.Add(newObject);
         }
@@ -103,10 +105,9 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         {
             var foundedObj = FindByName(name);
 
-            for (int i = foundedObj.CurrentPosition + 1; i < _listOfObjectsOfRatingList.Count; i++)
+            for (int i = foundedObj.Position + 1; i < _listOfObjectsOfRatingList.Count; i++)
             {
-                _listOfObjectsOfRatingList[i].CurrentPosition--;
-                _listOfObjectsOfRatingList[i].PreviousPosition--;
+                _listOfObjectsOfRatingList[i].Position--;
             }
             _listOfObjectsOfRatingList.Remove(foundedObj);
         }
@@ -120,16 +121,22 @@ namespace BotAnbotip.Bot.Data.CustomClasses
     [JsonObject]
     public class RatingListObject : IComparable<RatingListObject>
     {
+        private Evaluation _lastEvaluation;
         public string Name { get; set; }
         public string Url { get; set; }
         public string ThumbnailUrl { get; set; }
         public List<ulong> LikedUsers { get; set; }
         public long NumberOfLikes { get; set; }
         public ulong MessageId { get; set; }
-        public int PreviousPosition { get; set; }
-        public int CurrentPosition { get; set; }
+        public int Position { get; set; }
         public Dictionary<ulong, Evaluation> UserEvaluation { get; set; }
-        public Evaluation LastEvaluation { get; set; }
+        public Evaluation LastEvaluation {
+            get
+            {
+                if (DataManager.ReverseSign) return (Evaluation)((int)_lastEvaluation * (-1));
+                return _lastEvaluation;
+            }
+            set { _lastEvaluation = value; } }
 
         private RatingListObject() { }
 
@@ -161,11 +168,9 @@ namespace BotAnbotip.Bot.Data.CustomClasses
 
         public void SwapWith(RatingListObject obj)
         {
-            this.PreviousPosition = this.CurrentPosition;
-            obj.PreviousPosition = obj.CurrentPosition;
-
-            this.CurrentPosition = obj.PreviousPosition;
-            obj.CurrentPosition = this.PreviousPosition;
+            var bufPosition = this.Position;
+            this.Position = obj.Position;
+            obj.Position = bufPosition;
 
             var bufMessageId = this.MessageId;
             this.MessageId = obj.MessageId;

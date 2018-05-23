@@ -1,4 +1,7 @@
-﻿using BotAnbotip.Bot.Data.Group;
+﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
+using BotAnbotip.Bot.Data.Group;
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -16,8 +19,12 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
 
+            var username = BotClientManager.MainBot.Guild.GetUser(message.Author.Id).Nickname;
+            if (username == null) username = message.Author.Username;
             var embedBuilder = new EmbedBuilder()
-                .WithTitle("📰Новость📰")
+                .WithTitle(MessageTitles.Titles[TitleType.News])
+                .WithFooter(username, message.Author.GetAvatarUrl())
+                .WithTimestamp(DateTimeOffset.Now)
                 .WithColor(Color.Orange);
 
             if (hasImage)

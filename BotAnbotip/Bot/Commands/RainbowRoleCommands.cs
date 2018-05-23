@@ -15,36 +15,27 @@ namespace BotAnbotip.Bot.Commands
 {
     class RainbowRoleCommands
     {
-        public static async Task ChangeRainbowRoleState(string argument, SocketMessage message = null)
+        public static async Task ChangeRainbowRoleState(SocketMessage message, string argument)
         {
-            if (message != null)
-            {
-                await message.DeleteAsync();
-                if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-            }
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
             var str = argument.Split(' ');
             if (str.Length > 1)
             {
-                DataManager.RainbowRoleId.Value = ulong.Parse(str[1]);
                 argument = str[0];
-                await DataManager.RainbowRoleId.SaveAsync();
+                await DataManager.RainbowRoleId.SaveAsync(ulong.Parse(str[1]));
             }
-
             if (argument == "вкл")
             {
-                CyclicalMethodsManager.RunRainbowRoleAutoChange();
-                DataManager.RainbowRoleIsRunning.Value = true;
-                await DataManager.RainbowRoleIsRunning.SaveAsync();
+                CyclicActionManager.RainbowRoleAutoChange.Run();
+                await DataManager.RainbowRoleIsRunning.SaveAsync(true);
             }
             else if (argument == "выкл")
             {
-                CyclicalMethodsManager.StopRainbowRoleAutoChange();
-                DataManager.RainbowRoleIsRunning.Value = false;
-                await DataManager.RainbowRoleIsRunning.SaveAsync();
+                CyclicActionManager.RainbowRoleAutoChange.Stop();
+                await DataManager.RainbowRoleIsRunning.SaveAsync(false);
             }
-        }
-
-        
+        }       
     }
 }

@@ -1,4 +1,5 @@
-﻿using BotAnbotip.Bot.Data.CustomEnums;
+﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
 using Discord;
 using System;
@@ -12,7 +13,7 @@ namespace BotAnbotip.Bot.OtherModules
     {
         public static async Task Punish(ulong userId, PunishmentReason reason)
         {
-            var user = (IUser)ConstInfo.MainGroupGuild.GetUser(userId);
+            var user = (IUser)BotClientManager.MainBot.Guild.GetUser(userId);
             await user.SendMessageAsync("Предупреждение: " + reason);
         }
     }

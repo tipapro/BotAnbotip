@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data.Group;
+using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -27,7 +29,7 @@ namespace BotAnbotip.Bot.Commands
             int numOfLines = str.Length;
             string resultStr = "**" + str[0] + "**\n";
             var embedBuilder = new EmbedBuilder()
-                .WithTitle(":bar_chart:Голосование:bar_chart:")
+                .WithTitle(MessageTitles.Titles[TitleType.Voting])
                 .WithColor(Color.Gold);
 
             for (int i = 1; i < numOfLines; i++)
