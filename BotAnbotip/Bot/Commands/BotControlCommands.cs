@@ -12,7 +12,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class BotControlCommands
     {
-        public static async void Stop(SocketMessage message, DiscordSocketClient client)
+        public static async void Stop(IMessage message, DiscordSocketClient client)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
@@ -22,7 +22,7 @@ namespace BotAnbotip.Bot.Commands
             Environment.Exit(0);
         }
 
-        public static async void ClearData(SocketMessage message, DiscordSocketClient client)
+        public static async void ClearData(IMessage message, DiscordSocketClient client)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;

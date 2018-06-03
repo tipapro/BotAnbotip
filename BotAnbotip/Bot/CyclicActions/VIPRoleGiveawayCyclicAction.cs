@@ -29,70 +29,67 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             while (IsStarted)
             {
+                if ((DateTime.Now.DayOfWeek != DayOfWeek.Monday) && (DataManager.DidRoleGiveawayBegin == true))
+                    await DataManager.DidRoleGiveawayBegin.SaveAsync(false);
+                while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1])
+                    await Task.Delay(new TimeSpan(0, 10, 0), token);
                 if (!DataManager.DidRoleGiveawayBegin.Value)
                 {
-                    await Task.Delay(new TimeSpan(0, 10, 0), token);
-                    if (DateTime.Now.DayOfWeek != DayOfWeek.Friday && !DataManager.DebugTriger[0]) continue;
-                    DataManager.DebugTriger[0] = false;
-
-                    var embedBuilder1 = new EmbedBuilder()
-                        .WithTitle(":gift:Еженедельный розыгрыш VIP роли:gift:")
-                        .WithDescription("Правила розыгрыша таковы:\n" +
-                        "```1) Поставьте лайк этому посту;\n" +
-                        "2) Ждать понедельника.\n```" +
-                        "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.")
-                        .WithColor(Color.Blue);
-                    var sendedMessage = await BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder1.Build());
-                    await sendedMessage.AddReactionAsync(new Emoji("💙"));
-
                     DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
-                    await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
                     await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
-                }
+                    await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
+                    
+                    var winner = await ChooseTheWinner();
+                    string winnerText, giveawayText;
+                    if (winner == 0) winnerText =  "Победитель не определён из-за нехватки участников.";
+                    else winnerText =  "Победитель этой недели: <@!" + winner + ">.";
 
-                while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1]) await Task.Delay(new TimeSpan(0, 10, 0), token);
-                var embedBuilder2 = new EmbedBuilder();
-                if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
-                    || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0)
-                {
-                    embedBuilder2
-                        .WithTitle(":gift:Итоги еженедельного розыгрыша VIP роли:gift:")
-                        .WithDescription("Розыгрыш не состоялся вследствие нехватки участников.")
+                    DataManager.ParticipantsOfTheGiveaway.Value.Remove(GiveawayType.VIP);
+                    await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
+
+                    giveawayText = "\nА наш розыгрыш продолжается.\n" +
+                        "Правила:\n" +
+                    "```1) Поставьте лайк этому посту;\n" +
+                    "2) Ждать понедельника.\n```" +
+                    "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.";
+
+                    var embedBuilder = new EmbedBuilder()
+                        .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])
+                        .WithDescription(winnerText + giveawayText)
                         .WithColor(Color.Blue);
+
+                    var sendedMessage = await BotClientManager.MainBot.Guild
+                        .GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder.Build());
+                    await sendedMessage.AddReactionAsync(new Emoji("💙"));
+                    await sendedMessage.PinAsync();
                 }
-                else if (DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count > 0)
-                {
-                    var maxRand = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count - 1;
-
-
-                    var randomNum = await GetRandomNumber(0, maxRand);
-                    Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
-                    ulong winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
-                    if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] == winner)
-                    {
-                        randomNum = await GetRandomNumber(0, maxRand);
-                        Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
-                        winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
-                    }
-                    await BotClientManager.MainBot.Guild.GetUser(winner).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
-                    if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] != 0)
-                        await BotClientManager.MainBot.Guild.GetUser(DataManager.LastWinner.Value[GiveawayType.VIP])
-                         .RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
-                    DataManager.LastWinner.Value[GiveawayType.VIP] = winner;
-                    await DataManager.LastWinner.SaveAsync();
-
-                    embedBuilder2
-                        .WithTitle(MessageTitles.Titles[TitleType.Giveaway])
-                        .WithDescription("Победитель этой недели: <@!" + winner + ">.")
-                        .WithColor(Color.Blue);
-                }
-                DataManager.ParticipantsOfTheGiveaway.Value.Remove(GiveawayType.VIP);
-                await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
-                await DataManager.DidRoleGiveawayBegin.SaveAsync(false);
-
-                await BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder2.Build());
             }
+        }
 
+        public static async Task<ulong> ChooseTheWinner()
+        {
+            if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
+                        || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0) return 0;
+
+            var maxRand = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count - 1;
+            var randomNum = await GetRandomNumber(0, maxRand);
+
+            Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
+            ulong winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
+            if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] == winner)
+            {
+                randomNum = await GetRandomNumber(0, maxRand);
+                Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
+                winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
+            }
+            await BotClientManager.MainBot.Guild.GetUser(winner).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
+            if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] != 0)
+                await BotClientManager.MainBot.Guild.GetUser(DataManager.LastWinner.Value[GiveawayType.VIP])
+                 .RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
+            DataManager.LastWinner.Value[GiveawayType.VIP] = winner;
+            await DataManager.LastWinner.SaveAsync();
+
+            return winner;
         }
 
         public static async Task<int> GetRandomNumber(int min, int max)

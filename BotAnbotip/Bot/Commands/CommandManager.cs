@@ -41,9 +41,9 @@ namespace BotAnbotip.Bot.Commands
                         case "-list":
                         case "removelist": await Task.Run(() => RatingListCommands.RemoveListAsync(message, argument)); break;
 
-                        //case "ревёрс":
-                        //case "ревёрслист":
-                        //case "reverselist": await Task.Run(() => RatingListCommands.ReverseAsync(message, argument)); break;
+                        case "ревёрс":
+                        case "ревёрслист":
+                        case "reverselist": await Task.Run(() => RatingListCommands.ReverseAsync(message, argument)); break;
 
                         case "+об":
                         case "добавьоб":

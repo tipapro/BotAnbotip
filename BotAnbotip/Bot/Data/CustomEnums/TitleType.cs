@@ -7,7 +7,7 @@ namespace BotAnbotip.Bot.Data.CustomEnums
     public enum TitleType
     {
         WantPlay,
-        Giveaway,
+        VipGiveaway,
         Anonymous,
         Announcement,
         News,

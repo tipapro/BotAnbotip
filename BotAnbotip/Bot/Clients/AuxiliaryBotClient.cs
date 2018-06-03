@@ -36,12 +36,6 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        private Task MessageReceived(SocketMessage message)
-        {
-            _msgHandler.MessageReceived(message).GetAwaiter().GetResult();
-            return Task.CompletedTask;
-        }
-
         private static Task RunCyclicalMethods(SocketGuild guild)
         {
             if (DataManager.HackerChannelIsRunning.Value) CyclicActionManager.HackerChannelAutoChange.Run();

@@ -12,7 +12,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class AnnouncementCommands
     {
-        public static async Task SendAsync(SocketMessage message, string argument)
+        public static async Task SendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Администратор)) return;

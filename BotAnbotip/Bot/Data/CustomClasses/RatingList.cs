@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace BotAnbotip.Bot.Data.CustomClasses
@@ -11,175 +8,160 @@ namespace BotAnbotip.Bot.Data.CustomClasses
     [JsonObject]
     public class RatingList
     {
-        public string Name { get; set; }
         public ulong Id { get; set; }
         public RatingListType Type { get; set; }
-        public ObjectsOfRatingList ListObjects { get; set; }
-
+        public RLObjectList ListOfObjects { get; set; }
+        public RLMessageIdList ListOfMessageIds { get; set; }
 
         private RatingList() { }
 
-        public RatingList(ulong id, string name, RatingListType type)
+        public RatingList(ulong id, RatingListType type)
         {
             Id = id;
-            Name = name;
-            ListObjects = new ObjectsOfRatingList();
             Type = Type;
+            ListOfObjects = new RLObjectList();
+            ListOfMessageIds = new RLMessageIdList(id);            
         }
     }
 
     [JsonObject]
-    public class ObjectsOfRatingList:IEnumerable
+    public class RLMessageIdList : IEnumerable
     {
         [JsonProperty]
-        private List<RatingListObject> _listOfObjectsOfRatingList;
-        public int Count => _listOfObjectsOfRatingList.Count;
+        private List<ulong> _listOfRLMessageIds;
 
-        public ObjectsOfRatingList()
+        public bool IsReversed { get; set; }
+        public int Count => _listOfRLMessageIds.Count;
+
+        public RLMessageIdList(ulong groupId)
         {
-            _listOfObjectsOfRatingList = new List<RatingListObject>();
+            IsReversed = false;
+            _listOfRLMessageIds = new List<ulong>();
         }
 
-        public RatingListObject this[string name] => FindByName(name);
+        public ulong this[int position] => _listOfRLMessageIds[ConvertPosition(position)];        
 
-        public RatingListObject this[int position] => _listOfObjectsOfRatingList[position];
+        public void Add(ulong messageId) => _listOfRLMessageIds.Add(messageId);
 
+        public void Remove(ulong messageId) => _listOfRLMessageIds.Remove(messageId);
+        
+        public ulong Last() => this[_listOfRLMessageIds.Count - 1];
 
-        private RatingListObject FindByName(string name)
+        private int ConvertPosition(int position)
         {
-            foreach (var objectOfRatingList in _listOfObjectsOfRatingList)
-            {
-                if (name == objectOfRatingList.Name) return objectOfRatingList;
-            }
-            return null;
-        }
-
-        public void Sort(RatingListObject obj)
-        {
-            int endValue, eval = (int)obj.LastEvaluation;
-
-            if (eval == (int)Evaluation.Dislike) endValue = _listOfObjectsOfRatingList.Count-1;
-            else endValue = 0;
-
-            for (int i = obj.Position - eval;; i-= eval)
-            {
-                if ((i == endValue - eval))
-                {
-                    _listOfObjectsOfRatingList[endValue] = obj;
-                    break;
-                }
-                if (obj.CompareTo(_listOfObjectsOfRatingList[i]) == eval)
-                {
-                    obj.SwapWith(_listOfObjectsOfRatingList[i]);
-                    _listOfObjectsOfRatingList[i + eval] = _listOfObjectsOfRatingList[i];
-                }
-                else
-                {
-                    _listOfObjectsOfRatingList[i + eval] = obj;
-                    break;
-                }
-            }
-        }
-
-        public void ReverseMessageIds()
-        {
-            int count = _listOfObjectsOfRatingList.Count;
-            for (int i = 0; i < count; i++)
-            {
-                if (i >= count - 1 - i) break;
-                _listOfObjectsOfRatingList[i].SwapWith(_listOfObjectsOfRatingList[count - 1 - i]);
-            }
-        }
-
-        public void Add(string name, ulong messageId, string url = "", string thumbnailUrl = "")
-        {
-            var newObject = new RatingListObject(name, messageId, url, thumbnailUrl)
-            {
-                Position = _listOfObjectsOfRatingList.Count
-            };
-
-            _listOfObjectsOfRatingList.Add(newObject);
-        }
-
-        public void Remove(string name)
-        {
-            var foundedObj = FindByName(name);
-
-            for (int i = foundedObj.Position + 1; i < _listOfObjectsOfRatingList.Count; i++)
-            {
-                _listOfObjectsOfRatingList[i].Position--;
-            }
-            _listOfObjectsOfRatingList.Remove(foundedObj);
+            if (IsReversed)
+                return _listOfRLMessageIds.Count - 1 - position;
+            else
+                return position;
         }
 
         public IEnumerator GetEnumerator()
         {
-            return ((IEnumerable)_listOfObjectsOfRatingList).GetEnumerator();
+            return ((IEnumerable)_listOfRLMessageIds).GetEnumerator();
         }
     }
 
     [JsonObject]
-    public class RatingListObject : IComparable<RatingListObject>
+    public class RLObjectList : IEnumerable
     {
         [JsonProperty]
-        private Evaluation _lastEvaluation;
-        public string Name { get; set; }
-        public string Url { get; set; }
-        public string ThumbnailUrl { get; set; }
-        public List<ulong> LikedUsers { get; set; }
-        public long NumberOfLikes { get; set; }
-        public ulong MessageId { get; set; }
-        public int Position { get; set; }
-        public Dictionary<ulong, Evaluation> UserEvaluation { get; set; }
-        public Evaluation LastEvaluation {
-            get
+        private List<RLObject> _listOfRLObjects;
+
+        public int Count => _listOfRLObjects.Count;
+
+        public RLObjectList()
+        {
+            _listOfRLObjects = new List<RLObject>();
+        }
+
+        public RLObject this[int position] => _listOfRLObjects[position];
+
+
+        public (int, RLObject) FindByName(string name)
+        {
+            for (int i = 0; i < _listOfRLObjects.Count; i++)
             {
-                if (DataManager.ReverseSign) return (Evaluation)((int)_lastEvaluation * (-1));
-                return _lastEvaluation;
+                if (name == _listOfRLObjects[i].Name) return (i, _listOfRLObjects[i]);
             }
-            set { _lastEvaluation = value; } }
-
-        private RatingListObject() { }
-
-        public RatingListObject(string name, ulong messageId, string url = "", string thumbnailUrl = "")
-        {
-            Name = name;
-            MessageId = messageId;
-            Url = url;
-            ThumbnailUrl = thumbnailUrl;
-            UserEvaluation = new Dictionary<ulong, Evaluation>();
-            LikedUsers = new List<ulong>();
-            LastEvaluation = Evaluation.None;
+            return (0, null);
         }
 
-        public int CompareTo(RatingListObject obj)
+        public int Sort(RLObject obj, int position, Evaluation eval)
         {
-            var result = this.NumberOfLikes.CompareTo(obj.NumberOfLikes);
-            if (result == 0) result = obj.Name.CompareTo(this.Name);
-            return result;
+            int endValue = eval == Evaluation.Dislike ? _listOfRLObjects.Count - 1 : 0;
+            int newPosition;
+
+            for (int i = position - (int)eval; ; i -= (int)eval)
+            {
+                if ((i == endValue - (int)eval))
+                {
+                    newPosition = endValue;
+                    _listOfRLObjects[endValue] = obj;
+                    break;
+                }
+                if (obj.CompareTo(_listOfRLObjects[i]) == (int)eval)
+                {
+                    _listOfRLObjects[i + (int)eval] = _listOfRLObjects[i];
+                }
+                else
+                {
+                    newPosition = i + (int)eval;
+                    _listOfRLObjects[i + (int)eval] = obj;
+                    break;
+                }
+            }
+            return newPosition;
         }
 
-        public void ChangeEvaluation(ulong userId, Evaluation eval)
+        public void Add(RLObject obj)
         {
-            if (eval == Evaluation.Like) LikedUsers.Add(userId);
-            else LikedUsers.Remove(userId);
-            NumberOfLikes = LikedUsers.Count;
-            UserEvaluation[userId] = eval;
+            _listOfRLObjects.Add(obj);
         }
 
-        public void SwapWith(RatingListObject obj)
+        public void Remove(string name)
         {
-            var bufPosition = this.Position;
-            this.Position = obj.Position;
-            obj.Position = bufPosition;
+            _listOfRLObjects.Remove(FindByName(name).Item2);
+        }
 
-            var bufMessageId = this.MessageId;
-            this.MessageId = obj.MessageId;
-            obj.MessageId = bufMessageId;
+        public IEnumerator GetEnumerator()
+        {
+            return ((IEnumerable)_listOfRLObjects).GetEnumerator();
         }
     }
 
-    public enum Evaluation { Like = 1, Dislike = -1, None = 1 }
+    [JsonObject]
+    public class RLObject : IComparable<RLObject>
+    {
+        public string Name { get; }
+        public string Url { get; }
+        public string ThumbnailUrl { get; }
+        public List<ulong> LikedUsers { get; set; }
+
+        private RLObject() { }
+
+        public RLObject(string name, int position, string url = "", string thumbnailUrl = "")
+        {
+            Name = name;
+            Url = url;
+            ThumbnailUrl = thumbnailUrl;
+            LikedUsers = new List<ulong>();
+        }
+
+        public int CompareTo(RLObject obj)
+        {
+            var result = this.LikedUsers.Count.CompareTo(obj.LikedUsers.Count);
+            if (result == 0) result = obj.Name.CompareTo(this.Name);
+            return result;
+        }
+    }
+
+    public enum Evaluation
+    {
+        Like = 1,
+        None = 1,
+        Dislike = -1
+    }
+
 
     public enum RatingListType { Game, Music, Other}
 }

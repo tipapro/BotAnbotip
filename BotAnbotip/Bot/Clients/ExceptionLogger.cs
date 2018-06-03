@@ -12,7 +12,8 @@ namespace BotAnbotip.Bot.Clients
             if (ex != null)
             {
                 if (text != "") text += ": ";
-                Console.WriteLine(text + "Степень вложенности - " + counter++ + ": " + ex.Message);
+                
+                Console.WriteLine(ex.Source + ": " + text + "Степень вложенности - " + counter++ + ": " + ex.Message);
                 Log(ex.InnerException, text);
             }
             counter = 0;

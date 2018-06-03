@@ -6,17 +6,18 @@ using BotAnbotip.Bot.Data;
 using Discord.WebSocket;
 using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Clients;
+using Discord;
 
 namespace BotAnbotip.Bot.Commands
 {
     class ManageTheRolesCommands
     {
-        public static async Task GetAsync(SocketMessage message, string argument)
+        public static async Task GetAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
 
-            ulong roleId = 0;
-            roleId = ulong.Parse(argument.Substring(3, argument.Length - 4));
+            ulong roleId = ulong.Parse(argument.Substring(3, argument.Length - 4));
 
             if (CheckTheRole(roleId))
             {

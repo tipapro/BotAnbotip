@@ -32,26 +32,25 @@ namespace BotAnbotip.Bot.Handlers
         {
             try
             {
-                if ((message.Content == "") || (message.Content == null) || (message.Author.Id == BotClientManager.AuxiliaryBot.Id) 
-                    || (message.Author.Id == BotClientManager.MainBot.Id) || (antiSpam.Check(message.Author.Id, message.Content))) return;
-                if (message.Content.ToCharArray()[0] == prefix)
-                {
-                    string[] buf = message.Content.Substring(1).Split(' ');
-                    string command = buf[0];
-                    string argument = "";
-                    if (buf.Length > 1)
-                    {
-                        argument = message.Content.Substring((prefix + command + " ").ToCharArray().Length);
-                    }
-                    await _cmdManager.RunCommand(command.ToLower(), argument, message);
-                }
+                await ProcessTheMessage(message);
             }
             catch (Exception ex)
             {
-                new ExceptionLogger().Log(ex, "Ошибка при обработке сообщения");
+                new ExceptionLogger().Log(ex, "Ошибка при обработке отправленного сообщения");
             }
+            //return Task.CompletedTask;
         }
 
-
+        private async Task ProcessTheMessage(SocketMessage message)
+        {
+            if ((message.Content == "") || (message.Content == null) || (message.Author.Id == BotClientManager.AuxiliaryBot.Id)
+                || (message.Author.Id == BotClientManager.MainBot.Id) || (antiSpam.Check(message.Author.Id, message.Content))
+                || (message.Content.ToCharArray()[0] != prefix)) return;
+            string[] buf = message.Content.Substring(1).Split(' ');
+            string command = buf[0];
+            string argument = "";
+            if (buf.Length > 1) argument = message.Content.Substring((prefix + command + " ").ToCharArray().Length);
+            await _cmdManager.RunCommand(command.ToLower(), argument, message);
+        }
     }
 }

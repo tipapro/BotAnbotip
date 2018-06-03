@@ -12,7 +12,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         {
             { TitleType.Announcement, ":loudspeaker:Объявление:loudspeaker:" },
             { TitleType.Anonymous, ":spy:Анонимное сообщение:spy:" },
-            { TitleType.Giveaway, ":gift:Итоги еженедельного розыгрыша VIP роли:gift:" },
+            { TitleType.VipGiveaway, ":gift:Еженедельный розыгрыш VIP роли:gift:" },
             { TitleType.News, ":newspaper:Новость:newspaper:" },
             { TitleType.Voting, ":bar_chart:Голосование:bar_chart:" },
             { TitleType.WantPlay, ":video_game:Приглашение в игру:video_game:" },

@@ -15,7 +15,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class WantPlayMessageCommands
     {
-        public static async Task SendAsync(string gameName, SocketMessage message = null, string gamePictureUrl = null, string url = null)
+        public static async Task SendAsync(string gameName, IMessage message = null, string gamePictureUrl = null, string url = null)
         {
             if (gameName.Length > 64) return;
             string userMention = "";
@@ -75,7 +75,7 @@ namespace BotAnbotip.Bot.Commands
                     finally { }
         }
 
-        public static async Task AddUserAcceptedAsync(IUserMessage message, IUser user)
+        public static async Task AddUserAcceptedAsync(IMessage message, IUser user)
         {
             if (!DataManager.AgreeingToPlayUsers.Value.ContainsKey(message.Id)) return;
             if (DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0] == user.Id) return;
@@ -93,13 +93,13 @@ namespace BotAnbotip.Bot.Commands
                     str = str.Substring(0, str.Length - 2);
                     str = "\n\n" + "Приняли приглашение: " + str + ".";
                 }
-            await message.ModifyAsync((messageProperties) => {
+            await ((IUserMessage)message).ModifyAsync((messageProperties) => {
                 var embed = message.Embeds.First();
                 messageProperties.Embed = embed.ToEmbedBuilder().WithDescription(embed.Description.Split('\n')[0] + str).Build();
             });
         }
 
-        public static async Task SendOptionsOfSubscriptionAsync(IUserMessage message, IUser user)
+        public static async Task SendOptionsOfSubscriptionAsync(IMessage message, IUser user)
         {           
             if(!CommandManager.CheckPermission((IGuildUser)user, RoleIds.Активный_Участник)) return;
 
@@ -130,7 +130,7 @@ namespace BotAnbotip.Bot.Commands
             await sendedMessage.AddReactionAsync(new Emoji("8\u20E3"));
         }
 
-        public static async Task RemoveUserAcceptedAsync(IUserMessage message, IUser user)
+        public static async Task RemoveUserAcceptedAsync(IMessage message, IUser user)
         {
             if (!DataManager.AgreeingToPlayUsers.Value.ContainsKey(message.Id)) return;
             if (DataManager.AgreeingToPlayUsers.Value[message.Id].Item2[0] == user.Id) return;
@@ -148,13 +148,13 @@ namespace BotAnbotip.Bot.Commands
                 str = str.Substring(0, str.Length - 2);
                 str = "\n\n" + "Приняли приглашение: " + str + ".";
             }
-            await message.ModifyAsync((messageProperties) => {
+            await ((IUserMessage)message).ModifyAsync((messageProperties) => {
                 var embed = message.Embeds.First();
                 messageProperties.Embed = embed.ToEmbedBuilder().WithDescription(embed.Description.Split('\n')[0] + str).Build();
             });
         }
 
-        public static async Task AddUserSubscriptionAsync(IUserMessage message, IUser user, int type)
+        public static async Task AddUserSubscriptionAsync(IMessage message, IUser user, int type)
         {
             ulong authorId = ulong.Parse(message.Embeds.First().Description.Split('!')[1].Split('>')[0]);
             string gameName = message.Embeds.First().Description.Split('*')[2];
@@ -172,7 +172,7 @@ namespace BotAnbotip.Bot.Commands
             }           
         }
 
-        public static async Task RemoveUserSubscriptionAsync(IUserMessage message, IUser user, int type)
+        public static async Task RemoveUserSubscriptionAsync(IMessage message, IUser user, int type)
         {
             ulong authorId = ulong.Parse(message.Embeds.First().Description.Split('!')[1].Split('>')[0]);
             string gameName = message.Embeds.First().Description.Split('*')[2];

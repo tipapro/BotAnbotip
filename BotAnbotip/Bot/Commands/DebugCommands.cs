@@ -10,7 +10,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class DebugCommands
     {
-        public static async void ChangeFlag(SocketMessage message, int num)
+        public static async void ChangeFlag(IMessage message, int num)
         {
             try { await message.DeleteAsync(); } finally { }
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;

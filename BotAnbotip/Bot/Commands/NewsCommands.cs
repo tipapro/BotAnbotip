@@ -14,7 +14,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class NewsCommands
     {
-        public static async Task SendAsync(SocketMessage message, string argument, bool hasImage = false, bool fromYT = false)
+        public static async Task SendAsync(IMessage message, string argument, bool hasImage = false, bool fromYT = false)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
@@ -41,9 +41,7 @@ namespace BotAnbotip.Bot.Commands
                 var url = str[0];
                 string videoId = "";
                 foreach (string bufStr in url.Split('/'))
-                {
                     if (bufStr == "youtu.be") videoId = url.Substring(url.Length - 11);
-                }
 
                 if (videoId == "") videoId = url.Split('=')[1].Substring(0, 11);
 

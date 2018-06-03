@@ -15,7 +15,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class RainbowRoleCommands
     {
-        public static async Task ChangeRainbowRoleState(SocketMessage message, string argument)
+        public static async Task ChangeRainbowRoleState(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;

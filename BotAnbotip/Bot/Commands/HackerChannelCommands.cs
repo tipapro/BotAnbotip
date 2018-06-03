@@ -13,7 +13,7 @@ namespace BotAnbotip.Bot.Commands
 {
     class HackerChannelCommands
     {
-        public static async Task ChangeStateOfTheHackerChannelAsync(SocketMessage message, string argument)
+        public static async Task ChangeStateOfTheHackerChannelAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
@@ -24,7 +24,6 @@ namespace BotAnbotip.Bot.Commands
                 argument = str[0];
                 await DataManager.HackerChannelId.SaveAsync(ulong.Parse(str[1]));
             }
-
             if (argument == "вкл")
             {
                 CyclicActionManager.HackerChannelAutoChange.Run();

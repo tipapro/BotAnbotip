@@ -16,13 +16,12 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
         public static DropboxData<Dictionary<ulong, Dictionary<string, List<ulong>>>> Subscribers;    //User -- Games -- His subscribers
 
-        
         public static DropboxData<bool> DidRoleGiveawayBegin;
         public static DropboxData<bool> RainbowRoleIsRunning;
         public static DropboxData<ulong> RainbowRoleId;
         public static DropboxData<bool> HackerChannelIsRunning;
         public static DropboxData<ulong> HackerChannelId;
-        public static DropboxData<bool> ReverseSign { get; set; }
+        
 
         public static bool[] DebugTriger = new bool[5];
 
@@ -43,7 +42,6 @@ namespace BotAnbotip.Bot.Data
             RainbowRoleId = InitializeDropboxData(RainbowRoleId, nameof(RainbowRoleId));
             HackerChannelIsRunning = InitializeDropboxData(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
             HackerChannelId = InitializeDropboxData(HackerChannelId, nameof(HackerChannelId));
-            ReverseSign = InitializeDropboxData(ReverseSign, nameof(ReverseSign));
         }       
 
         public static async Task SaveAllDataAsync()
@@ -63,7 +61,6 @@ namespace BotAnbotip.Bot.Data
                 await HackerChannelIsRunning.SaveAsync();
                 await RainbowRoleId.SaveAsync();
                 await HackerChannelId.SaveAsync();
-                await ReverseSign.SaveAsync();
             }
             catch (Exception ex)
             {
@@ -89,7 +86,6 @@ namespace BotAnbotip.Bot.Data
                 await HackerChannelIsRunning.ReadAsync();
                 await RainbowRoleId.ReadAsync();
                 await HackerChannelId.ReadAsync();
-                await ReverseSign.ReadAsync();
             }
             catch (Exception ex)
             {

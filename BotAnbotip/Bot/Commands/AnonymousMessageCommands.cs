@@ -12,9 +12,10 @@ namespace BotAnbotip.Bot.Commands
 {
     public class AnonymousMessageCommands
     {
-        public static async Task SendAsync(SocketMessage message, string argument)
+        public static async Task SendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.Anonymous])
@@ -29,19 +30,19 @@ namespace BotAnbotip.Bot.Commands
             await DataManager.AnonymousMessages.SaveAsync();
         }
 
-        public static async Task DeleteAsync(SocketMessage message, string argument)
+        public static async Task DeleteAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
 
-            ulong soughtForMessage = ulong.Parse(argument);
-            if (DataManager.AnonymousMessages.Value[soughtForMessage] == message.Author.Id)
+            ulong soughtForMessageId = ulong.Parse(argument);
+            if (DataManager.AnonymousMessages.Value[soughtForMessageId] == message.Author.Id)
             {
-                var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
+                var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessageId);
                 await foundedMessage.DeleteAsync();
             }
         }
 
-        public static async Task GetAnonymousUserAsync(SocketMessage message, string argument)
+        public static async Task GetAnonymousUserAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;

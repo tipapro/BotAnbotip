@@ -47,12 +47,6 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        private Task MessageReceived(SocketMessage message)
-        {
-            _msgHandler.MessageReceived(message).GetAwaiter().GetResult();
-            return Task.CompletedTask;
-        }
-
         private async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             await Task.Run(() =>_reactionHandler.ReactionAdded(messageWithReaction, channel, reaction));

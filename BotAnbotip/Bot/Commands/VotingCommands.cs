@@ -19,7 +19,7 @@ namespace BotAnbotip.Bot.Commands
             { 6, "6\u20E3" }, { 7, "7\u20E3" }, { 8, "8\u20E3" }, { 9, "9\u20E3" }, { 10, "🔟" }, };
 
 
-        public static async Task AddVotingdAsync(SocketMessage message, string argument)
+        public static async Task AddVotingdAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
@@ -51,7 +51,7 @@ namespace BotAnbotip.Bot.Commands
             await DataManager.VotingLists.SaveAsync();
         }
 
-        public static async Task DeleteVotingAsync(SocketMessage message, string argument)
+        public static async Task DeleteVotingAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
 
