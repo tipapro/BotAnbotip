@@ -14,6 +14,7 @@ namespace BotAnbotip.Bot.Commands
 {
     public class RatingListCommands
     {
+        public static Task AwaitedTask;
         public static Dictionary<RatingListType, string> TypeEmodji = new Dictionary<RatingListType, string>()
         {
             {RatingListType.Game, "🎮"},
@@ -22,76 +23,66 @@ namespace BotAnbotip.Bot.Commands
 
         public static async Task AddListAsync(IMessage message, string argument)
         {
-            try
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+
+            var strBuf = argument.Split(' ');
+            var listName = argument.Substring((strBuf[0].Length));
+            RatingListType listType = RatingListType.Other;
+            if (strBuf.Length != 1)
             {
-                await message.DeleteAsync();
-                if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
-                var userRoles = ((IGuildUser)message.Author).RoleIds;
-
-                var strBuf = argument.Split(' ');
-                var listName = argument.Substring((strBuf[0].Length));
-                RatingListType listType = RatingListType.Other;
-                if (strBuf.Length != 1)
+                switch (strBuf[0])
                 {
-                    switch (strBuf[0])
-                    {
-                        case "игры":
-                            listType = RatingListType.Game;
-                            break;
-                        case "музыка":
-                            listType = RatingListType.Music;
-                            break;
-                    }
+                    case "игры":
+                        listType = RatingListType.Game;
+                        break;
+                    case "музыка":
+                        listType = RatingListType.Music;
+                        break;
                 }
-
-                var newRatingChannel = await BotClientManager.MainBot.Guild.CreateTextChannelAsync(listName);
-                await newRatingChannel.ModifyAsync((textChannelProperties) =>
-                {
-                    textChannelProperties.CategoryId = (ulong)CategoryIds.Рейтинговые_Листы;
-                });
-
-                await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Главный_Бот),
-                    OverwritePermissions.AllowAll(newRatingChannel));
-
-                await newRatingChannel.AddPermissionOverwriteAsync(
-                    BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Музыкальный_Бот), 
-                    OverwritePermissions.DenyAll(newRatingChannel));
-                await newRatingChannel.AddPermissionOverwriteAsync(
-                    BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Чат_Бот),
-                    OverwritePermissions.DenyAll(newRatingChannel));
-                await newRatingChannel.AddPermissionOverwriteAsync(
-                    BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds._Бот),
-                    OverwritePermissions.DenyAll(newRatingChannel));
-                await newRatingChannel.AddPermissionOverwriteAsync(
-                    BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Backend_Bot),
-                    OverwritePermissions.DenyAll(newRatingChannel));
-
-                await newRatingChannel.AddPermissionOverwriteAsync(
-                    BotClientManager.MainBot.Guild.EveryoneRole,
-                    OverwritePermissions.DenyAll(newRatingChannel));
-
-                await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Активный_Участник),
-                    OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
-                        null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Модератор),
-                    OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
-                        null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Администратор),
-                    OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
-                        null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-                await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Заместитель),
-                    OverwritePermissions.DenyAll(newRatingChannel).Modify(PermValue.Allow,
-                        null, null, PermValue.Allow, null, null, null, null, null, PermValue.Allow));
-
-                DataManager.RatingChannels.Value.Add(newRatingChannel.Id,
-                    new RatingList(newRatingChannel.Id, listType));               
-                await DataManager.RatingChannels.SaveAsync();
             }
-            catch (Exception ex)
+
+            var newRatingChannel = await BotClientManager.MainBot.Guild.CreateTextChannelAsync(listName);
+            await newRatingChannel.ModifyAsync((textChannelProperties) =>
             {
-                Console.WriteLine(ex.Message);
-            }
+                textChannelProperties.CategoryId = (ulong)CategoryIds.Рейтинговые_Листы;
+            });
+
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Главный_Бот),
+                OverwritePermissions.AllowAll(newRatingChannel));
+
+            await newRatingChannel.AddPermissionOverwriteAsync(
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Музыкальный_Бот),
+                OverwritePermissions.DenyAll(newRatingChannel));
+            await newRatingChannel.AddPermissionOverwriteAsync(
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Чат_Бот),
+                OverwritePermissions.DenyAll(newRatingChannel));
+            await newRatingChannel.AddPermissionOverwriteAsync(
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds._Бот),
+                OverwritePermissions.DenyAll(newRatingChannel));
+            await newRatingChannel.AddPermissionOverwriteAsync(
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Backend_Bot),
+                OverwritePermissions.DenyAll(newRatingChannel));
+
+            await newRatingChannel.AddPermissionOverwriteAsync(
+                BotClientManager.MainBot.Guild.EveryoneRole,
+                OverwritePermissions.DenyAll(newRatingChannel));
+
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Активный_Участник),
+                OverwritePermissions.DenyAll(newRatingChannel).Modify(
+                    createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Модератор),
+                OverwritePermissions.DenyAll(newRatingChannel).Modify(
+                    createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Администратор),
+                OverwritePermissions.DenyAll(newRatingChannel).Modify(
+                    createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Заместитель),
+                OverwritePermissions.DenyAll(newRatingChannel).Modify(
+                    createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
+
+            DataManager.RatingChannels.Value.Add(newRatingChannel.Id, new RatingList(newRatingChannel.Id, listType));
+            await DataManager.RatingChannels.SaveAsync();
         }
 
         public static async Task RemoveListAsync(IMessage message, string argument)
@@ -99,17 +90,11 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            var userRoles = ((IGuildUser) message.Author).RoleIds;
+            ulong ratingListId = ulong.Parse(argument);
+            var ratingChannel = BotClientManager.MainBot.Guild.GetChannel(ratingListId);
+            if (ratingChannel != null) await ratingChannel.DeleteAsync();
 
-            if (userRoles.Contains((ulong) RoleIds.Основатель))
-            {
-                ulong id = ulong.Parse(argument);
-                var ratingChannel = BotClientManager.MainBot.Guild.GetChannel(id);
-                if (ratingChannel != null) await ratingChannel.DeleteAsync();
-
-                DataManager.RemoveRatingList(id);
-            }
-
+            DataManager.RemoveRatingList(ratingListId);
             await DataManager.RatingChannels.SaveAsync();
         }
 
@@ -129,7 +114,7 @@ namespace BotAnbotip.Bot.Commands
                 objName = argument.Substring(url.Count() + thumbnailUrl.Count() + 2);
             }
             else if (hasLink)
-            {               
+            {
                 url = bufStr[0];
                 objName = argument.Substring(url.Count() + 1);
             }
@@ -139,10 +124,10 @@ namespace BotAnbotip.Bot.Commands
                 objName = argument.Substring(thumbnailUrl.Count() + 1);
             }
 
-                var embedBuilder = new EmbedBuilder()
-                .WithDescription("**" + objName + "**")
-                .WithFooter("Количество лайков: 0 ❤️")
-                .WithColor(Color.Green);
+            var embedBuilder = new EmbedBuilder()
+            .WithDescription("**" + objName + "**")
+            .WithFooter("Количество лайков: 0 ❤️")
+            .WithColor(Color.Green);
             embedBuilder = embedBuilder.WithThumbnailUrl(thumbnailUrl).WithUrl(url);
 
             var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
@@ -160,7 +145,11 @@ namespace BotAnbotip.Bot.Commands
                 await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
             }
 
-            await SortAsync(message.Channel, obj, ratingList.ListOfObjects.Count-1, Evaluation.None);
+            var position = ratingList.ListOfMessageIds.IsReversed ? 0 : ratingList.ListOfObjects.Count - 1;
+            var newPosition = ratingList.ListOfObjects.Sort(obj, position, Evaluation.None);
+
+            await UpdateList(ratingList, position, newPosition);
+
             await DataManager.RatingChannels.SaveAsync();
         }
 
@@ -170,16 +159,17 @@ namespace BotAnbotip.Bot.Commands
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
             var list = DataManager.RatingChannels.Value[message.Channel.Id];
-
             var buf = list.ListOfObjects.FindByName(argument);
+            var position = buf.Item1;
+            var obj = buf.Item2;
 
-            if (buf.Item2 != null)
+            if (obj != null)
             {
                 var messageId = list.ListOfMessageIds[buf.Item1];
                 var foundedMessage = await message.Channel.GetMessageAsync(messageId);
                 await foundedMessage.DeleteAsync();
 
-                list.ListOfObjects.Remove(argument);
+                list.ListOfObjects.Remove(list.ListOfObjects.FindByName(argument).Item2);
                 list.ListOfMessageIds.Remove(messageId);
                 await DataManager.RatingChannels.SaveAsync();
             }
@@ -191,8 +181,10 @@ namespace BotAnbotip.Bot.Commands
 
             var objName = ConvertMessageToRatingListObject(message);
 
-            var buf = DataManager.RatingChannels.Value[message.Channel.Id].ListOfObjects.FindByName(objName);
-            var position = buf.Item1;
+            var ratingList = DataManager.RatingChannels.Value[message.Channel.Id];
+            var buf = ratingList.ListOfObjects.FindByName(objName);
+            var currentPosition = buf.Item1;
+            var obj = buf.Item2;
             var likedUsers = buf.Item2?.LikedUsers;
             if (likedUsers == null) throw new NullReferenceException();
 
@@ -204,18 +196,11 @@ namespace BotAnbotip.Bot.Commands
             }
             else likedUsers.Remove(user.Id);
 
-            if (previousCount != likedUsers.Count)
-            {
-                await message.ModifyAsync((messageProperties) =>
-                {
-                    var messageEmbed = message.Embeds.First();
-                    var embedBuilder = messageEmbed.ToEmbedBuilder()
-                        .WithFooter("Количество лайков: " + likedUsers.Count + " ❤️");
-                    messageProperties.Embed = embedBuilder.Build();
-                });
-                await SortAsync(message.Channel, buf.Item2, position, eval);
-                await DataManager.RatingChannels.SaveAsync();
-            }
+            var newPosition = ratingList.ListOfObjects.Sort(obj, currentPosition, eval);
+
+            await UpdateList(ratingList, currentPosition, newPosition);
+            await DataManager.RatingChannels.SaveAsync();
+
         }
 
         public static async Task ReverseAsync(IMessage message, string argument)
@@ -228,49 +213,31 @@ namespace BotAnbotip.Bot.Commands
 
             list.ListOfMessageIds.IsReversed = !list.ListOfMessageIds.IsReversed;
 
-            await UpdateList(list, 0, list.ListOfObjects.Count, 1);
+            await UpdateList(list, 0, list.ListOfObjects.Count);
             await DataManager.RatingChannels.SaveAsync();
         }
 
-        private static async Task SortAsync(IMessageChannel channel, RLObject obj, int position, Evaluation eval)
-        {
-            var list = DataManager.RatingChannels.Value[channel.Id];
-            var newPosition = list.ListOfObjects.Sort(obj, position, eval);
-
-            if (newPosition != position)
-                await UpdateList(list, position, newPosition - (int)eval, (int)eval * (-1));
-            await DataManager.RatingChannels.SaveAsync();
-        }
-
-        public static async Task UpdateList(RatingList list, int from, int to, int sign)
+        public static async Task UpdateList(RatingList list, int previousPosition, int currentPosition)
         {
             var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
             var objects = list.ListOfObjects;
 
-            for (int i = from; i != to; i += sign)
+            int sign = previousPosition <= currentPosition ? 1 : -1;
+
+            for (int i = previousPosition; i != currentPosition + sign; i += sign)
             {
+                await Task.Delay(100);
                 var listObj = list.ListOfObjects[i];
                 var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
 
-                await ((IUserMessage)messageObj).ModifyAsync((messageProperties) =>
-                 {
-                     var embedBuilder = new EmbedBuilder()
+                var embedBuilder = new EmbedBuilder()
                      .WithDescription("**" + listObj.Name + "**")
                      .WithFooter($"Количество лайков: {listObj.LikedUsers.Count} ❤️")
                      .WithColor(Color.Green);
-                     if (listObj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(listObj.ThumbnailUrl);
-                     if (listObj.Url != "") embedBuilder.WithUrl(listObj.Url);
+                if (listObj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(listObj.ThumbnailUrl);
+                if (listObj.Url != "") embedBuilder.WithUrl(listObj.Url);
 
-                     messageProperties.Embed = embedBuilder.Build();
-                 });
-                await ((IUserMessage)messageObj).AddReactionAsync(new Emoji("💙"));
-                await ((IUserMessage)messageObj).AddReactionAsync(new Emoji("❌"));
-
-                if (list.Type != RatingListType.Other)
-                {
-                    await ((IUserMessage)messageObj).AddReactionAsync(new Emoji(TypeEmodji[list.Type]));
-                }
-                await Task.Delay(300);
+                await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
             }
         }
 

@@ -44,10 +44,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         public void Add(ulong messageId) => _listOfRLMessageIds.Add(messageId);
 
         public void Remove(ulong messageId) => _listOfRLMessageIds.Remove(messageId);
-        
-        public ulong Last() => this[_listOfRLMessageIds.Count - 1];
 
-        private int ConvertPosition(int position)
+        public int ConvertPosition(int position)
         {
             if (IsReversed)
                 return _listOfRLMessageIds.Count - 1 - position;
@@ -55,10 +53,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
                 return position;
         }
 
-        public IEnumerator GetEnumerator()
-        {
-            return ((IEnumerable)_listOfRLMessageIds).GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() => ((IEnumerable)_listOfRLMessageIds).GetEnumerator();   
     }
 
     [JsonObject]
@@ -86,47 +81,29 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             return (0, null);
         }
 
-        public int Sort(RLObject obj, int position, Evaluation eval)
+        public int Sort(RLObject obj, int currentPosition, Evaluation eval)
         {
             int endValue = eval == Evaluation.Dislike ? _listOfRLObjects.Count - 1 : 0;
             int newPosition;
 
-            for (int i = position - (int)eval; ; i -= (int)eval)
+            for (int i = currentPosition - (int)eval; ; i -= (int)eval)
             {
-                if ((i == endValue - (int)eval))
-                {
-                    newPosition = endValue;
-                    _listOfRLObjects[endValue] = obj;
-                    break;
-                }
-                if (obj.CompareTo(_listOfRLObjects[i]) == (int)eval)
-                {
-                    _listOfRLObjects[i + (int)eval] = _listOfRLObjects[i];
-                }
-                else
+                if ((obj.CompareTo(_listOfRLObjects[i]) != (int)eval) || (i == endValue - (int)eval))
                 {
                     newPosition = i + (int)eval;
                     _listOfRLObjects[i + (int)eval] = obj;
                     break;
                 }
+                _listOfRLObjects[i + (int)eval] = _listOfRLObjects[i];
             }
             return newPosition;
         }
 
-        public void Add(RLObject obj)
-        {
-            _listOfRLObjects.Add(obj);
-        }
+        public void Add(RLObject obj) => _listOfRLObjects.Add(obj);
 
-        public void Remove(string name)
-        {
-            _listOfRLObjects.Remove(FindByName(name).Item2);
-        }
+        public void Remove(RLObject obj) => _listOfRLObjects.Remove(obj);
 
-        public IEnumerator GetEnumerator()
-        {
-            return ((IEnumerable)_listOfRLObjects).GetEnumerator();
-        }
+        public IEnumerator GetEnumerator() => ((IEnumerable)_listOfRLObjects).GetEnumerator();
     }
 
     [JsonObject]
@@ -161,7 +138,6 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         None = 1,
         Dislike = -1
     }
-
 
     public enum RatingListType { Game, Music, Other}
 }

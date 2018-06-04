@@ -19,8 +19,8 @@ namespace BotAnbotip.Bot.CyclicActions
 
         public static double globalX;
 
-        public RainbowRoleAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string stopMessage) :
-    base(botClient, errorMessage, stopMessage)
+        public RainbowRoleAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+            base(botClient, errorMessage, startMessage, stopMessage)
         {
             _cycleMethod = Cycle;
         }

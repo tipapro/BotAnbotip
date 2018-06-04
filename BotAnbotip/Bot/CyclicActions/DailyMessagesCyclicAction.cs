@@ -14,8 +14,8 @@ namespace BotAnbotip.Bot.CyclicActions
 {
     class DailyMessagesCyclicAction : CyclicActionBase
     {
-        public DailyMessagesCyclicAction(BotClientBase botClient, string errorMessage, string stopMessage) : 
-            base(botClient, errorMessage, stopMessage)
+        public DailyMessagesCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
+            base(botClient, errorMessage, startMessage, stopMessage)
         {
             _cycleMethod = Cycle;
         }

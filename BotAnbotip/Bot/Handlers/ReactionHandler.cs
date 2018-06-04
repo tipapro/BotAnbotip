@@ -44,6 +44,7 @@ namespace BotAnbotip.Bot.Handlers
             //if (antiSpam.Check(user.Id)) return;
 
             var message = await messageWithReaction.DownloadAsync();
+            var messageTitle = message.Embeds.First().Title;
 
             if ((message.Author.Id != BotClientManager.MainBot.Client.CurrentUser.Id) || (message.Embeds.Count == 0)) return;
             if (!(channel is IDMChannel))
@@ -67,8 +68,9 @@ namespace BotAnbotip.Bot.Handlers
                 else
                 {
                     //для остального
-                    if ((message.Embeds.First().Title == null) || (message.Embeds.First().Title == "")) return;
-                    switch (MessageTitles.GetType(message.Embeds.First().Title))
+                    
+                    if ((messageTitle == null) || (messageTitle == "")) return;
+                    switch (MessageTitles.GetType(messageTitle))
                     {
                         case TitleType.WantPlay:
                             switch (reaction.Emote.Name)
@@ -91,7 +93,7 @@ namespace BotAnbotip.Bot.Handlers
             //Для лички
             else
             {
-                switch (MessageTitles.GetType(message.Embeds.First().Title))
+                switch (MessageTitles.GetType(messageTitle))
                 {
                     case TitleType.SubscriptionManager:
                         switch (reaction.Emote.Name)
@@ -132,6 +134,7 @@ namespace BotAnbotip.Bot.Handlers
             //if (antiSpam.Check(user.Id)) return;
 
             var message = await messageWithReaction.DownloadAsync();
+            var messageTitle = message.Embeds.First().Title;
 
             if (!(message.Author.Id == BotClientManager.MainBot.Client.CurrentUser.Id) || (message.Embeds.Count == 0)) return;
             if (!(channel is IDMChannel))
@@ -141,7 +144,7 @@ namespace BotAnbotip.Bot.Handlers
                 //для рейтингового листа
                 if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы) return;
                 //для остального
-                switch (MessageTitles.GetType(message.Embeds.First().Title))
+                switch (MessageTitles.GetType(messageTitle))
                 {
                     case TitleType.WantPlay:
                         switch (reaction.Emote.Name)

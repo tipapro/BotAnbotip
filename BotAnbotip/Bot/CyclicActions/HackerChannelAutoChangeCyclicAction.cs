@@ -17,8 +17,8 @@ namespace BotAnbotip.Bot.CyclicActions
 
         private static Random random = new Random();
 
-        public HackerChannelAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string stopMessage) :
-            base(botClient, errorMessage, stopMessage)
+        public HackerChannelAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+            base(botClient, errorMessage, startMessage, stopMessage)
         {
             _cycleMethod = Cycle;
         }

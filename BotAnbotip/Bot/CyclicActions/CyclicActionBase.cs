@@ -1,4 +1,5 @@
 ﻿using BotAnbotip.Bot.Clients;
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,16 +16,18 @@ namespace BotAnbotip.Bot.CyclicActions
         protected Func<CancellationToken, Task> _cycleMethod;
 
         public string ErrorMessage;
+        public string StartMessage;
         public string StopMessage;
 
         public bool IsStarted => _isStarted;
         public BotClientBase BotClient => _botClient;
         public Func<CancellationToken, Task> CycleMethod => _cycleMethod;
 
-        public CyclicActionBase(BotClientBase botClient, string errorMessage, string stopMessage)
+        public CyclicActionBase(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage)
         {
             _botClient = botClient;
             ErrorMessage = errorMessage;
+            StartMessage = startMessage;
             StopMessage = stopMessage;
         }
 
@@ -41,6 +44,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
+                await BotClient.Log(new LogMessage(LogSeverity.Info, "", "Бот авторизован"));
                 await CycleMethod.Invoke(_cts.Token);
             }
             catch (Exception ex)

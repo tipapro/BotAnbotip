@@ -19,8 +19,8 @@ namespace BotAnbotip.Bot.CyclicActions
         private static Random random = new Random();
         public static string RandomOrgURL = "";
 
-        public VipRoleGiveawayCyclicAction(BotClientBase botClient, string errorMessage, string stopMessage) :
-    base(botClient, errorMessage, stopMessage)
+        public VipRoleGiveawayCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+            base(botClient, errorMessage, startMessage, stopMessage)
         {
             _cycleMethod = Cycle;
         }
@@ -31,12 +31,12 @@ namespace BotAnbotip.Bot.CyclicActions
             {
                 if ((DateTime.Now.DayOfWeek != DayOfWeek.Monday) && (DataManager.DidRoleGiveawayBegin == true))
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(false);
-                while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[1])
+                while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[0])
                     await Task.Delay(new TimeSpan(0, 10, 0), token);
-                if (!DataManager.DidRoleGiveawayBegin.Value)
+                DataManager.DebugTriger[0] = false;
+                if (!DataManager.DidRoleGiveawayBegin.Value && !DataManager.DebugTriger[1])
                 {
-                    DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
-                    await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
+                    DataManager.DebugTriger[1] = false;
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
                     
                     var winner = await ChooseTheWinner();
@@ -44,7 +44,9 @@ namespace BotAnbotip.Bot.CyclicActions
                     if (winner == 0) winnerText =  "Победитель не определён из-за нехватки участников.";
                     else winnerText =  "Победитель этой недели: <@!" + winner + ">.";
 
-                    DataManager.ParticipantsOfTheGiveaway.Value.Remove(GiveawayType.VIP);
+                   
+                    if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)) DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
+                    else DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
                     await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
                     giveawayText = "\nА наш розыгрыш продолжается.\n" +

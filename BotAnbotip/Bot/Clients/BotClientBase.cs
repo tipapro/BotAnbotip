@@ -64,7 +64,7 @@ namespace BotAnbotip.Bot.Clients
             await _client.StartAsync();
         }
 
-        private Task Log(LogMessage msg)
+        public Task Log(LogMessage msg)
         {
             Console.WriteLine(DateTime.Now + "  " + Type + "Bot: " + msg.Message);
             return Task.CompletedTask;

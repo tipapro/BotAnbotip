@@ -13,8 +13,8 @@ namespace BotAnbotip.Bot.CyclicActions
 {
     class WantPlayAutoRemovingCyclicAction : CyclicActionBase
     {
-        public WantPlayAutoRemovingCyclicAction(BotClientBase botClient, string errorMessage, string stopMessage) :
-    base(botClient, errorMessage, stopMessage)
+        public WantPlayAutoRemovingCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+            base(botClient, errorMessage, startMessage, stopMessage)
         {
             _cycleMethod = Cycle;
         }
