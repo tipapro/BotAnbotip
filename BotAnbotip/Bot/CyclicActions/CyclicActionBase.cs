@@ -44,7 +44,7 @@ namespace BotAnbotip.Bot.CyclicActions
         {
             try
             {
-                await BotClient.Log(new LogMessage(LogSeverity.Info, "", "StartMessage"));
+                await BotClient.Log(new LogMessage(LogSeverity.Info, "", StartMessage));
                 await CycleMethod.Invoke(_cts.Token);
             }
             catch (Exception ex)
