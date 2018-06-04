@@ -21,8 +21,8 @@ namespace BotAnbotip.Bot.Clients
         }
 
         public async Task PrepareAsync()
-        {            
-            _client.GuildAvailable += RunCyclicalMethods;
+        {
+            _client.Connected += RunCyclicalMethods;
             _client.Disconnected += (ex) => {CyclicActionManager.TurnOffAuxiliary(); return Task.CompletedTask;};
             _client.GuildAvailable += Method;
 
@@ -36,7 +36,7 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        private static Task RunCyclicalMethods(SocketGuild guild)
+        private static Task RunCyclicalMethods()
         {
             if (DataManager.HackerChannelIsRunning.Value) CyclicActionManager.HackerChannelAutoChange.Run();
             if (DataManager.RainbowRoleIsRunning.Value) CyclicActionManager.RainbowRoleAutoChange.Run();

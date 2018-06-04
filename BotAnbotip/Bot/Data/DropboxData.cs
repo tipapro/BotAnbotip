@@ -25,10 +25,7 @@ namespace BotAnbotip.Bot.Data
 
             string json = await DropboxIntegration.DownloadAsync(PrivateData.FileNamePrefix + _fileName + ".json");
 
-            if (json != "")
-            {
-                _value = JsonConvert.DeserializeObject<T>(json);
-            }
+            if (json != "") _value = JsonConvert.DeserializeObject<T>(json);
             else InitializeVariable();
         }
 

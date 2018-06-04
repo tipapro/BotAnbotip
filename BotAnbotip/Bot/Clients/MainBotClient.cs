@@ -34,7 +34,7 @@ namespace BotAnbotip.Bot.Clients
             _client.ReactionRemoved += ReactionRemoved;
             _client.Disconnected += (ex) => { CyclicActionManager.TurnOffMain(); return Task.CompletedTask; };
             _client.GuildAvailable += Method;
-            _client.GuildAvailable += RunCyclicalMethods;
+            _client.Connected += RunCyclicalMethods;
             _client.UserJoined += UserJoinedTheGroup;
 
             await _client.SetGameAsync("ANBOTIP Group");          
@@ -62,7 +62,7 @@ namespace BotAnbotip.Bot.Clients
             await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Участник));
         }
 
-        private Task RunCyclicalMethods(SocketGuild guild)
+        private Task RunCyclicalMethods()
         {
             CyclicActionManager.RunAllMain();
             return Task.CompletedTask;

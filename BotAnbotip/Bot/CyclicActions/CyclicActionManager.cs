@@ -14,13 +14,13 @@ namespace BotAnbotip.Bot.CyclicActions
         private static DailyMessagesCyclicAction _dailyMessages = new DailyMessagesCyclicAction(BotClientManager.MainBot,
                 "Ошибка ежедневных сообщений", "Ежедневные сообщения запущены", "Ежедневные сообщения остановлены");
         private static HackerChannelAutoChangeCyclicAction _hackerChannelAutoChange = new HackerChannelAutoChangeCyclicAction(BotClientManager.AuxiliaryBot,
-                "Ошибка автосмены навзания канала", "Автосмена навзания канала запущены", "Автосмена навзания канала остановлена");
+                "Ошибка автосмены навзания канала", "Автосмена навзания канала запущена", "Автосмена навзания канала остановлена");
         private static RainbowRoleAutoChangeCyclicAction _rainbowRoleAutoChange = new RainbowRoleAutoChangeCyclicAction(BotClientManager.AuxiliaryBot,
-                "Ошибка автосмены цвета роли", "Автосмена цвета роли запущены", "Автосмена цвета роли остановлена");
+                "Ошибка автосмены цвета роли", "Автосмена цвета роли запущена", "Автосмена цвета роли остановлена");
         private static VipRoleGiveawayCyclicAction _vipRoleGiveaway = new VipRoleGiveawayCyclicAction(BotClientManager.MainBot,
-                "Ошибка розыгрыша VIP роли", "Розыгрыш VIP роли запущены", "Розыгрыш VIP роли остановлен");
+                "Ошибка розыгрыша VIP роли", "Розыгрыш VIP роли запущен", "Розыгрыш VIP роли остановлен");
         private static WantPlayAutoRemovingCyclicAction _wantPlayAutoRemoving = new WantPlayAutoRemovingCyclicAction(BotClientManager.MainBot,
-                "Ошибка автоудаления приглашений в игру", "Автоудаление приглашений в игру запущены", "Автоудаление приглашений в игру остановлены");
+                "Ошибка автоудаления приглашений в игру", "Автоудаление приглашений в игру запущено", "Автоудаление приглашений в игру остановлены");
 
         public static DailyMessagesCyclicAction DailyMessages => _dailyMessages;
         public static HackerChannelAutoChangeCyclicAction HackerChannelAutoChange => _hackerChannelAutoChange;
