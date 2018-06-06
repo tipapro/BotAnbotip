@@ -33,7 +33,11 @@ namespace BotAnbotip.Bot.CyclicActions
 
         public async void Run()
         {
-            if (IsStarted) return;
+            if (IsStarted)
+            {
+                await BotClient.Log(new LogMessage(LogSeverity.Info, "", ErrorMessage + ": Действие уже запущено"));
+                return;
+            }
             while (!BotClient.IsLoaded) await Task.Delay(1000);
             _cts = new CancellationTokenSource();
             _isStarted = true;

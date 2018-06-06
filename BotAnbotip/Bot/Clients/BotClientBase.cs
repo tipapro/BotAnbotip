@@ -29,7 +29,7 @@ namespace BotAnbotip.Bot.Clients
             _client = new DiscordSocketClient();            
             _client.Log += Log;
             _client.GuildAvailable += SetGuild;
-            _client.Ready += Loaded;
+            _client.Connected += Loaded;
             _client.Disconnected += Disconnected;
         }
 

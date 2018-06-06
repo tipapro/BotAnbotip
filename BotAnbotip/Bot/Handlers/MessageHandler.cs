@@ -14,7 +14,6 @@ namespace BotAnbotip.Bot.Handlers
 {
     class MessageHandler
     {
-        private AntiSpam antiSpam;
         private ulong botId;
         private char prefix;
 
@@ -22,7 +21,6 @@ namespace BotAnbotip.Bot.Handlers
 
         public MessageHandler(ulong botId, char prefix)
         {
-            antiSpam = new AntiSpam(SpamType.Message);
             this.botId = botId;
             this.prefix = prefix;
             _cmdManager = new CommandManager(botId);
@@ -44,8 +42,7 @@ namespace BotAnbotip.Bot.Handlers
         private async void ProcessTheMessage(SocketMessage message)
         {
             if ((message.Content == "") || (message.Content == null) || (message.Author.Id == BotClientManager.AuxiliaryBot.Id)
-                || (message.Author.Id == BotClientManager.MainBot.Id) || (antiSpam.Check(message.Author.Id, message.Content))
-                || (message.Content.ToCharArray()[0] != prefix)) return;
+                || (message.Author.Id == BotClientManager.MainBot.Id) || (message.Content.ToCharArray()[0] != prefix)) return;
             string[] buf = message.Content.Substring(1).Split(' ');
             string command = buf[0];
             string argument = "";

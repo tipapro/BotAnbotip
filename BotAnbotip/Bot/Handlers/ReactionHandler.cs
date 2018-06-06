@@ -41,8 +41,6 @@ namespace BotAnbotip.Bot.Handlers
             if (reaction.UserId == BotClientManager.MainBot.Client.CurrentUser.Id) return;
 
             var user = reaction.User.Value;
-            //if (antiSpam.Check(user.Id)) return;
-
             var message = await messageWithReaction.DownloadAsync();
             var messageTitle = message.Embeds.First().Title;
 
@@ -131,8 +129,6 @@ namespace BotAnbotip.Bot.Handlers
             if (reaction.UserId == BotClientManager.MainBot.Client.CurrentUser.Id) return;
 
             var user = reaction.User.Value;
-            //if (antiSpam.Check(user.Id)) return;
-
             var message = await messageWithReaction.DownloadAsync();
             var messageTitle = message.Embeds.First().Title;
 

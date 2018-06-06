@@ -28,7 +28,6 @@ namespace BotAnbotip.Bot.CyclicActions
         private async Task Cycle(CancellationToken token)
         {
             globalX = 0;
-            await ((ITextChannel)BotClientManager.AuxiliaryBot.Guild.GetChannel((ulong)ChannelIds.test)).SendMessageAsync("Автосмена цвета запущена " + DateTime.Now);
             while (IsStarted)
             {
                 await Task.Delay(DelayTime, token);

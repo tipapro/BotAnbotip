@@ -21,7 +21,9 @@ namespace BotAnbotip.Bot.Clients
     {
         private MessageHandler _msgHandler;
         private ReactionHandler _reactionHandler;
-        
+        private AntiSpam _antiReactionSpam;
+        private AntiSpam _antiMessageSpam;
+
         public MainBotClient(BotType type) : base(type)
         {
         }
@@ -43,6 +45,10 @@ namespace BotAnbotip.Bot.Clients
         private Task Method(SocketGuild arg)
         {
             _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.MainPrefix);
+            _antiMessageSpam = new AntiSpam(SpamType.Message);
+            _antiReactionSpam = new AntiSpam(SpamType.Reaction);           
+            //_client.MessageReceived += (message) => { _antiMessageSpam.Check(message.Author.Id, message.Content); return Task.CompletedTask; };
+            //_client.ReactionAdded += (messageWithReaction, channel, reaction) => { _antiMessageSpam.Check(reaction.User.Value.Id); return Task.CompletedTask; };
             _client.MessageReceived += _msgHandler.MessageReceived;
             return Task.CompletedTask;
         }
