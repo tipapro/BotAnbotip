@@ -19,11 +19,11 @@ namespace BotAnbotip.Bot.Clients
 
         public AuxiliaryBotClient(BotType type) : base(type)
         {
-            _cyclicActionManager = new CyclicActionManager(type);
         }
 
         public async Task PrepareAsync()
         {
+            _cyclicActionManager = new CyclicActionManager(_type);
             _client.Connected += OnConnection;            
             _client.Disconnected += OnDisconnection;
             _client.MessageReceived += OnMessageReceiving;

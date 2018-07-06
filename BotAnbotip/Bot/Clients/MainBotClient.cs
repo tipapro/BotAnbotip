@@ -27,11 +27,11 @@ namespace BotAnbotip.Bot.Clients
 
         public MainBotClient(BotType type) : base(type)
         {
-            _cyclicActionManager = new CyclicActionManager(type);
         }
 
         public async Task PrepareAsync()
         {
+            _cyclicActionManager = new CyclicActionManager(_type);
             _reactionHandler = new ReactionHandler();
             _antiMessageSpam = new AntiSpam(SpamType.Message);
             _antiReactionSpam = new AntiSpam(SpamType.Reaction);

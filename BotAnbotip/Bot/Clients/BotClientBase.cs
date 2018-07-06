@@ -59,10 +59,18 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        public async void Launch()
+        public async Task<bool> Launch()
         {
-            await _client.LoginAsync(TokenType.Bot, PrivateData.GetBotToken(Type));
-            await _client.StartAsync();
+            try
+            {
+                await _client.LoginAsync(TokenType.Bot, PrivateData.GetBotToken(Type));
+                await _client.StartAsync();
+            }
+            catch (Discord.Net.HttpException)
+            {
+                return false;
+            }
+            return true;
         }
 
         public Task Log(LogMessage msg)

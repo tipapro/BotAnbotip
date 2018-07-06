@@ -14,8 +14,11 @@ namespace BotAnbotip
             await BotClientManager.MainBot.PrepareAsync();
             await BotClientManager.AuxiliaryBot.PrepareAsync();
 
-            BotClientManager.MainBot.Launch();
-            BotClientManager.AuxiliaryBot.Launch();
+            bool mainLaunchResult = false;
+            while (!mainLaunchResult) mainLaunchResult = await BotClientManager.MainBot.Launch();
+
+            bool auxiliaryLaunchResult = false;
+            while (!auxiliaryLaunchResult) auxiliaryLaunchResult = await BotClientManager.AuxiliaryBot.Launch();
 
             await Task.Delay(-1);
         }
