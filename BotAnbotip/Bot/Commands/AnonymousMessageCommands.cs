@@ -7,49 +7,74 @@ using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
+using System.Collections.Generic;
+using System;
 
 namespace BotAnbotip.Bot.Commands
 {
-    public class AnonymousMessageCommands
+    public class AnonymousMessageCommands : CommandsBase
     {
-        public static async Task SendAsync(IMessage message, string argument)
+        public AnonymousMessageCommands() : base
+            (
+            (TransformMessageToSendAsync, 
+            new string[] { "анон", "анонимно", "anon", "anonymously" }),
+            (TransformMessageToDeleteAsync,
+            new string[] { "-анон", "удалианон", "-anon", "deleteanon", "deleteanonymousmessage" }),
+            (TransformMessageToGetAuthorAsync,
+            new string[] { "ктоанон", "whoisanon" })
+            ){ }
+        
+        private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
-
-            var embedBuilder = new EmbedBuilder()
-                .WithTitle(MessageTitles.Titles[TitleType.Anonymous])
-                .WithDescription(argument)
-                .WithColor(Color.DarkGrey);
-
-            var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
-            await sendedMessage.ModifyAsync(
-                (messageProperties) => { messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("MessageID: " + sendedMessage.Id)).Build(); });
-
-            DataManager.AnonymousMessages.Value.Add(sendedMessage.Id, message.Author.Id);
-            await DataManager.AnonymousMessages.SaveAsync();
+            await CommandManager.AnonymousMessage.SendAsync(message.Author, message.Channel, argument);
         }
 
-        public static async Task DeleteAsync(IMessage message, string argument)
+        private static async Task TransformMessageToDeleteAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-
-            ulong soughtForMessageId = ulong.Parse(argument);
-            if (DataManager.AnonymousMessages.Value[soughtForMessageId] == message.Author.Id)
-            {
-                var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessageId);
-                await foundedMessage.DeleteAsync();
-            }
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            ulong messageId = ulong.Parse(argument);
+            await CommandManager.AnonymousMessage.DeleteAsync(message.Author, message.Channel, messageId);
         }
 
-        public static async Task GetAnonymousUserAsync(IMessage message, string argument)
+        private static async Task TransformMessageToGetAuthorAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
             ulong messageId = ulong.Parse(argument);
+            await CommandManager.AnonymousMessage.GetAuthorAsync(message.Author, messageId);
+        }
+
+        public async Task SendAsync(IUser user, IMessageChannel channel, string text)
+        {
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle(MessageTitles.Titles[TitleType.Anonymous])
+                .WithDescription(text)
+                .WithColor(Color.DarkGrey);
+
+            var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
+            await sendedMessage.ModifyAsync((messageProperties) =>
+            {
+                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID Сообщения: " + sendedMessage.Id)).Build();
+            });
+
+            DataManager.AnonymousMessages.Value.Add(sendedMessage.Id, user.Id);
+            await DataManager.AnonymousMessages.SaveAsync();
+        }
+
+        public async Task DeleteAsync(IUser user, IMessageChannel channel, ulong messageId)
+        {
+            if (DataManager.AnonymousMessages.Value[messageId] != user.Id) return;
+            var foundedMessage = await channel.GetMessageAsync(messageId);
+            await foundedMessage.DeleteAsync();
+        }
+
+        public async Task GetAuthorAsync(IUser user, ulong messageId)
+        {
             ulong userId = DataManager.AnonymousMessages.Value[messageId];
-            await message.Author.SendMessageAsync(BotClientManager.MainBot.Guild.GetUser(userId).Mention);
+            await user.SendMessageAsync(BotClientManager.MainBot.Guild.GetUser(userId).Mention);
         }
     }
 }

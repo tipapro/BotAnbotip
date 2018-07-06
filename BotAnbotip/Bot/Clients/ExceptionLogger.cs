@@ -13,7 +13,7 @@ namespace BotAnbotip.Bot.Clients
             {
                 if ((text != "") && (counter == 0)) text += ": ";
                 
-                Console.WriteLine(ex.Source + ": " + text + "Степень вложенности - " + counter++ + ": " + ex.Message);
+                Console.WriteLine(DateTime.Now + "  " + ex.Source + ": " + text + "Степень вложенности - " + counter++ + ": " + ex.Message);
                 Log(ex.InnerException, text);
             }
             counter = 0;

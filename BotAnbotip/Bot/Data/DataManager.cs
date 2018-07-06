@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
 
@@ -64,7 +65,7 @@ namespace BotAnbotip.Bot.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Save data error: " + ex.Message);
+                new ExceptionLogger().Log(ex, "Save data error");
             }
         }
 
@@ -89,11 +90,8 @@ namespace BotAnbotip.Bot.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Read data error: " + ex.Message);
+                new ExceptionLogger().Log(ex, "Read data error");
             }
         }
-
-        public static void RemoveRatingList(ulong id) => RatingChannels.Value.Remove(id);
-
     }
 }

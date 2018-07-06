@@ -5,16 +5,30 @@ using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class DebugCommands
+    class DebugCommands : CommandsBase
     {
-        public static async void ChangeFlag(IMessage message, int num)
+        public DebugCommands() : base
+            (
+            (TransformMessageToChangeFlagAsync,
+            new string[] { "сменифлаг", "changeflag" })
+            ){ }
+
+        private static async Task TransformMessageToChangeFlagAsync(IMessage message, string argument)
         {
-            try { await message.DeleteAsync(); } finally { }
+            await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            var num = int.Parse(argument);
+            await CommandManager.Debug.ChangeFlagAsync(num);
+        }
+
+        public Task ChangeFlagAsync(int num)
+        {
             DataManager.DebugTriger[num] = !DataManager.DebugTriger[num];
+            return Task.CompletedTask;
         }
     }
 }

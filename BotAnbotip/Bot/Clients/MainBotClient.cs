@@ -23,54 +23,65 @@ namespace BotAnbotip.Bot.Clients
         private ReactionHandler _reactionHandler;
         private AntiSpam _antiReactionSpam;
         private AntiSpam _antiMessageSpam;
+        private CyclicActionManager _cyclicActionManager;
 
         public MainBotClient(BotType type) : base(type)
         {
+            _cyclicActionManager = new CyclicActionManager(type);
         }
 
         public async Task PrepareAsync()
         {
             _reactionHandler = new ReactionHandler();
-            
-            _client.ReactionAdded += ReactionAdded;
-            _client.ReactionRemoved += ReactionRemoved;
-            _client.Disconnected += (ex) => { CyclicActionManager.TurnOffMain(); return Task.CompletedTask; };
-            _client.GuildAvailable += Method;
-            _client.Connected += RunCyclicalMethods;
-            _client.UserJoined += UserJoinedTheGroup;
+            _antiMessageSpam = new AntiSpam(SpamType.Message);
+            _antiReactionSpam = new AntiSpam(SpamType.Reaction);
+
+            _client.ReactionAdded += OnReactionAddition;
+            _client.ReactionRemoved += OnReactionRemoving;            
+            _client.Connected += OnConnection;
+            _client.Disconnected += OnDisconnection;
+            _client.UserJoined += OnUserJoining;
+            _client.MessageReceived += OnMessageReceiving;
 
             await _client.SetGameAsync("ANBOTIP Group");          
         }
 
-        private Task Method(SocketGuild arg)
-        {
-            _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.MainPrefix);
-            _antiMessageSpam = new AntiSpam(SpamType.Message);
-            _antiReactionSpam = new AntiSpam(SpamType.Reaction);           
-            //_client.MessageReceived += (message) => { _antiMessageSpam.Check(message.Author.Id, message.Content); return Task.CompletedTask; };
-            //_client.ReactionAdded += (messageWithReaction, channel, reaction) => { _antiMessageSpam.Check(reaction.User.Value.Id); return Task.CompletedTask; };
-            _client.MessageReceived += _msgHandler.MessageReceived;
-            return Task.CompletedTask;
-        }
-
-        private async Task ReactionAdded(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            await Task.Run(() =>_reactionHandler.ReactionAdded(messageWithReaction, channel, reaction));
-        }
-
-        private async Task ReactionRemoved(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
-        {
-            await Task.Run(() => _reactionHandler.ReactionRemoved(messageWithReaction, channel, reaction));
-        }
-
-        private async Task UserJoinedTheGroup(SocketGuildUser user)
+        private async Task OnUserJoining(SocketGuildUser user)
         {
             await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Участник));
         }
 
-        private Task RunCyclicalMethods()
+        private Task OnConnection()
         {
-            CyclicActionManager.RunAllMain();
+            _cyclicActionManager.RunAll();
+            _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.MainPrefix);
+            return Task.CompletedTask;
+        }
+
+        private Task OnDisconnection(Exception ex)
+        {
+            _cyclicActionManager.TurnOffAll();
+            return Task.CompletedTask;
+        }
+
+        private Task OnMessageReceiving(SocketMessage message)
+        {
+            //_antiMessageSpam.Check(message.Author.Id, message.Content);
+            _msgHandler.ProcessTheMessage(message);
+            return Task.CompletedTask;
+        }
+
+        private Task OnReactionAddition(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            //_antiMessageSpam.Check(reaction.User.Value.Id);
+            _reactionHandler.ProcessTheAddedReaction(messageWithReaction, channel, reaction);
+            return Task.CompletedTask;
+        }
+
+        private Task OnReactionRemoving(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            //_antiMessageSpam.Check(reaction.User.Value.Id);
+            _reactionHandler.ProcessTheRemovedReaction(messageWithReaction, channel, reaction);
             return Task.CompletedTask;
         }
 

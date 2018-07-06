@@ -12,55 +12,66 @@ using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class NewsCommands
+    class NewsCommands : CommandsBase
     {
-        public static async Task SendAsync(IMessage message, string argument, bool hasImage = false, bool fromYT = false)
+        public NewsCommands() : base
+            (
+            (TransformMessageToSendAsync,
+            new string[] { "новость", "добавьновость", "news", "addnews" })
+            ){ }
+
+        private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            string  imageUrl = null, videoUrl = null;
+            var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
+            foreach(var (arg, str) in argumentList)
+            {
+                switch (arg)
+                {
+                    case 'и':
+                    case 'i': imageUrl = str;  break;
+                    case 'в':
+                    case 'v': videoUrl = str; break;                        
+                }
+            }
+            await CommandManager.News.SendAsync(message.Author, message.Channel, argument, imageUrl, videoUrl);
+        }
 
-            var username = BotClientManager.MainBot.Guild.GetUser(message.Author.Id).Nickname;
-            if (username == null) username = message.Author.Username;
+        public async Task SendAsync(IUser user, IMessageChannel channel, string text, string imageUrl = null, string videoUrl = null)
+        { 
+            var username = BotClientManager.MainBot.Guild.GetUser(user.Id).Nickname;
+            if (username == null) username = user.Username;
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.News])
-                .WithFooter(username, message.Author.GetAvatarUrl())
+                .WithFooter(username, user.GetAvatarUrl())
                 .WithTimestamp(DateTimeOffset.Now)
                 .WithColor(Color.Orange);
 
-            if (hasImage)
+            if (imageUrl != null)
             {
-                var str = argument.Split(' ');
-                var imageUrl = str[0];
                 embedBuilder.WithImageUrl(imageUrl);
-                argument = argument.Substring(imageUrl.Length);
             }
-
-            if (fromYT)
+            if (videoUrl != null)
             {
-                var str = argument.Split(' ');
-                var url = str[0];
                 string videoId = "";
-                foreach (string bufStr in url.Split('/'))
-                    if (bufStr == "youtu.be") videoId = url.Substring(url.Length - 11);
+                foreach (string bufStr in videoUrl.Split('/'))
+                    if (bufStr == "youtu.be") videoId = videoUrl.Substring(videoUrl.Length - 11);
 
-                if (videoId == "") videoId = url.Split('=')[1].Substring(0, 11);
-
-                embedBuilder.WithImageUrl($"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg");
-                argument = argument.Substring(url.Length);
+                if (videoId == "") videoId = videoUrl.Split('=')[1].Substring(0, 11);               
 
                 var newUrl = $"https://youtu.be/{videoId}";
-                embedBuilder.WithDescription(argument).AddField(new string('-', 40), newUrl);           
+
+                embedBuilder.WithImageUrl($"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg");
+                embedBuilder.AddField(new string('-', 40), newUrl);
             }
 
+            embedBuilder.WithDescription(text);
 
-            embedBuilder.WithDescription(argument);
-
-            var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
-
-
+            var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
             await sendedMessage.AddReactionAsync(new Emoji("👍"));
             await sendedMessage.AddReactionAsync(new Emoji("👎"));
-
         }
     }
 }

@@ -12,59 +12,73 @@ using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class VotingCommands
+    class VotingCommands : CommandsBase
     {
-        static public Dictionary<int, string> Numerals = new Dictionary<int, string> {
+        public VotingCommands() : base
+            (
+            (TransformMessageToAddVotingdAsync,
+            new string[] { "голосование", "+голосование", "добавьголосование", "voting", "+voting", "addvoting" }),
+            (TransformMessageToDeleteVotingAsync,
+            new string[] { "-голосование", "удалиголосование", "-voting", "deletevoting" })
+            ){ }
+
+        static private Dictionary<int, string> Numerals = new Dictionary<int, string> {
             { 1, "1\u20E3" }, { 2, "2\u20E3" }, { 3, "3\u20E3" }, { 4, "4\u20E3" }, { 5, "5\u20E3" },
             { 6, "6\u20E3" }, { 7, "7\u20E3" }, { 8, "8\u20E3" }, { 9, "9\u20E3" }, { 10, "🔟" }, };
 
 
-        public static async Task AddVotingdAsync(IMessage message, string argument)
+        private static async Task TransformMessageToAddVotingdAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            List<string> subjects = new List<string>();
+            foreach(var (arg, str) in CommandManager.ClearAndGetCommandArguments(ref argument))
+            {
+                if (arg == 's') subjects.Add(str);
+            }
+            await CommandManager.Voting.AddVotingdAsync(message.Channel, argument, subjects);
+        }
 
-            var str = argument.Split('|');
+        private static async Task TransformMessageToDeleteVotingAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            ulong messageId = ulong.Parse(argument);
+            await CommandManager.Voting.DeleteVotingAsync(message.Channel, messageId);
+        }
 
-            int numOfLines = str.Length;
-            string resultStr = "**" + str[0] + "**\n";
+        public async Task AddVotingdAsync(IMessageChannel channel, string topic, List<string> subjects)
+        {
+            string resultStr = "**" + topic + "**\n";
+
+            for (int i = 0; i < subjects.Count; i++)
+                resultStr += new Emoji(Numerals[i + 1]) + "`" + subjects[i] + "`\n";
+
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.Voting])
-                .WithColor(Color.Gold);
+                .WithColor(Color.Gold)
+                .WithDescription(resultStr);
 
-            for (int i = 1; i < numOfLines; i++)
+            var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
+
+            await sendedMessage.ModifyAsync((messageProperties) =>
             {
-                resultStr += new Emoji(Numerals[i]) + "`" + str[i] + "`\n";
-            }
+                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID Сообщения: " + sendedMessage.Id)).Build();
+            });
 
-           embedBuilder.WithDescription(resultStr);
-
-            var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
-
-            for (int i = 1; i < numOfLines; i++)
-            {
-                await sendedMessage.AddReactionAsync(new Emoji(Numerals[i]));
-            }
-            
+            for (int i = 0; i < subjects.Count; i++)
+                await sendedMessage.AddReactionAsync(new Emoji(Numerals[i + 1]));
 
             DataManager.VotingLists.Value.Add(sendedMessage.Id, new List<(string, int)>());
             await DataManager.VotingLists.SaveAsync();
         }
 
-        public static async Task DeleteVotingAsync(IMessage message, string argument)
+        public async Task DeleteVotingAsync(IMessageChannel channel, ulong messageId)
         {
-            await message.DeleteAsync();
-
-            ulong soughtForMessage = ulong.Parse(argument);
-
-            var userRoles = ((IGuildUser)message.Author).RoleIds;
-            if (userRoles.Contains((ulong)RoleIds.Основатель))
-            {
-                var foundedMessage = await message.Channel.GetMessageAsync(soughtForMessage);
-                await foundedMessage.DeleteAsync();
-                DataManager.VotingLists.Value.Remove(foundedMessage.Id);
-                await DataManager.VotingLists.SaveAsync();
-            }
+            var foundedMessage = await channel.GetMessageAsync(messageId);
+            await foundedMessage.DeleteAsync();
+            DataManager.VotingLists.Value.Remove(foundedMessage.Id);
+            await DataManager.VotingLists.SaveAsync();
         }
     }
 }

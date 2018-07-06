@@ -17,10 +17,9 @@ namespace BotAnbotip.Bot.CyclicActions
         public DailyMessagesCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
             base(botClient, errorMessage, startMessage, stopMessage)
         {
-            _cycleMethod = Cycle;
         }
 
-        private async Task Cycle(CancellationToken token)
+        protected override async Task Cycle(CancellationToken token)
         {
             await Task.CompletedTask;
             /*while (IsStarted)

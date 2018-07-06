@@ -10,18 +10,27 @@ using Discord;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class ManageTheRolesCommands
+    class RoleManagementCommands : CommandsBase
     {
-        public static async Task GetAsync(IMessage message, string argument)
+        public RoleManagementCommands() : base
+            (
+            (TransformMessageToGetAsync,
+            new string[] { "дайроль", "получитьроль", "givemerole", "getrole" })
+            ){ }
+
+        private static async Task TransformMessageToGetAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
-
             ulong roleId = ulong.Parse(argument.Substring(3, argument.Length - 4));
+            await CommandManager.RoleManagement.GetAsync(message.Author, roleId);
+        }
 
+        public async Task GetAsync(IUser user, ulong roleId)
+        {
             if (CheckTheRole(roleId))
             {
-                await ((SocketGuildUser)message.Author).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+                await ((IGuildUser)user).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
             }
         }
 

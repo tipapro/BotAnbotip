@@ -22,10 +22,9 @@ namespace BotAnbotip.Bot.CyclicActions
         public RainbowRoleAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
-            _cycleMethod = Cycle;
         }
 
-        private async Task Cycle(CancellationToken token)
+        protected override async Task Cycle(CancellationToken token)
         {
             globalX = 0;
             while (IsStarted)

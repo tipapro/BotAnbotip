@@ -13,164 +13,54 @@ namespace BotAnbotip.Bot.Commands
 {
     class CommandManager
     {
+        public const char ArgumentPrefix = '/';
+
         private ulong botId;
+
+        private List<CommandsBase> _commandsCollection;
+
+        public static AnnouncementCommands Announcement { get; private set; }
+        public static AnonymousMessageCommands AnonymousMessage { get; private set; }
+        public static BotControlCommands BotControl { get; private set; }
+        public static DebugCommands Debug { get; private set; }
+        public static RoleManagementCommands RoleManagement { get; private set; }
+        public static NewsCommands News { get; private set; }
+        public static RatingListCommands RatingList { get; private set; }
+        public static VotingCommands Voting { get; private set; }
+        public static WantPlayMessageCommands WantPlayMessage { get; private set; }
+
+        public static HackerChannelCommands HackerChannel { get; private set; }
+        public static RainbowRoleCommands RainbowRole { get; private set; }
 
         public CommandManager(ulong botId)
         {
+            Announcement = new AnnouncementCommands();
+            AnonymousMessage = new AnonymousMessageCommands();
+            BotControl = new BotControlCommands();
+            Debug = new DebugCommands();
+            RoleManagement = new RoleManagementCommands();
+            News = new NewsCommands();
+            RatingList = new RatingListCommands();
+            Voting = new VotingCommands();
+            WantPlayMessage = new WantPlayMessageCommands();
+
+            HackerChannel = new HackerChannelCommands();
+            RainbowRole = new RainbowRoleCommands();
+
             this.botId = botId;
+            if (botId == BotClientManager.MainBot.Id)
+                _commandsCollection = new List<CommandsBase> { Announcement, AnonymousMessage, BotControl, Debug, RoleManagement, News,
+                RatingList, Voting, WantPlayMessage };
+            else if (botId == BotClientManager.AuxiliaryBot.Id)
+                _commandsCollection = new List<CommandsBase> { HackerChannel, RainbowRole };
         }
 
-        public async Task RunCommand(string command, string argument, SocketMessage message)
+        public async Task RunCommand(string commandName, string argument, SocketMessage message)// !!!!!!!!!!
         {
-            if (argument != "")
+            foreach (var commands in _commandsCollection)
             {
-                if (botId == BotClientManager.MainBot.Id)
-                {
-                    switch (command)
-                    {
-                        case "ктоанон":
-                        case "whoisanon": await AnonymousMessageCommands.GetAnonymousUserAsync(message, argument); break;
-
-                        case "+лист":
-                        case "добавьлист":
-                        case "+list":
-                        case "addlist":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.AddListAsync(message, argument); break;
-
-                        case "-лист":
-                        case "удалилист":
-                        case "-list":
-                        case "removelist":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.RemoveListAsync(message, argument); break;
-
-                        case "ревёрс":
-                        case "ревёрслист":
-                        case "reverselist":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.ReverseAsync(message, argument); break;
-
-                        case "+об":
-                        case "добавьоб":
-                        case "+obj":
-                        case "addobj":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.AddValueAsync(message, argument, false, false); break;
-
-                        case "+об+с":
-                        case "добавьоб+с":
-                        case "+obj+l":
-                        case "addobj+l":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.AddValueAsync(message, argument, true, false); break;
-
-                        case "+об+к":
-                        case "добавьоб+к":
-                        case "+obj+i":
-                        case "addobj+i":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.AddValueAsync(message, argument, false, true); break;
-
-                        case "+об+с+к":
-                        case "+об+к+с":
-                        case "добавьоб+с+к":
-                        case "добавьоб+к+с":
-                        case "+obj+l+i":
-                        case "+obj+i+l":
-                        case "addobj+i+l":
-                        case "addobj+l+i":
-                            RatingListCommands.AwaitedTask?.Wait();
-                            RatingListCommands.AwaitedTask = RatingListCommands.AddValueAsync(message, argument, true, true); break;
-
-                        case "-об":
-                        case "удалиоб":
-                        case "-obj":
-                        case "removeobj": await RatingListCommands.RemoveValueAsync(message, argument); break;
-
-                        case "новость":
-                        case "news": await NewsCommands.SendAsync(message, argument); break;
-
-                        case "новость+к":
-                        case "news+p": await NewsCommands.SendAsync(message, argument, true); break;
-
-                        case "новость+ю":
-                        case "news+y": await NewsCommands.SendAsync(message, argument, false, true); break;
-
-                        case "голосование":
-                        case "voting": await VotingCommands.AddVotingdAsync(message, argument); break;
-
-                        case "-голосование":
-                        case "удалиголосование":
-                        case "-voting":
-                        case "deletevoting": await VotingCommands.DeleteVotingAsync(message, argument); break;
-
-                        case "анон":
-                        case "анонимно":
-                        case "anon":
-                        case "anonymously": await AnonymousMessageCommands.SendAsync(message, argument); break;
-
-                        case "-анон":
-                        case "удалианон":
-                        case "-anon":
-                        case "deleteanon":
-                        case "deleteanonymousmessage": await AnonymousMessageCommands.DeleteAsync(message, argument); break;
-
-                        case "объяви":
-                        case "анонс":
-                        case "announce": await AnnouncementCommands.SendAsync(message, argument); break;
-
-                        case "дайроль":
-                        case "giveme":
-                        case "giverole": await ManageTheRolesCommands.GetAsync(message, argument); break;
-
-                        case "хочуиграть":
-                        case "wantplay": await WantPlayMessageCommands.SendAsync(argument, message); break;
-
-                        default:
-                            await message.DeleteAsync();
-                            await message.Author.SendMessageAsync($"Команда {command} не определена.\nВаше запрос: " + message.Content);
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (command)
-                    {
-                        case "радуга":
-                        case "rainbow": await RainbowRoleCommands.ChangeRainbowRoleState(message, argument); break;
-
-                        case "хакерканал":
-                        case "hakerch":
-                        case "hakerchannel": await HackerChannelCommands.ChangeStateOfTheHackerChannelAsync(message, argument); break;
-
-                        default:
-                            await message.DeleteAsync();
-                            await message.Author.SendMessageAsync($"Команда {command} не определена.\nВаше запрос: " + message.Content);
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                switch (command)
-                {
-                    case "стоп":
-                    case "stop": BotControlCommands.Stop(message, BotClientManager.MainBot.Client); break;
-
-                    case "удалиданные":
-                    case "cleardata": BotControlCommands.ClearData(message, BotClientManager.MainBot.Client); break;
-
-                    case "debug0": DebugCommands.ChangeFlag(message, 0); break;
-                    case "debug1": DebugCommands.ChangeFlag(message, 1); break;
-                    case "debug2": DebugCommands.ChangeFlag(message, 2); break;
-                    case "debug3": DebugCommands.ChangeFlag(message, 3); break;
-                    case "debug4": DebugCommands.ChangeFlag(message, 4); break;
-                    default:
-                        await message.DeleteAsync();
-                        await message.Author.SendMessageAsync($"Неаргументированная команда {command} не определена.\nВаше запрос: " + message.Content);
-                        break;
-                }
+                var command = commands[commandName];
+                if (command != null) await command.Invoke(message, argument);
             }
         }
 
@@ -204,6 +94,34 @@ namespace BotAnbotip.Bot.Commands
                 case RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
                 default: return 0;
             }
+        }
+
+
+        public static List<(char, string)> ClearAndGetCommandArguments(ref string text)
+        {
+            List<(char, string)> resultList = new List<(char, string)>();
+            int startIndex = 0;
+            var charArray = text.ToCharArray();
+            for (var i = 0; i < charArray.Length - 1; i++)
+            {
+                if ((charArray[i] != ArgumentPrefix) || (charArray[i + 1] == ArgumentPrefix)) continue;
+                string resultString = "";
+                startIndex = i + 2;
+                if ((i != charArray.Length) && (charArray[i + 2] == ':') && (charArray[i + 3] == '"'))
+                {
+                    for (var j = i + 4; j < charArray.Length; j++)
+                    {
+                        if (charArray[j] != '"') continue;
+                        resultString = text.Substring(i + 4, j - i - 4);
+                        i = j;
+                        startIndex = j+1;
+                        break;
+                    }
+                }
+                resultList.Add((charArray[i + 1], resultString));
+            }
+            text = text.Substring(startIndex).Trim();
+            return resultList;
         }
     }
 }

@@ -11,25 +11,52 @@ using BotAnbotip.Bot.CyclicActions;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class HackerChannelCommands
+    class HackerChannelCommands : CommandsBase
     {
-        public static async Task ChangeStateOfTheHackerChannelAsync(IMessage message, string argument)
+        public HackerChannelCommands() : base
+            (
+            (TransformMessageToChangeStateAsync,
+            new string[] { "хакерканал", "hackerchannel", "hackerch" })
+            ){ }
+
+        private static async Task TransformMessageToChangeStateAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            var str = argument.Split(' ');
-            if (str.Length > 1)
+            var strArray = argument.Split(' ');
+
+            ulong roleId = 0;
+            if (strArray.Length > 1)
             {
-                argument = str[0];
-                await DataManager.HackerChannelId.SaveAsync(ulong.Parse(str[1]));
+                argument = strArray[0];
+                roleId = ulong.Parse(strArray[1]);
             }
-            if (argument == "вкл")
+
+            bool changedState = false;
+            switch (argument)
+            {
+                case "вкл":
+                case "+":
+                case "on": changedState = true; break;
+                case "выкл":
+                case "-":
+                case "off": changedState = false; break;
+                default: throw new ArgumentException("Неопознанный аргумент", "changedState");
+            }
+            await CommandManager.HackerChannel.ChangeStateAsync(changedState, roleId);
+        }
+
+        public async Task ChangeStateAsync(bool changedState, ulong roleId = 0)
+        {
+            if (roleId != 0) await DataManager.HackerChannelId.SaveAsync(roleId);
+
+            if (changedState)
             {
                 CyclicActionManager.HackerChannelAutoChange.Run();
                 await DataManager.HackerChannelIsRunning.SaveAsync(true);
             }
-            else if (argument == "выкл")
+            else 
             {
                 CyclicActionManager.HackerChannelAutoChange.Stop();
                 await DataManager.HackerChannelIsRunning.SaveAsync(false);

@@ -12,36 +12,124 @@ using BotAnbotip.Bot.Clients;
 
 namespace BotAnbotip.Bot.Commands
 {
-    public class RatingListCommands
+    public class RatingListCommands : CommandsBase
     {
-        public static Task AwaitedTask;
+        public RatingListCommands() : base
+            (
+            (TransformMessageToAddListAsync,
+            new string[] { "+лист", "добавьлист", "+list","addlist" }),
+            (TransformMessageToRemoveListAsync,
+            new string[] { "-лист", "удалилист", "-list", "removelist" }),
+            (TransformMessageToAddValueAsync,
+            new string[] { "+объект", "добавьобъект", "добавьоб", "+object", "addobject", "addobj" }),
+            (TransformMessageToRemoveValueAsync,
+            new string[] { "-объект", "удалиобъект", "удалиоб", "-object", "removeobject", "removeobj" }),
+            (TransformMessageToReverseAsync,
+            new string[] { "переверни", "перевернилист", "reverse", "reverselist" }),
+            (TransformMessageToUpdateList,
+            new string[] { "обнови", "обновилист", "update", "updatelist" })
+            )
+        { }
+
         public static Dictionary<RatingListType, string> TypeEmodji = new Dictionary<RatingListType, string>()
         {
-            {RatingListType.Game, "🎮"},
-            {RatingListType.Music, "🎵"}
+            {RatingListType.Gaming, "🎮"},
+            {RatingListType.Musical, "🎵"}
         };
 
-        public static async Task AddListAsync(IMessage message, string argument)
+        private static async Task TransformMessageToAddListAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
 
-            var strBuf = argument.Split(' ');
-            var listName = argument.Substring((strBuf[0].Length));
             RatingListType listType = RatingListType.Other;
-            if (strBuf.Length != 1)
+            var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
+            foreach (var (arg, str) in argumentList)
             {
-                switch (strBuf[0])
+                switch (arg)
                 {
-                    case "игры":
-                        listType = RatingListType.Game;
+                    case 'т':
+                    case 't':
+                        switch (str)
+                        {
+                            case "игровой":
+                            case "gaming": listType = RatingListType.Gaming; break;
+                            case "музыкальный":
+                            case "musical": listType = RatingListType.Musical; break;
+                        }
                         break;
-                    case "музыка":
-                        listType = RatingListType.Music;
-                        break;
+                    case 'и':
+                    case 'g': listType = RatingListType.Gaming; break;
+                    case 'м':
+                    case 'm': listType = RatingListType.Musical; break;
                 }
             }
+            await CommandManager.RatingList.AddListAsync(argument, listType);
+        }
 
+        private static async Task TransformMessageToRemoveListAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            ulong ratingListId = ulong.Parse(argument);
+            await CommandManager.RatingList.RemoveListAsync(ratingListId);
+        }
+
+        private static async Task TransformMessageToAddValueAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+
+            string thumbnailUrl = null, url = null;
+            var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
+            foreach (var (arg, str) in argumentList)
+            {
+                switch (arg)
+                {
+                    case 'и':
+                    case 'i': thumbnailUrl = str; break;
+                    case 'с':
+                    case 'l': url = str; break;
+                }
+            }
+            await CommandManager.RatingList.AddValueAsync(message.Channel, argument, thumbnailUrl, url);
+        }
+
+        private static async Task TransformMessageToRemoveValueAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            await CommandManager.RatingList.RemoveValueAsync(message.Channel, argument);
+        }
+
+        private static async Task TransformMessageToReverseAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            await CommandManager.RatingList.ReverseAsync(message.Channel);
+        }
+
+        private static async Task TransformMessageToUpdateList(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            int fromPos = 0, toPos = 0;
+            if (argument == "-1")
+            {
+                fromPos = 0;
+                toPos = -1;
+            }
+            else
+            {
+                var strArray = argument.Split(' ');
+                fromPos = int.Parse(strArray[0]);
+                toPos = int.Parse(strArray[1]);
+            }
+            await CommandManager.RatingList.UpdateList(fromPos, toPos, message.Channel.Id);
+        }
+
+        public async Task AddListAsync(string listName,  RatingListType listType)
+        {
             var newRatingChannel = await BotClientManager.MainBot.Guild.CreateTextChannelAsync(listName);
             await newRatingChannel.ModifyAsync((textChannelProperties) =>
             {
@@ -85,110 +173,72 @@ namespace BotAnbotip.Bot.Commands
             await DataManager.RatingChannels.SaveAsync();
         }
 
-        public static async Task RemoveListAsync(IMessage message, string argument)
+        public async Task RemoveListAsync(ulong ratingListId)
         {
-            await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
-            ulong ratingListId = ulong.Parse(argument);
             var ratingChannel = BotClientManager.MainBot.Guild.GetChannel(ratingListId);
             if (ratingChannel != null) await ratingChannel.DeleteAsync();
 
-            DataManager.RemoveRatingList(ratingListId);
+            DataManager.RatingChannels.Value.Remove(ratingListId);
             await DataManager.RatingChannels.SaveAsync();
         }
 
-        public static async Task AddValueAsync(IMessage message, string argument, bool hasLink, bool hasImage)//!!!!!
+        public async Task AddValueAsync(IMessageChannel channel, string objName, string thumbnailUrl = null, string url = null)//!!!!!
         {
-            await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
-            string[] bufStr = argument.Split(' ');
-            string thumbnailUrl = "", url = "";
-            string objName = argument;
-
-            if ((hasLink) && (hasImage))
-            {
-                url = bufStr[1];
-                thumbnailUrl = bufStr[0];
-                objName = argument.Substring(url.Count() + thumbnailUrl.Count() + 2);
-            }
-            else if (hasLink)
-            {
-                url = bufStr[0];
-                objName = argument.Substring(url.Count() + 1);
-            }
-            else if (hasImage)
-            {
-                thumbnailUrl = bufStr[0];
-                objName = argument.Substring(thumbnailUrl.Count() + 1);
-            }
-
+            var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
             var embedBuilder = new EmbedBuilder()
             .WithDescription("**" + objName + "**")
             .WithFooter("Количество лайков: 0 ❤️")
             .WithColor(Color.Green);
-            embedBuilder = embedBuilder.WithThumbnailUrl(thumbnailUrl).WithUrl(url);
+            if (thumbnailUrl != null) embedBuilder.WithThumbnailUrl(thumbnailUrl);
+            if (url != null) embedBuilder.WithUrl(url);
 
-            var sendedMessage = await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
+            var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
 
             await sendedMessage.AddReactionAsync(new Emoji("💙"));
             await sendedMessage.AddReactionAsync(new Emoji("❌"));
 
-            var ratingList = DataManager.RatingChannels.Value[message.Channel.Id];
+            var ratingList = DataManager.RatingChannels.Value[channel.Id];
             var obj = new RLObject(objName, ratingList.ListOfObjects.Count, url, thumbnailUrl);
             ratingList.ListOfObjects.Add(obj);
             ratingList.ListOfMessageIds.Add(sendedMessage.Id);
 
             if (ratingList.Type != RatingListType.Other)
-            {
                 await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
-            }
+            var newPosition = ratingList.ListOfObjects.Sort(obj, ratingList.ListOfObjects.Count - 1, Evaluation.None);
 
-            var position = ratingList.ListOfMessageIds.IsReversed ? 0 : ratingList.ListOfObjects.Count - 1;
-            var newPosition = ratingList.ListOfObjects.Sort(obj, position, Evaluation.None);
-
-            await UpdateList(ratingList, position, newPosition);
+            var position = ratingList.ListOfMessageIds.IsReversed ? 0 : ratingList.ListOfMessageIds.Count - 1;
+            await UpdateList(position, newPosition, 0, ratingList);
 
             await DataManager.RatingChannels.SaveAsync();
+            RemoveFromQueue(queueIds);
         }
 
-        public static async Task RemoveValueAsync(IMessage message, string argument)
+        public async Task RemoveValueAsync(IMessageChannel channel, string objName)
         {
-            await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
-            var list = DataManager.RatingChannels.Value[message.Channel.Id];
-            var buf = list.ListOfObjects.FindByName(argument);
-            var position = buf.Item1;
-            var obj = buf.Item2;
+            var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
+            var list = DataManager.RatingChannels.Value[channel.Id];
+            var (position, obj) = list.ListOfObjects.FindByName(objName);
 
             if (obj != null)
             {
-                var messageId = list.ListOfMessageIds[buf.Item1];
-                var foundedMessage = await message.Channel.GetMessageAsync(messageId);
+                var messageId = list.ListOfMessageIds[position];
+                var foundedMessage = await channel.GetMessageAsync(messageId);
                 await foundedMessage.DeleteAsync();
 
-                list.ListOfObjects.Remove(list.ListOfObjects.FindByName(argument).Item2);
+                list.ListOfObjects.Remove(obj);
                 list.ListOfMessageIds.Remove(messageId);
                 await DataManager.RatingChannels.SaveAsync();
             }
+            RemoveFromQueue(queueIds);
         }
 
-        public static async Task ChangeRatingAsync(IUserMessage message, IUser user, Evaluation eval)
+        public async Task ChangeRatingAsync(IUser user,  IMessageChannel channel, string objName,  Evaluation eval)
         {
-            if (!CommandManager.CheckPermission((IGuildUser)user, RoleIds.Активный_Участник)) return;
-
-            var objName = ConvertMessageToRatingListObject(message);
-
-            var ratingList = DataManager.RatingChannels.Value[message.Channel.Id];
-            var buf = ratingList.ListOfObjects.FindByName(objName);
-            var currentPosition = buf.Item1;
-            var obj = buf.Item2;
-            var likedUsers = buf.Item2?.LikedUsers;
+            var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
+            var ratingList = DataManager.RatingChannels.Value[channel.Id];
+            var (position, obj) = ratingList.ListOfObjects.FindByName(objName);
+            var likedUsers = obj?.LikedUsers;
             if (likedUsers == null) throw new NullReferenceException();
-
-            var previousCount = likedUsers.Count;
 
             if (eval == Evaluation.Like)
             {
@@ -196,35 +246,35 @@ namespace BotAnbotip.Bot.Commands
             }
             else likedUsers.Remove(user.Id);
 
-            var newPosition = ratingList.ListOfObjects.Sort(obj, currentPosition, eval);
+            var newPosition = ratingList.ListOfObjects.Sort(obj, position, eval);
 
-            await UpdateList(ratingList, currentPosition, newPosition);
+            await UpdateList(position, newPosition, 0, ratingList);
             await DataManager.RatingChannels.SaveAsync();
-
+            RemoveFromQueue(queueIds);
         }
 
-        public static async Task ReverseAsync(IMessage message, string argument)
+        public async Task ReverseAsync(IMessageChannel channel)
         {
-            await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
-            var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(ulong.Parse(argument)));
+            var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
             var list = DataManager.RatingChannels.Value[channel.Id];
 
             list.ListOfMessageIds.IsReversed = !list.ListOfMessageIds.IsReversed;
 
-            await UpdateList(list, 0, list.ListOfObjects.Count);
+            await UpdateList(0, -1, 0, list);
             await DataManager.RatingChannels.SaveAsync();
+            RemoveFromQueue(queueIds);
         }
 
-        public static async Task UpdateList(RatingList list, int previousPosition, int currentPosition)
+        public async Task UpdateList(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
         {
+            if ((channelId != 0) && (list == null)) list = DataManager.RatingChannels.Value[channelId];
+            if (toPos == -1) toPos = list.ListOfObjects.Count - 1;
             var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
             var objects = list.ListOfObjects;
 
-            int sign = previousPosition <= currentPosition ? 1 : -1;
+            int sign = fromPos <= toPos ? 1 : -1;
 
-            for (int i = previousPosition; i != currentPosition + sign; i += sign)
+            for (int i = fromPos; i != toPos + sign; i += sign)
             {
                 await Task.Delay(100);
                 var listObj = list.ListOfObjects[i];
@@ -239,6 +289,7 @@ namespace BotAnbotip.Bot.Commands
 
                 await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
             }
+
         }
 
         public static string ConvertMessageToRatingListObject(IUserMessage message)

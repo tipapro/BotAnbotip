@@ -15,31 +15,38 @@ namespace BotAnbotip.Bot.Clients
     public class AuxiliaryBotClient: BotClientBase
     {
         private MessageHandler _msgHandler;
+        private CyclicActionManager _cyclicActionManager;
 
         public AuxiliaryBotClient(BotType type) : base(type)
         {
+            _cyclicActionManager = new CyclicActionManager(type);
         }
 
         public async Task PrepareAsync()
         {
-            _client.Connected += RunCyclicalMethods;
-            _client.Disconnected += (ex) => {CyclicActionManager.TurnOffAuxiliary(); return Task.CompletedTask;};
-            _client.GuildAvailable += Method;
+            _client.Connected += OnConnection;            
+            _client.Disconnected += OnDisconnection;
+            _client.MessageReceived += OnMessageReceiving;
 
             await _client.SetGameAsync("ANBOTIP Group");
         }
 
-        private Task Method(SocketGuild arg)
+        private Task OnConnection()
         {
+            _cyclicActionManager.RunAll();
             _msgHandler = new MessageHandler(_client.CurrentUser.Id, PrivateData.AuxiliaryPrefix);
-            _client.MessageReceived += _msgHandler.MessageReceived;
             return Task.CompletedTask;
         }
 
-        private static Task RunCyclicalMethods()
+        private Task OnDisconnection(Exception ex)
         {
-            if (DataManager.HackerChannelIsRunning.Value) CyclicActionManager.HackerChannelAutoChange.Run();
-            if (DataManager.RainbowRoleIsRunning.Value) CyclicActionManager.RainbowRoleAutoChange.Run();
+            _cyclicActionManager.TurnOffAll();
+            return Task.CompletedTask;
+        }
+
+        private Task OnMessageReceiving(SocketMessage message)
+        {
+            _msgHandler.ProcessTheMessage(message);
             return Task.CompletedTask;
         }
     }

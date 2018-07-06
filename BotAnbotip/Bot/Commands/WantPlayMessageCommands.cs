@@ -13,37 +13,80 @@ using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class WantPlayMessageCommands
+    class WantPlayMessageCommands : CommandsBase
     {
-        public static async Task SendAsync(string gameName, IMessage message = null, string gamePictureUrl = null, string url = null)
+        public WantPlayMessageCommands() : base
+            (
+            (TransformMessageToSendAsync,
+            new string[] { "хочуиграть", "wantplay" }),
+            (TransformMessageToRemoveAsync,
+            new string[] { "удалиприглашение", "далиприглос", "removeinviting" })
+            ){ }
+
+        private static async Task TransformMessageToSendAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+
+            string gameImage = null;
+            string gameUrl = null;
+            var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
+            foreach (var (arg, str) in argumentList)
+            {
+                switch (arg)
+                {
+                    case 'и':
+                    case 'i': gameImage = str; break;
+                    case 'с':
+                    case 'l': gameUrl = str; break;
+                }
+            }
+            await CommandManager.WantPlayMessage.SendAsync(message.Author, argument, gameImage, gameUrl);
+        }
+
+        private static async Task TransformMessageToRemoveAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            await CommandManager.WantPlayMessage.RemoveAsync(message.Author, ulong.Parse(argument));
+        }
+
+        public async Task SendAsync(IUser user, string gameName, string gameImage = null, string gameUrl = null)
         {
             if (gameName.Length > 64) return;
-            string userMention = "";
-            ulong userId = 0;
             var embedBuilder = new EmbedBuilder()
+                .WithTitle(MessageTitles.Titles[TitleType.WantPlay])
+                .WithDescription("Пользователь " + user.Mention + " приглашает в игру **" + gameName + "**.")
+                .WithThumbnailUrl(gameImage)
                 .WithColor(Color.DarkBlue);
 
-            if ((message != null) && (message.Author.Id != BotClientManager.MainBot.Id))
-            {
-                await message.DeleteAsync();
-                userMention = message.Author.Mention;
-                userId = message.Author.Id;
-            }
-            if (gamePictureUrl != null) embedBuilder.WithThumbnailUrl(gamePictureUrl);
-            if (url != null) embedBuilder.WithUrl(url);
+            if (gameImage != null) embedBuilder.WithThumbnailUrl(gameImage);
+            if (gameUrl != null) embedBuilder.WithUrl(gameUrl);
 
-            embedBuilder.WithTitle(MessageTitles.Titles[TitleType.WantPlay])
-                .WithDescription("Пользователь " + userMention + " приглашает в игру **" + gameName + "**.");
 
             var sendedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
+
+            await sendedMessage.ModifyAsync((messageProperties) =>
+            {
+                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID Сообщения: " + sendedMessage.Id)).Build();
+            });
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
             await sendedMessage.AddReactionAsync(new Emoji("📩"));
 
-            DataManager.AgreeingToPlayUsers.Value.Add(sendedMessage.Id, (sendedMessage.Timestamp, new List<ulong> { userId }));
+            DataManager.AgreeingToPlayUsers.Value.Add(sendedMessage.Id, (sendedMessage.Timestamp, new List<ulong> { user.Id }));
             await DataManager.AgreeingToPlayUsers.SaveAsync();
+        }
 
-            //await NotifySubscribedUsersAsync(userId, gameName);
+        private async Task RemoveAsync(IUser user, ulong messageId)
+        {
+            if (DataManager.AgreeingToPlayUsers.Value[messageId].Item2[0] == user.Id)
+            {
+                var foundedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(messageId);
+                await foundedMessage.DeleteAsync();
+                DataManager.AgreeingToPlayUsers.Value.Remove(messageId);
+                await DataManager.AgreeingToPlayUsers.SaveAsync();
+            }
         }
 
         public static async Task NotifySubscribedUsersAsync(ulong userId, string gameName)
@@ -192,7 +235,7 @@ namespace BotAnbotip.Bot.Commands
 
 
 
-        private static async Task SubscribeAsync(ulong userId, string gameName, ulong subscriber)
+        public static async Task SubscribeAsync(ulong userId, string gameName, ulong subscriber)
         {
             if (!DataManager.Subscribers.Value.ContainsKey(userId))
                 DataManager.Subscribers.Value.Add(userId, new Dictionary<string, List<ulong>>());
@@ -204,7 +247,7 @@ namespace BotAnbotip.Bot.Commands
                 DataManager.Subscribers.Value[userId][gameName].Add(subscriber);
             await DataManager.Subscribers.SaveAsync();
         }
-        private static async Task UnsubscribeAsync(ulong userId, string gameName, ulong subscriber)
+        public static async Task UnsubscribeAsync(ulong userId, string gameName, ulong subscriber)
         {
             if ((DataManager.Subscribers.Value.ContainsKey(userId))
                 && (DataManager.Subscribers.Value[userId].ContainsKey(gameName))

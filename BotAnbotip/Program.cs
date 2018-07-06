@@ -10,10 +10,13 @@ namespace BotAnbotip
         {
             PrivateData.Read();
             await DataManager.ReadAllDataAsync();
+
             await BotClientManager.MainBot.PrepareAsync();
             await BotClientManager.AuxiliaryBot.PrepareAsync();
+
             BotClientManager.MainBot.Launch();
             BotClientManager.AuxiliaryBot.Launch();
+
             await Task.Delay(-1);
         }
     }

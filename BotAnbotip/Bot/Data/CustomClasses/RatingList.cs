@@ -10,8 +10,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
     {
         public ulong Id { get; set; }
         public RatingListType Type { get; set; }
-        public RLObjectList ListOfObjects { get; set; }
-        public RLMessageIdList ListOfMessageIds { get; set; }
+        public RLObjectCollection ListOfObjects { get; set; }
+        public MessageIdCollection ListOfMessageIds { get; set; }
 
         private RatingList() { }
 
@@ -19,13 +19,13 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         {
             Id = id;
             Type = Type;
-            ListOfObjects = new RLObjectList();
-            ListOfMessageIds = new RLMessageIdList(id);            
+            ListOfObjects = new RLObjectCollection();
+            ListOfMessageIds = new MessageIdCollection(id);            
         }
     }
 
     [JsonObject]
-    public class RLMessageIdList : IEnumerable
+    public class MessageIdCollection : IEnumerable
     {
         [JsonProperty]
         private List<ulong> _listOfRLMessageIds;
@@ -33,13 +33,13 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         public bool IsReversed { get; set; }
         public int Count => _listOfRLMessageIds.Count;
 
-        public RLMessageIdList(ulong groupId)
+        public MessageIdCollection(ulong groupId)
         {
             IsReversed = false;
             _listOfRLMessageIds = new List<ulong>();
         }
 
-        public ulong this[int position] => _listOfRLMessageIds[ConvertPosition(position)];        
+        public ulong this[int position] => _listOfRLMessageIds[ConvertPosition(position)];
 
         public void Add(ulong messageId) => _listOfRLMessageIds.Add(messageId);
 
@@ -53,18 +53,18 @@ namespace BotAnbotip.Bot.Data.CustomClasses
                 return position;
         }
 
-        public IEnumerator GetEnumerator() => ((IEnumerable)_listOfRLMessageIds).GetEnumerator();   
+        public IEnumerator GetEnumerator() => _listOfRLMessageIds.GetEnumerator();   
     }
 
     [JsonObject]
-    public class RLObjectList : IEnumerable
+    public class RLObjectCollection : IEnumerable
     {
         [JsonProperty]
         private List<RLObject> _listOfRLObjects;
 
         public int Count => _listOfRLObjects.Count;
 
-        public RLObjectList()
+        public RLObjectCollection()
         {
             _listOfRLObjects = new List<RLObject>();
         }
@@ -72,7 +72,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         public RLObject this[int position] => _listOfRLObjects[position];
 
 
-        public (int, RLObject) FindByName(string name)
+        public (int, RLObject) FindByName(string name)      // Неэффективно!!!
         {
             for (int i = 0; i < _listOfRLObjects.Count; i++)
             {
@@ -83,27 +83,34 @@ namespace BotAnbotip.Bot.Data.CustomClasses
 
         public int Sort(RLObject obj, int currentPosition, Evaluation eval)
         {
-            int endValue = eval == Evaluation.Dislike ? _listOfRLObjects.Count - 1 : 0;
-            int newPosition;
-
-            for (int i = currentPosition - (int)eval; ; i -= (int)eval)
+            try
             {
-                if ((obj.CompareTo(_listOfRLObjects[i]) != (int)eval) || (i == endValue - (int)eval))
+                int endValue = eval == Evaluation.Dislike ? _listOfRLObjects.Count - 1 : 0;
+                int newPosition = 0;
+
+                for (int i = currentPosition - (int)eval; ; i -= (int)eval)
                 {
-                    newPosition = i + (int)eval;
-                    _listOfRLObjects[i + (int)eval] = obj;
-                    break;
+                    if ((i == endValue - (int)eval) || (obj.CompareTo(_listOfRLObjects[i]) != (int)eval))
+                    {
+                        newPosition = i + (int)eval;
+                        _listOfRLObjects[i + (int)eval] = obj;
+                        break;
+                    }
+                    _listOfRLObjects[i + (int)eval] = _listOfRLObjects[i];
                 }
-                _listOfRLObjects[i + (int)eval] = _listOfRLObjects[i];
+                return newPosition;
             }
-            return newPosition;
+            catch (Exception ex)
+            {
+                throw new Exception("Ошибка при сортировке рейтингового листа", ex);
+            }
         }
 
         public void Add(RLObject obj) => _listOfRLObjects.Add(obj);
 
         public void Remove(RLObject obj) => _listOfRLObjects.Remove(obj);
 
-        public IEnumerator GetEnumerator() => ((IEnumerable)_listOfRLObjects).GetEnumerator();
+        public IEnumerator GetEnumerator() => _listOfRLObjects.GetEnumerator();
     }
 
     [JsonObject]
@@ -139,5 +146,5 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         Dislike = -1
     }
 
-    public enum RatingListType { Game, Music, Other}
+    public enum RatingListType { Gaming, Musical, Other}
 }

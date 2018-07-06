@@ -10,26 +10,27 @@ namespace BotAnbotip.Bot.CyclicActions
 {
     class CyclicActionBase
     {
-        private bool _isStarted;
-        private BotClientBase _botClient;
         private CancellationTokenSource _cts;
-        protected Func<CancellationToken, Task> _cycleMethod;
+        private Func<CancellationToken, Task> _cycleMethod;
 
         public string ErrorMessage;
         public string StartMessage;
         public string StopMessage;
 
-        public bool IsStarted => _isStarted;
-        public BotClientBase BotClient => _botClient;
-        public Func<CancellationToken, Task> CycleMethod => _cycleMethod;
+        public bool IsStarted { get; private set; }
+
+        public BotClientBase BotClient { get; }
 
         public CyclicActionBase(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage)
         {
-            _botClient = botClient;
+            BotClient = botClient;
             ErrorMessage = errorMessage;
             StartMessage = startMessage;
             StopMessage = stopMessage;
+            _cycleMethod = Cycle;
         }
+
+        protected virtual Task Cycle(CancellationToken token) => Task.CompletedTask;
 
         public async void Run()
         {
@@ -40,7 +41,7 @@ namespace BotAnbotip.Bot.CyclicActions
             }
             while (!BotClient.IsLoaded) await Task.Delay(1000);
             _cts = new CancellationTokenSource();
-            _isStarted = true;
+            IsStarted = true;
             RunCycle();
         }
 
@@ -49,11 +50,11 @@ namespace BotAnbotip.Bot.CyclicActions
             try
             {
                 await BotClient.Log(new LogMessage(LogSeverity.Info, "", StartMessage));
-                await CycleMethod.Invoke(_cts.Token);
+                await _cycleMethod.Invoke(_cts.Token);
             }
             catch (Exception ex)
             {
-                _isStarted = false;
+                IsStarted = false;
                 if ((ex is OperationCanceledException) && (_cts != null) && (((OperationCanceledException)ex).CancellationToken == _cts.Token))
                     new ExceptionLogger().Log(ex, StopMessage);
                 else

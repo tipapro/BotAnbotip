@@ -10,20 +10,29 @@ using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class AnnouncementCommands
+    class AnnouncementCommands : CommandsBase
     {
-        public static async Task SendAsync(IMessage message, string argument)
+        public AnnouncementCommands() : base
+            (
+            (TransformMessageToSendAsync,
+            new string[] { "объяви", "анонс", "announce" })
+            ){ }
+
+        private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Администратор)) return;
+            await CommandManager.Announcement.SendAsync(message.Channel, argument);
+        }
 
+        public async Task SendAsync(IMessageChannel channel, string text)
+        {
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.Announcement])
-                .WithDescription(argument)
+                .WithDescription(text)
                 .WithColor(Color.Magenta);
 
-            await message.Channel.SendMessageAsync("", false, embedBuilder.Build());
-
+            await channel.SendMessageAsync("", false, embedBuilder.Build());
         }
     }
 }

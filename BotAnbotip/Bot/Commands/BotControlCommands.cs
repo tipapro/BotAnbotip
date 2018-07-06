@@ -7,29 +7,44 @@ using System.Text;
 using System.Threading.Tasks;
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.Group;
+using BotAnbotip.Bot.Clients;
 
 namespace BotAnbotip.Bot.Commands
 {
-    class BotControlCommands
+    class BotControlCommands : CommandsBase
     {
-        public static async void Stop(IMessage message, DiscordSocketClient client)
+        public BotControlCommands() : base
+            (
+            (TransformMessageToStopAsync,
+            new string[] { "стоп", "stop"}),
+            (TransformMessageToClearDataAsync,
+            new string[] { "удалиданные", "сотриданные", "cleardata", "formatdata" })
+            ){ }
+        private static async Task TransformMessageToStopAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            await CommandManager.BotControl.StopAsync();
+        }
 
+        private static async Task TransformMessageToClearDataAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            await CommandManager.BotControl.ClearDataAsync();
+        }
+
+        public async Task StopAsync()
+        {
             await DataManager.SaveAllDataAsync();
-            await client.StopAsync();
+            await BotClientManager.MainBot.Client.StopAsync();
             Environment.Exit(0);
         }
 
-        public static async void ClearData(IMessage message, DiscordSocketClient client)
+        public async Task ClearDataAsync()
         {
-            await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-
             DataManager.InitializeAllVariables();
             await DataManager.SaveAllDataAsync();
-
         }
     }
 }
