@@ -268,6 +268,7 @@ namespace BotAnbotip.Bot.Commands
         public async Task UpdateList(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
         {
             if ((channelId != 0) && (list == null)) list = DataManager.RatingChannels.Value[channelId];
+            if (list.ListOfObjects.Count == 0) return;
             if (toPos == -1) toPos = list.ListOfObjects.Count - 1;
             var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
             var objects = list.ListOfObjects;
