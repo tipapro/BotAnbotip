@@ -25,6 +25,7 @@ namespace BotAnbotip.Bot.Clients
 
         public BotClientBase(BotType type)
         {
+            _isLoaded = false;
             _type = type;
             _client = new DiscordSocketClient();            
             _client.Log += Log;
