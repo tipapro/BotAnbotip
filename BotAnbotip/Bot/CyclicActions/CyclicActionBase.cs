@@ -39,6 +39,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 await BotClient.Log(new LogMessage(LogSeverity.Info, "", ErrorMessage + ": Действие уже запущено"));
                 return;
             }
+            while (BotClient.Guild == null) await Task.Delay(1000);
             while (!BotClient.IsLoaded) await Task.Delay(1000);
             _cts = new CancellationTokenSource();
             IsStarted = true;
