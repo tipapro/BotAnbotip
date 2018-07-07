@@ -303,7 +303,7 @@ namespace BotAnbotip.Bot.Commands
 
             for (int i = fromPos; i != toPos + sign; i += sign)
             {
-                await Task.Delay(100);
+                await Task.Delay(200);
                 var listObj = list.ListOfObjects[i];
                 var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
 
