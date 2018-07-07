@@ -186,11 +186,13 @@ namespace BotAnbotip.Bot.Commands
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
             var embedBuilder = new EmbedBuilder()
-            .WithDescription("**" + objName + "**")
+            .WithTitle(objName)
             .WithFooter("Количество лайков: 0 ❤️")
             .WithColor(Color.Green);
             if (thumbnailUrl != null) embedBuilder.WithThumbnailUrl(thumbnailUrl);
             if (url != null) embedBuilder.WithUrl(url);
+            
+            
 
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
 
@@ -282,7 +284,7 @@ namespace BotAnbotip.Bot.Commands
                 var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
 
                 var embedBuilder = new EmbedBuilder()
-                     .WithDescription("**" + listObj.Name + "**")
+                     .WithTitle(listObj.Name)
                      .WithFooter($"Количество лайков: {listObj.LikedUsers.Count} ❤️")
                      .WithColor(Color.Green);
                 if (listObj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(listObj.ThumbnailUrl);
@@ -291,12 +293,6 @@ namespace BotAnbotip.Bot.Commands
                 await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
             }
 
-        }
-
-        public static string ConvertMessageToRatingListObject(IUserMessage message)
-        {
-            return message.Embeds.First().Description
-                .Substring(2, message.Embeds.First().Description.Length - 4);   // "**...**" - 4 лишних знака(форматирования)
         }
     }
 }

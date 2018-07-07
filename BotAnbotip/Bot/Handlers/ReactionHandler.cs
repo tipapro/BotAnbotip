@@ -44,7 +44,7 @@ namespace BotAnbotip.Bot.Handlers
                         if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы)
                         {
                             await message.RemoveReactionAsync(reaction.Emote, user);
-                            string objName = RatingListCommands.ConvertMessageToRatingListObject(message);
+                            string objName = message.Embeds.First().Title;
 
                             switch (reaction.Emote.Name)
                             {
