@@ -17,7 +17,7 @@ namespace BotAnbotip.Bot.Commands
         public RatingListCommands() : base
             (
             (TransformMessageToAddListAsync,
-            new string[] { "+лист", "добавьлист", "+list","addlist" }),
+            new string[] { "+лист", "добавьлист", "+list", "addlist" }),
             (TransformMessageToRemoveListAsync,
             new string[] { "-лист", "удалилист", "-list", "removelist" }),
             (TransformMessageToAddValueAsync,
@@ -128,7 +128,7 @@ namespace BotAnbotip.Bot.Commands
             await CommandManager.RatingList.UpdateList(fromPos, toPos, message.Channel.Id);
         }
 
-        public async Task AddListAsync(string listName,  RatingListType listType)
+        public async Task AddListAsync(string listName, RatingListType listType)
         {
             var newRatingChannel = await BotClientManager.MainBot.Guild.CreateTextChannelAsync(listName);
             await newRatingChannel.ModifyAsync((textChannelProperties) =>
@@ -185,87 +185,111 @@ namespace BotAnbotip.Bot.Commands
         public async Task AddValueAsync(IMessageChannel channel, string objName, string thumbnailUrl = null, string url = null)//!!!!!
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
-            var embedBuilder = new EmbedBuilder()
-            .WithTitle(objName)
-            .WithFooter("Количество лайков: 0 ❤️")
-            .WithColor(Color.Green);
-            if (thumbnailUrl != null) embedBuilder.WithThumbnailUrl(thumbnailUrl);
-            if (url != null) embedBuilder.WithUrl(url);
-            
-            
+            try
+            {
+                var embedBuilder = new EmbedBuilder()
+                .WithTitle(objName)
+                .WithFooter("Количество лайков: 0 ❤️")
+                .WithColor(Color.Green);
+                if (thumbnailUrl != null) embedBuilder.WithThumbnailUrl(thumbnailUrl);
+                if (url != null) embedBuilder.WithUrl(url);
 
-            var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
 
-            await sendedMessage.AddReactionAsync(new Emoji("💙"));
-            await sendedMessage.AddReactionAsync(new Emoji("❌"));
 
-            var ratingList = DataManager.RatingChannels.Value[channel.Id];
-            var obj = new RLObject(objName, ratingList.ListOfObjects.Count, url, thumbnailUrl);
-            ratingList.ListOfObjects.Add(obj);
-            ratingList.ListOfMessageIds.Add(sendedMessage.Id);
+                var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
 
-            if (ratingList.Type != RatingListType.Other)
-                await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
-            var newPosition = ratingList.ListOfObjects.Sort(obj, ratingList.ListOfObjects.Count - 1, Evaluation.None);
+                await sendedMessage.AddReactionAsync(new Emoji("💙"));
+                await sendedMessage.AddReactionAsync(new Emoji("❌"));
 
-            var position = ratingList.ListOfMessageIds.IsReversed ? 0 : ratingList.ListOfMessageIds.Count - 1;
-            await UpdateList(position, newPosition, 0, ratingList);
+                var ratingList = DataManager.RatingChannels.Value[channel.Id];
+                var obj = new RLObject(objName, ratingList.ListOfObjects.Count, url, thumbnailUrl);
+                ratingList.ListOfObjects.Add(obj);
+                ratingList.ListOfMessageIds.Add(sendedMessage.Id);
 
-            await DataManager.RatingChannels.SaveAsync();
-            RemoveFromQueue(queueIds);
+                if (ratingList.Type != RatingListType.Other)
+                    await sendedMessage.AddReactionAsync(new Emoji(TypeEmodji[ratingList.Type]));
+                var newPosition = ratingList.ListOfObjects.Sort(obj, ratingList.ListOfObjects.Count - 1, Evaluation.None);
+
+                var position = ratingList.ListOfMessageIds.IsReversed ? 0 : ratingList.ListOfMessageIds.Count - 1;
+                await UpdateList(position, newPosition, 0, ratingList);
+
+                await DataManager.RatingChannels.SaveAsync();
+            }
+            finally
+            {
+                RemoveFromQueue(queueIds);
+            }
         }
 
         public async Task RemoveValueAsync(IMessageChannel channel, string objName)
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
-            var list = DataManager.RatingChannels.Value[channel.Id];
-            var (position, obj) = list.ListOfObjects.FindByName(objName);
-
-            if (obj != null)
+            try
             {
-                var messageId = list.ListOfMessageIds[position];
-                var foundedMessage = await channel.GetMessageAsync(messageId);
-                await foundedMessage.DeleteAsync();
+                var list = DataManager.RatingChannels.Value[channel.Id];
+                var (position, obj) = list.ListOfObjects.FindByName(objName);
 
-                list.ListOfObjects.Remove(obj);
-                list.ListOfMessageIds.Remove(messageId);
-                await DataManager.RatingChannels.SaveAsync();
+                if (obj != null)
+                {
+                    var messageId = list.ListOfMessageIds[position];
+                    var foundedMessage = await channel.GetMessageAsync(messageId);
+                    await foundedMessage.DeleteAsync();
+
+                    list.ListOfObjects.Remove(obj);
+                    list.ListOfMessageIds.Remove(messageId);
+                    await DataManager.RatingChannels.SaveAsync();
+                }
             }
-            RemoveFromQueue(queueIds);
+            finally
+            {
+                RemoveFromQueue(queueIds);
+            }
         }
 
-        public async Task ChangeRatingAsync(IUser user,  IMessageChannel channel, string objName,  Evaluation eval)
+        public async Task ChangeRatingAsync(IUser user, IMessageChannel channel, string objName, Evaluation eval)
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
-            var ratingList = DataManager.RatingChannels.Value[channel.Id];
-            var (position, obj) = ratingList.ListOfObjects.FindByName(objName);
-            var likedUsers = obj?.LikedUsers;
-            if (likedUsers == null) throw new NullReferenceException();
-
-            if (eval == Evaluation.Like)
+            try
             {
-                if (!likedUsers.Contains(user.Id)) likedUsers.Add(user.Id);
+                var ratingList = DataManager.RatingChannels.Value[channel.Id];
+                var (position, obj) = ratingList.ListOfObjects.FindByName(objName);
+                var likedUsers = obj?.LikedUsers;
+                if (likedUsers == null) throw new NullReferenceException();
+
+                if (eval == Evaluation.Like)
+                {
+                    if (!likedUsers.Contains(user.Id)) likedUsers.Add(user.Id);
+                }
+                else likedUsers.Remove(user.Id);
+
+                var newPosition = ratingList.ListOfObjects.Sort(obj, position, eval);
+
+                await UpdateList(position, newPosition, 0, ratingList);
+                await DataManager.RatingChannels.SaveAsync();
             }
-            else likedUsers.Remove(user.Id);
-
-            var newPosition = ratingList.ListOfObjects.Sort(obj, position, eval);
-
-            await UpdateList(position, newPosition, 0, ratingList);
-            await DataManager.RatingChannels.SaveAsync();
-            RemoveFromQueue(queueIds);
+            finally
+            {
+                RemoveFromQueue(queueIds);
+            }
         }
 
         public async Task ReverseAsync(IMessageChannel channel)
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
-            var list = DataManager.RatingChannels.Value[channel.Id];
+            try
+            {
+                var list = DataManager.RatingChannels.Value[channel.Id];
 
-            list.ListOfMessageIds.IsReversed = !list.ListOfMessageIds.IsReversed;
+                list.ListOfMessageIds.IsReversed = !list.ListOfMessageIds.IsReversed;
 
-            await UpdateList(0, -1, 0, list);
-            await DataManager.RatingChannels.SaveAsync();
-            RemoveFromQueue(queueIds);
-        }
+                await UpdateList(0, -1, 0, list);
+                await DataManager.RatingChannels.SaveAsync();
+            }
+            finally
+            {
+                RemoveFromQueue(queueIds);
+            }
+        }    
 
         public async Task UpdateList(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
         {
