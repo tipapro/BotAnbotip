@@ -10,6 +10,7 @@ using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
+using System.Text.RegularExpressions;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -20,8 +21,10 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToSendAsync,
             new string[] { "хочуиграть", "wantplay" }),
             (TransformMessageToRemoveAsync,
-            new string[] { "удалиприглашение", "далиприглос", "removeinviting" })
-            ){ }
+            new string[] { "удалиприглашение", "далиприглос", "removeinviting" }),
+            (TransformMessageToInviteAsync,
+            new string[] { "пригласи", "invite" }))
+            { }
 
         private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
@@ -51,6 +54,23 @@ namespace BotAnbotip.Bot.Commands
             await CommandManager.WantPlayMessage.RemoveAsync(message.Author, ulong.Parse(argument));
         }
 
+        private static async Task TransformMessageToInviteAsync(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            var charsToRemove = new string[] { "<", "@", ">"};
+            foreach (var c in charsToRemove)
+                argument = argument.Replace(c, string.Empty);
+            var strArray = argument.Split(' ');
+            var messageId = ulong.Parse(strArray[0]);
+            List<ulong> userIds = new List<ulong>();
+            for (var i = 1; i < strArray.Length; i++)
+            {
+                userIds.Add(ulong.Parse(strArray[i]));
+            }
+            await CommandManager.WantPlayMessage.InviteAsync(message.Author, messageId, userIds);
+        }
+
         public async Task SendAsync(IUser user, string gameName, string gameImage = null, string gameUrl = null)
         {
             if (gameName.Length > 64) return;
@@ -68,7 +88,7 @@ namespace BotAnbotip.Bot.Commands
 
             await sendedMessage.ModifyAsync((messageProperties) =>
             {
-                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID Сообщения: " + sendedMessage.Id)).Build();
+                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID для индивидуальных приглашений: " + sendedMessage.Id)).Build();
             });
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
@@ -89,33 +109,30 @@ namespace BotAnbotip.Bot.Commands
             }
         }
 
-        public static async Task NotifySubscribedUsersAsync(ulong userId, string gameName)
+        private async Task InviteAsync(IUser user, ulong messageId, List<ulong> userIds)
         {
+            int maxNum;
+            if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Заместитель)) maxNum = 13;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Администратор)) maxNum = 9;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Модератор)) maxNum = 7;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Активный_Участник)) maxNum = 5;
+            else maxNum = 3;
             var channel = BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой);
+            var foundedMessage = await ((ISocketMessageChannel)channel).GetMessageAsync(messageId);
             var invite = await channel.CreateInviteAsync();
             var embedBuilder = new EmbedBuilder()
                 .WithColor(Color.DarkBlue)
                 .WithTitle(MessageTitles.Titles[TitleType.WantPlay])
-                .WithDescription("Пользователь <@!" + userId + "> приглашает в игру **" + gameName + "**.\n" +
-                "Принять приглашение можно здесь: " + invite)
-                .WithFooter("Чтобы отключить оповещение или добавить ещё источников оповещения, напишите в этом чате: =моиподписки");
+                .WithDescription(foundedMessage.Embeds.First().Description +
+                "\nПринять приглашение можно здесь: " + invite.Url)
+                //.WithFooter("Чтобы отключить оповещение или добавить ещё источников оповещения, напишите в этом чате: =моиподписки")
+                .WithThumbnailUrl(foundedMessage.Embeds.First().Thumbnail?.Url)
+                .WithUrl(foundedMessage.Embeds.First().Url);
             var embed = embedBuilder.Build();
-            //if (CheckConditions(userId, gameName))
-                foreach (ulong subscriber in DataManager.Subscribers.Value[userId][gameName])
-                    try { await BotClientManager.MainBot.Guild.GetUser(subscriber).SendMessageAsync("", false, embed); }
-                    finally { }
-            //if (CheckConditions(userId, "__AnyGame"))
-                foreach (ulong subscriber in DataManager.Subscribers.Value[userId]["__AnyGame"])
-                    try { await BotClientManager.MainBot.Guild.GetUser(subscriber).SendMessageAsync("", false, embed); }
-                    finally { }
-            //if (CheckConditions(0, gameName))
-                foreach (ulong subscriber in DataManager.Subscribers.Value[0][gameName])
-                    try { await BotClientManager.MainBot.Guild.GetUser(subscriber).SendMessageAsync("", false, embed); }
-                    finally { }
-            //if (CheckConditions(0, "__AnyGame"))
-                foreach (ulong subscriber in DataManager.Subscribers.Value[0]["__AnyGame"])
-                    try { await BotClientManager.MainBot.Guild.GetUser(subscriber).SendMessageAsync("", false, embed); }
-                    finally { }
+            for (var i = 0; i < maxNum; i++)
+            {
+                await BotClientManager.MainBot.Guild.GetUser(userIds[i]).SendMessageAsync(invite.Url, false, embed);
+            }
         }
 
         public static async Task AddUserAcceptedAsync(IMessage message, IUser user)
