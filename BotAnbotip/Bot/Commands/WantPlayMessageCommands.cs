@@ -124,7 +124,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithColor(Color.DarkBlue)
                 .WithTitle(MessageTitles.Titles[TitleType.WantPlay])
                 .WithDescription(foundedMessage.Embeds.First().Description +
-                "\nПринять приглашение можно здесь: " + invite.Url)
+                "\n\nПринять приглашение можно здесь: " + invite.Url)
                 //.WithFooter("Чтобы отключить оповещение или добавить ещё источников оповещения, напишите в этом чате: =моиподписки")
                 .WithThumbnailUrl(foundedMessage.Embeds.First().Thumbnail?.Url)
                 .WithUrl(foundedMessage.Embeds.First().Url);

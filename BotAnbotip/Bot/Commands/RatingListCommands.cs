@@ -27,7 +27,9 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToReverseAsync,
             new string[] { "переверни", "перевернилист", "reverse", "reverselist" }),
             (TransformMessageToUpdateList,
-            new string[] { "обнови", "обновилист", "update", "updatelist" })
+            new string[] { "обновилист", "updatelist" }),
+            (TransformMessageToUpdateReactions,
+            new string[] { "обновиреакции", "updatereactions" })
             )
         { }
 
@@ -126,6 +128,25 @@ namespace BotAnbotip.Bot.Commands
                 toPos = int.Parse(strArray[1]);
             }
             await CommandManager.RatingList.UpdateList(fromPos, toPos, message.Channel.Id);
+        }
+
+        private static async Task TransformMessageToUpdateReactions(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            int fromPos = 0, toPos = 0;
+            if (argument == "-1")
+            {
+                fromPos = 0;
+                toPos = -1;
+            }
+            else
+            {
+                var strArray = argument.Split(' ');
+                fromPos = int.Parse(strArray[0]);
+                toPos = int.Parse(strArray[1]);
+            }
+            await CommandManager.RatingList.UpdateReactions(fromPos, toPos, message.Channel.Id);
         }
 
         public async Task AddListAsync(string listName, RatingListType listType)
@@ -316,7 +337,45 @@ namespace BotAnbotip.Bot.Commands
 
                 await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
             }
+        }
 
+        public async Task UpdateReactions(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
+        {
+            if ((channelId != 0) && (list == null)) list = DataManager.RatingChannels.Value[channelId];
+            if (list.ListOfObjects.Count == 0) return;
+            if (toPos == -1) toPos = list.ListOfObjects.Count - 1;
+            var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
+            var objects = list.ListOfObjects;
+
+            int sign = fromPos <= toPos ? 1 : -1;
+
+            for (int i = fromPos; i != toPos + sign; i += sign)
+            {
+                await Task.Delay(200);
+                var listObj = list.ListOfObjects[i];
+                var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
+                var objName = messageObj.Embeds.First().Title;
+                var reactions = ((IUserMessage)messageObj).Reactions;
+                
+
+                foreach (var reaction in reactions)
+                {
+                    var users = await ((IUserMessage)messageObj).GetReactionUsersAsync(reaction.Key);
+                    Evaluation eval;
+                    switch (reaction.Key.Name)
+                    {
+                        case "💙": eval = Evaluation.Like; break;
+                        case "❌": eval = Evaluation.Dislike; break;
+                        default: continue;
+                    }                   
+                    foreach (var user in users)
+                    {
+                        if (user.Id == BotClientManager.MainBot.Id) continue;
+                        await ChangeRatingAsync(user, channel, objName, eval);
+                        await ((IUserMessage)messageObj).RemoveReactionAsync(reaction.Key, user);
+                    }
+                }
+            }
         }
     }
 }
