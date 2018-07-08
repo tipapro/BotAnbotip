@@ -58,10 +58,10 @@ namespace BotAnbotip.Bot.Commands
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
-            var charsToRemove = new string[] { "<", "@", ">"};
-            foreach (var c in charsToRemove)
-                argument = argument.Replace(c, string.Empty);
-            var strArray = argument.Split(' ');
+            var strArray = new string((from c in argument
+                                   where char.IsWhiteSpace(c) || char.IsNumber(c)
+                                     select c
+                                     ).ToArray()).Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var messageId = ulong.Parse(strArray[0]);
             List<ulong> userIds = new List<ulong>();
             for (var i = 1; i < strArray.Length; i++)
@@ -88,7 +88,7 @@ namespace BotAnbotip.Bot.Commands
 
             await sendedMessage.ModifyAsync((messageProperties) =>
             {
-                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID для индивидуальных приглашений: " + sendedMessage.Id)).Build();
+                messageProperties.Embed = embedBuilder.WithFooter(new EmbedFooterBuilder().WithText("ID: " + sendedMessage.Id)).Build();
             });
 
             await sendedMessage.AddReactionAsync(new Emoji("✅"));
