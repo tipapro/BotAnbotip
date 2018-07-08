@@ -267,7 +267,7 @@ namespace BotAnbotip.Bot.Commands
             }
         }
 
-        public async Task ChangeRatingAsync(IUser user, IMessageChannel channel, string objName, Evaluation eval)
+        public async Task ChangeRatingAsync(ulong userId, IMessageChannel channel, string objName, Evaluation eval)
         {
             var queueIds = AddToQueue(nameof(DataManager.RatingChannels));
             try
@@ -279,9 +279,9 @@ namespace BotAnbotip.Bot.Commands
 
                 if (eval == Evaluation.Like)
                 {
-                    if (!likedUsers.Contains(user.Id)) likedUsers.Add(user.Id);
+                    if (!likedUsers.Contains(userId)) likedUsers.Add(userId);
                 }
-                else likedUsers.Remove(user.Id);
+                else likedUsers.Remove(userId);
 
                 var newPosition = ratingList.ListOfObjects.Sort(obj, position, eval);
 
@@ -348,16 +348,14 @@ namespace BotAnbotip.Bot.Commands
             var objects = list.ListOfObjects;
 
             int sign = fromPos <= toPos ? 1 : -1;
-
+            var variableCollection = new Dictionary<string, Dictionary<Evaluation, ulong>>();
             for (int i = fromPos; i != toPos + sign; i += sign)
-            {
-                await Task.Delay(200);
+            {                
                 var listObj = list.ListOfObjects[i];
                 var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
                 var objName = messageObj.Embeds.First().Title;
                 var reactions = ((IUserMessage)messageObj).Reactions;
-                
-
+                var reactionsAndUsers = new Dictionary<Evaluation, ulong>();
                 foreach (var reaction in reactions)
                 {
                     var users = await ((IUserMessage)messageObj).GetReactionUsersAsync(reaction.Key);
@@ -371,11 +369,16 @@ namespace BotAnbotip.Bot.Commands
                     foreach (var user in users)
                     {
                         if (user.Id == BotClientManager.MainBot.Id) continue;
-                        await ChangeRatingAsync(user, channel, objName, eval);
+                        reactionsAndUsers.Add(eval, user.Id);
+                        await Task.Delay(200);
                         await ((IUserMessage)messageObj).RemoveReactionAsync(reaction.Key, user);
                     }
                 }
+                variableCollection[objName] = reactionsAndUsers;
             }
+            foreach(var pair1 in variableCollection)
+                foreach (var pair2 in pair1.Value)
+                    await ChangeRatingAsync(pair2.Value, channel, pair1.Key, pair2.Key);
         }
     }
 }

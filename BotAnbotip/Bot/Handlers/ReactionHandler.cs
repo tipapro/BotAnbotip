@@ -48,8 +48,8 @@ namespace BotAnbotip.Bot.Handlers
 
                             switch (reaction.Emote.Name)
                             {
-                                case "💙": await CommandManager.RatingList.ChangeRatingAsync(user, channel, objName, Evaluation.Like); break;
-                                case "❌": await CommandManager.RatingList.ChangeRatingAsync(user, channel, objName, Evaluation.Dislike); break;
+                                case "💙": await CommandManager.RatingList.ChangeRatingAsync(user.Id, channel, objName, Evaluation.Like); break;
+                                case "❌": await CommandManager.RatingList.ChangeRatingAsync(user.Id, channel, objName, Evaluation.Dislike); break;
                                 case "🎮":
                                     await Task.Run(() => CommandManager.WantPlayMessage.SendAsync(user, objName, message.Embeds.First().Thumbnail?.Url, message.Embeds.First().Url)); break;
                             }
