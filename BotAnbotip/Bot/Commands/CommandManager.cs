@@ -103,27 +103,29 @@ namespace BotAnbotip.Bot.Commands
         public static List<(char, string)> ClearAndGetCommandArguments(ref string text)
         {
             List<(char, string)> resultList = new List<(char, string)>();
-            int startIndex = 0, bufI;
+            int startIndex = 0;
+            char argument;
             string resultString;
             var charArray = text.ToCharArray();
-            for (var i = 0; i < charArray.Length - 1; i++)
+            for (var i = 0; i < charArray.Length - 3; i++)
             {
                 if ((charArray[i] != ArgumentPrefix) || (charArray[i + 1] == ArgumentPrefix)) continue;
                 resultString = "";
-                bufI = i;
+                argument = charArray[i + 1];
                 startIndex = i + 2;
-                if ((i != charArray.Length) && (charArray[i + 2] == ':') && (charArray[i + 3] == '"'))
+                if ((i + 4 < charArray.Length) && (charArray[i + 2] == ':') && (charArray[i + 3] == '"'))
                 {
                     for (var j = i + 4; j < charArray.Length; j++)
                     {
                         if (charArray[j] != '"') continue;
                         resultString = text.Substring(i + 4, j - i - 4);
                         i = j;
-                        startIndex = j+1;
+                        startIndex = j + 1;
                         break;
                     }
                 }
-                resultList.Add((charArray[bufI + 1], resultString));
+                else if (charArray[i + 2] != ' ') continue;
+                resultList.Add((argument, resultString));
             }
             text = text.Substring(startIndex).Trim();
             return resultList;

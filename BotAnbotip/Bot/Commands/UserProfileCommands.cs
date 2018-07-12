@@ -29,7 +29,7 @@ namespace BotAnbotip.Bot.Commands
         {
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
             var profile = DataManager.UserProfiles.Value[user.Id];
-            var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelPoints.RolelList[profile.Level]);
+            var role = BotClientManager.MainBot.Guild.GetRole((ulong)Level.RoleList[profile.Level]);
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
                 .AddField("Профиль", user.Mention, true)

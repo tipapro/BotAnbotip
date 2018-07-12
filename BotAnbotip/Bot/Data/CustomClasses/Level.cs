@@ -5,9 +5,9 @@ using System.Text;
 
 namespace BotAnbotip.Bot.Data.CustomClasses
 {
-    class LevelPoints
+    class Level
     {
-        public static Dictionary<LevelRoleIds, long> Levels = new Dictionary<LevelRoleIds, long>
+        public static Dictionary<LevelRoleIds, long> Points = new Dictionary<LevelRoleIds, long>
         {
             { LevelRoleIds.Медь1, 0 },
             { LevelRoleIds.Медь2, 200 },
@@ -45,7 +45,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             { LevelRoleIds.Сингулярность, 100000000 }
         };
 
-        public static LevelRoleIds[] RolelList = 
+        public static LevelRoleIds[] RoleList = 
         {
             LevelRoleIds.Медь1, LevelRoleIds.Медь2, LevelRoleIds.Медь3,
             LevelRoleIds.Бронза1, LevelRoleIds.Бронза2, LevelRoleIds.Бронза3,

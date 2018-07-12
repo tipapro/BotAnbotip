@@ -44,8 +44,10 @@ namespace BotAnbotip.Bot.Clients
         {
             await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Участник));
             if (DataManager.UserProfiles.Value.ContainsKey(user.Id))
-                Guild.GetRole((ulong)LevelPoints.RolelList[DataManager.UserProfiles.Value[user.Id].Level]);
-            else Guild.GetRole((ulong)LevelRoleIds.Медь1);
+            {
+                await user.AddRoleAsync(Guild.GetRole((ulong)Level.RoleList[DataManager.UserProfiles.Value[user.Id].Level]));
+            }
+            else await user.AddRoleAsync(Guild.GetRole((ulong)LevelRoleIds.Медь1));
         }
 
         private Task OnConnection()
