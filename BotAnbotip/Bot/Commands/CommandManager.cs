@@ -45,6 +45,7 @@ namespace BotAnbotip.Bot.Commands
             RatingList = new RatingListCommands();
             Voting = new VotingCommands();
             WantPlayMessage = new WantPlayMessageCommands();
+            UserProfile = new UserProfileCommands();
 
             HackerChannel = new HackerChannelCommands();
             RainbowRole = new RainbowRoleCommands();
@@ -52,7 +53,7 @@ namespace BotAnbotip.Bot.Commands
             this.botId = botId;
             if (botId == BotClientManager.MainBot.Id)
                 _commandsCollection = new List<CommandsBase> { Announcement, AnonymousMessage, BotControl, Debug, RoleManagement, News,
-                RatingList, Voting, WantPlayMessage };
+                RatingList, Voting, WantPlayMessage, UserProfile };
             else if (botId == BotClientManager.AuxiliaryBot.Id)
                 _commandsCollection = new List<CommandsBase> { HackerChannel, RainbowRole };
         }
