@@ -16,6 +16,7 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<GiveawayType, List<ulong>>> ParticipantsOfTheGiveaway;     //GiveawayType -- List of UserIds
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
         public static DropboxData<Dictionary<ulong, Dictionary<string, List<ulong>>>> Subscribers;    //User -- Games -- His subscribers
+        public static DropboxData<Dictionary<ulong, UserProfile>> UserProfiles;
 
         public static DropboxData<bool> DidRoleGiveawayBegin;
         public static DropboxData<bool> RainbowRoleIsRunning;
@@ -37,6 +38,7 @@ namespace BotAnbotip.Bot.Data
             ParticipantsOfTheGiveaway = InitializeDropboxData(ParticipantsOfTheGiveaway, nameof(ParticipantsOfTheGiveaway));
             LastWinner = InitializeDropboxData(LastWinner, nameof(LastWinner));
             Subscribers = InitializeDropboxData(Subscribers, nameof(Subscribers));
+            UserProfiles = InitializeDropboxData(UserProfiles, nameof(UserProfiles));
 
             DidRoleGiveawayBegin = InitializeDropboxData(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
             RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
@@ -56,6 +58,7 @@ namespace BotAnbotip.Bot.Data
                 await ParticipantsOfTheGiveaway.SaveAsync();
                 await LastWinner.SaveAsync();
                 await Subscribers.SaveAsync();
+                await UserProfiles.SaveAsync();
 
                 await DidRoleGiveawayBegin.SaveAsync();
                 await RainbowRoleIsRunning.SaveAsync();
@@ -81,6 +84,7 @@ namespace BotAnbotip.Bot.Data
                 await ParticipantsOfTheGiveaway.ReadAsync();
                 await LastWinner.ReadAsync();
                 await Subscribers.ReadAsync();
+                await UserProfiles.ReadAsync();
 
                 await DidRoleGiveawayBegin.ReadAsync();
                 await RainbowRoleIsRunning.ReadAsync();

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace BotAnbotip.Bot.Data.CustomEnums
+﻿namespace BotAnbotip.Bot.Data.CustomEnums
 {
     public enum SpamType
     {

@@ -10,11 +10,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class DailyMessagesCyclicAction : CyclicActionBase
+    class DailyMessagesService : ServiceBase
     {
-        public DailyMessagesCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
+        public DailyMessagesService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
             base(botClient, errorMessage, startMessage, stopMessage)
         {
         }

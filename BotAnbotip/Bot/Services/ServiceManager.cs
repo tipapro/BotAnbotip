@@ -8,31 +8,34 @@ using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
 using Discord;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class CyclicActionManager
+    class ServiceManager
     {
         private BotType botType;
 
-        public static DailyMessagesCyclicAction DailyMessages { get; private set; }
-        public static HackerChannelAutoChangeCyclicAction HackerChannelAutoChange { get; private set; }
-        public static RainbowRoleAutoChangeCyclicAction RainbowRoleAutoChange { get; private set; }
-        public static VipRoleGiveawayCyclicAction VipRoleGiveaway { get; private set; }
-        public static WantPlayAutoRemovingCyclicAction WantPlayAutoRemoving { get; private set; }
+        public static DailyMessagesService DailyMessages { get; private set; }
+        public static HackerChannelAutoChangeService HackerChannelAutoChange { get; private set; }
+        public static RainbowRoleAutoChangeService RainbowRoleAutoChange { get; private set; }
+        public static VipRoleGiveawayService VipRoleGiveaway { get; private set; }
+        public static WantPlayAutoRemovingService WantPlayAutoRemoving { get; private set; }
+        public static LevelCounterService LevelCounter { get; private set; }
 
-        public CyclicActionManager(BotType type)
+        public ServiceManager(BotType type)
         {
             botType = type;
-            DailyMessages = new DailyMessagesCyclicAction(BotClientManager.MainBot,
+            DailyMessages = new DailyMessagesService(BotClientManager.MainBot,
                 "Ошибка ежедневных сообщений", "Ежедневные сообщения запущены", "Ежедневные сообщения остановлены");
-            HackerChannelAutoChange = new HackerChannelAutoChangeCyclicAction(BotClientManager.AuxiliaryBot,
+            HackerChannelAutoChange = new HackerChannelAutoChangeService(BotClientManager.AuxiliaryBot,
                 "Ошибка автосмены навзания канала", "Автосмена навзания канала запущена", "Автосмена навзания канала остановлена");
-            RainbowRoleAutoChange = new RainbowRoleAutoChangeCyclicAction(BotClientManager.AuxiliaryBot,
+            RainbowRoleAutoChange = new RainbowRoleAutoChangeService(BotClientManager.AuxiliaryBot,
                 "Ошибка автосмены цвета роли", "Автосмена цвета роли запущена", "Автосмена цвета роли остановлена");
-            VipRoleGiveaway = new VipRoleGiveawayCyclicAction(BotClientManager.MainBot,
+            VipRoleGiveaway = new VipRoleGiveawayService(BotClientManager.MainBot,
                 "Ошибка розыгрыша VIP роли", "Розыгрыш VIP роли запущен", "Розыгрыш VIP роли остановлен");
-            WantPlayAutoRemoving = new WantPlayAutoRemovingCyclicAction(BotClientManager.MainBot,
+            WantPlayAutoRemoving = new WantPlayAutoRemovingService(BotClientManager.MainBot,
                 "Ошибка автоудаления приглашений в игру", "Автоудаление приглашений в игру запущено", "Автоудаление приглашений в игру остановлены");
+            LevelCounter = new LevelCounterService(BotClientManager.MainBot,
+                "Ошибка счётчика уровня", "Счётчик уровня запущен", "Счётчик уровня остановлен");
         }
 
         public void RunAll()
@@ -42,6 +45,7 @@ namespace BotAnbotip.Bot.CyclicActions
                 DailyMessages.Run();
                 VipRoleGiveaway.Run();
                 WantPlayAutoRemoving.Run();
+                LevelCounter.Run();
             }
             else if (botType == BotType.Auxiliary)
             {

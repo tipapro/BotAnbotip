@@ -1,7 +1,4 @@
 ﻿using BotAnbotip.Bot.Data.CustomEnums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BotAnbotip.Bot.Clients
 {

@@ -9,11 +9,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class WantPlayAutoRemovingCyclicAction : CyclicActionBase
+    class WantPlayAutoRemovingService : ServiceBase
     {
-        public WantPlayAutoRemovingCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+        public WantPlayAutoRemovingService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
         }
@@ -42,7 +42,6 @@ namespace BotAnbotip.Bot.CyclicActions
                     }
                 }
             }
-
         }
     }
 }

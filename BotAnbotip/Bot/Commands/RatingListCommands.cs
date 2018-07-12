@@ -310,7 +310,7 @@ namespace BotAnbotip.Bot.Commands
             {
                 RemoveFromQueue(queueIds);
             }
-        }    
+        }
 
         public async Task UpdateList(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
         {
@@ -322,63 +322,78 @@ namespace BotAnbotip.Bot.Commands
 
             int sign = fromPos <= toPos ? 1 : -1;
 
-            for (int i = fromPos; i != toPos + sign; i += sign)
+            try
             {
-                await Task.Delay(200);
-                var listObj = list.ListOfObjects[i];
-                var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
+                for (int i = fromPos; i != toPos + sign; i += sign)
+                {
+                    await Task.Delay(200);
+                    var listObj = list.ListOfObjects[i];
+                    var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
 
-                var embedBuilder = new EmbedBuilder()
-                     .WithTitle(listObj.Name)
-                     .WithFooter($"Количество лайков: {listObj.LikedUsers.Count} ❤️")
-                     .WithColor(Color.Green);
-                if (listObj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(listObj.ThumbnailUrl);
-                if (listObj.Url != "") embedBuilder.WithUrl(listObj.Url);
+                    var embedBuilder = new EmbedBuilder()
+                         .WithTitle(listObj.Name)
+                         .WithFooter($"Количество лайков: {listObj.LikedUsers.Count} ❤️")
+                         .WithColor(Color.Green);
+                    if (listObj.ThumbnailUrl != "") embedBuilder.WithThumbnailUrl(listObj.ThumbnailUrl);
+                    if (listObj.Url != "") embedBuilder.WithUrl(listObj.Url);
 
-                await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
+                    await ((IUserMessage)messageObj).ModifyAsync((messageProperties) => messageProperties.Embed = embedBuilder.Build());
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Ошибка при обновлении сообщений рейтингового лсита", ex);
             }
         }
 
         public async Task UpdateReactions(int fromPos, int toPos, ulong channelId = 0, RatingList list = null)
         {
-            if ((channelId != 0) && (list == null)) list = DataManager.RatingChannels.Value[channelId];
-            if (list.ListOfObjects.Count == 0) return;
-            if (toPos == -1) toPos = list.ListOfObjects.Count - 1;
-            var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
-            var objects = list.ListOfObjects;
+            try
+            {
+                if ((channelId != 0) && (list == null)) list = DataManager.RatingChannels.Value[channelId];
+                if (list.ListOfObjects.Count == 0) return;
+                if (toPos == -1) toPos = list.ListOfObjects.Count - 1;
+                var channel = ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel(list.Id));
+                var objects = list.ListOfObjects;
 
-            int sign = fromPos <= toPos ? 1 : -1;
-            var variableCollection = new Dictionary<string, Dictionary<Evaluation, ulong>>();
-            for (int i = fromPos; i != toPos + sign; i += sign)
-            {                
-                var listObj = list.ListOfObjects[i];
-                var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
-                var objName = messageObj.Embeds.First().Title;
-                var reactions = ((IUserMessage)messageObj).Reactions;
-                var reactionsAndUsers = new Dictionary<Evaluation, ulong>();
-                foreach (var reaction in reactions)
+                int sign = fromPos <= toPos ? 1 : -1;
+                var variableCollection = new Dictionary<string, Dictionary<Evaluation, ulong>>();
+                for (int i = fromPos; i != toPos + sign; i += sign)
                 {
-                    var users = await ((IUserMessage)messageObj).GetReactionUsersAsync(reaction.Key);
-                    Evaluation eval;
-                    switch (reaction.Key.Name)
+                    var listObj = list.ListOfObjects[i];
+                    var messageObj = await channel.GetMessageAsync(list.ListOfMessageIds[i]);
+                    var objName = messageObj.Embeds.First().Title;
+                    var reactions = ((IUserMessage)messageObj).Reactions;
+                    var reactionsAndUsers = new Dictionary<Evaluation, ulong>();
+                    foreach (var reaction in reactions)
                     {
-                        case "💙": eval = Evaluation.Like; break;
-                        case "❌": eval = Evaluation.Dislike; break;
-                        default: continue;
-                    }                   
-                    foreach (var user in users)
-                    {
-                        if (user.Id == BotClientManager.MainBot.Id) continue;
-                        reactionsAndUsers.Add(eval, user.Id);
-                        await Task.Delay(200);
-                        await ((IUserMessage)messageObj).RemoveReactionAsync(reaction.Key, user);
+                        var users = await ((IUserMessage)messageObj).GetReactionUsersAsync(reaction.Key);
+                        Evaluation eval;
+                        switch (reaction.Key.Name)
+                        {
+                            case "💙": eval = Evaluation.Like; break;
+                            case "❌": eval = Evaluation.Dislike; break;
+                            default: continue;
+                        }
+                        foreach (var user in users)
+                        {
+                            if (user.Id == BotClientManager.MainBot.Id) continue;
+                            reactionsAndUsers.Add(eval, user.Id);
+                            await Task.Delay(200);
+                            await ((IUserMessage)messageObj).RemoveReactionAsync(reaction.Key, user);
+                        }
                     }
+                    variableCollection[objName] = reactionsAndUsers;
                 }
-                variableCollection[objName] = reactionsAndUsers;
+                foreach (var pair1 in variableCollection)
+                    foreach (var pair2 in pair1.Value)
+                        await ChangeRatingAsync(pair2.Value, channel, pair1.Key, pair2.Key);
             }
-            foreach(var pair1 in variableCollection)
-                foreach (var pair2 in pair1.Value)
-                    await ChangeRatingAsync(pair2.Value, channel, pair1.Key, pair2.Key);
+            catch (Exception ex)
+            {
+                throw new Exception("Ошибка при обновлении реакций сообщений рейтингового лсита", ex);
+            }
         }
     }
 }
+

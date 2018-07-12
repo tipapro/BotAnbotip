@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class CyclicActionBase
+    class ServiceBase
     {
         private CancellationTokenSource _cts;
         private Func<CancellationToken, Task> _cycleMethod;
@@ -21,7 +21,7 @@ namespace BotAnbotip.Bot.CyclicActions
 
         public BotClientBase BotClient { get; }
 
-        public CyclicActionBase(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage)
+        public ServiceBase(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage)
         {
             BotClient = botClient;
             ErrorMessage = errorMessage;

@@ -1,8 +1,6 @@
 ﻿using BotAnbotip.Bot.Data.CustomEnums;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
 
 namespace BotAnbotip.Bot.Data.CustomClasses
 {
@@ -16,7 +14,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             { TitleType.News, ":newspaper:Новость:newspaper:" },
             { TitleType.Voting, ":bar_chart:Голосование:bar_chart:" },
             { TitleType.WantPlay, ":video_game:Приглашение в игру:video_game:" },
-            { TitleType.SubscriptionManager, ":envelope_with_arrow:Менеджер подписок:envelope_with_arrow:" }
+            { TitleType.SubscriptionManager, ":envelope_with_arrow:Менеджер подписок:envelope_with_arrow:" },
+            { TitleType.UserLevel, ":small_blue_diamond:Уровень пользователя:small_blue_diamond:" }
         };
 
         public static TitleType GetType(string title)

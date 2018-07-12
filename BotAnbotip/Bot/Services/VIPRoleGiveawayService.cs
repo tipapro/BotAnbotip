@@ -12,14 +12,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class VipRoleGiveawayCyclicAction : CyclicActionBase
+    class VipRoleGiveawayService : ServiceBase
     {
         private static Random random = new Random();
         public static string RandomOrgURL = "";
 
-        public VipRoleGiveawayCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+        public VipRoleGiveawayService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
         }

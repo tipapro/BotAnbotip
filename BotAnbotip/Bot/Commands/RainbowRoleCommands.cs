@@ -9,7 +9,7 @@ using Discord.WebSocket;
 using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.OtherModules;
-using BotAnbotip.Bot.CyclicActions;
+using BotAnbotip.Bot.Services;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -55,12 +55,12 @@ namespace BotAnbotip.Bot.Commands
 
             if (changedState)
             {
-                CyclicActionManager.RainbowRoleAutoChange.Run();
+                ServiceManager.RainbowRoleAutoChange.Run();
                 await DataManager.RainbowRoleIsRunning.SaveAsync(true);
             }
             else
             {
-                CyclicActionManager.RainbowRoleAutoChange.Stop();
+                ServiceManager.RainbowRoleAutoChange.Stop();
                 await DataManager.RainbowRoleIsRunning.SaveAsync(false);
             }
         }

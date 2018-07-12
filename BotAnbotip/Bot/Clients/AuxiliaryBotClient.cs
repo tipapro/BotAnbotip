@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Discord;
 using Discord.WebSocket;
 using BotAnbotip.Bot.Data;
-using BotAnbotip.Bot.Data.Group;
-using BotAnbotip.Bot.Commands;
 using BotAnbotip.Bot.Handlers;
-using BotAnbotip.Bot.CyclicActions;
-using System.Linq;
+using BotAnbotip.Bot.Services;
 using BotAnbotip.Bot.Data.CustomEnums;
 
 namespace BotAnbotip.Bot.Clients
@@ -15,7 +11,7 @@ namespace BotAnbotip.Bot.Clients
     public class AuxiliaryBotClient: BotClientBase
     {
         private MessageHandler _msgHandler;
-        private CyclicActionManager _cyclicActionManager;
+        private ServiceManager _cyclicActionManager;
 
         public AuxiliaryBotClient(BotType type) : base(type)
         {
@@ -23,7 +19,7 @@ namespace BotAnbotip.Bot.Clients
 
         public async Task PrepareAsync()
         {
-            _cyclicActionManager = new CyclicActionManager(_type);
+            _cyclicActionManager = new ServiceManager(_type);
             _client.Connected += OnConnection;            
             _client.Disconnected += OnDisconnection;
             _client.MessageReceived += OnMessageReceiving;

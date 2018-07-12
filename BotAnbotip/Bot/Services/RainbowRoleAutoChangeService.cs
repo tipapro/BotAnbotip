@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class RainbowRoleAutoChangeCyclicAction : CyclicActionBase
+    class RainbowRoleAutoChangeService : ServiceBase
     {
         private const double speed = 19;
         private const double segment = 100;
@@ -19,7 +19,7 @@ namespace BotAnbotip.Bot.CyclicActions
 
         public static double globalX;
 
-        public RainbowRoleAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+        public RainbowRoleAutoChangeService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
         }

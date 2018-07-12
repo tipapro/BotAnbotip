@@ -8,22 +8,15 @@ namespace BotAnbotip.Bot.Data
 {
     class PrivateData
     {
-        private static string _fileNamePrefix;
-        private static string _dropboxApiKey;
-        private static string _mainBotToken;
-        private static string _auxiliaryBotToken;
-        private static char _mainPrefix;
-        private static char _auxiliaryPrefix;
-
         public static bool Debug = false;
 
 
-        public static string FileNamePrefix => _fileNamePrefix;
-        public static string DropboxApiKey => _dropboxApiKey;
-        public static string MainBotToken => _mainBotToken;
-        public static string AuxiliaryBotToken => _auxiliaryBotToken;
-        public static char MainPrefix => _mainPrefix;
-        public static char AuxiliaryPrefix => _auxiliaryPrefix;
+        public static string FileNamePrefix { get; private set; }
+        public static string DropboxApiKey { get; private set; }
+        public static string MainBotToken { get; private set; }
+        public static string AuxiliaryBotToken { get; private set; }
+        public static char MainPrefix { get; private set; }
+        public static char AuxiliaryPrefix { get; private set; }
 
         public static void Read()
         {
@@ -37,23 +30,23 @@ namespace BotAnbotip.Bot.Data
                 {
                     using (StreamReader reader = new StreamReader(testData))
                     {
-                        _dropboxApiKey = reader.ReadLine();
-                        _mainBotToken = reader.ReadLine();
-                        _auxiliaryBotToken = reader.ReadLine();
-                        _mainPrefix = reader.ReadLine().ToCharArray()[0];
-                        _auxiliaryPrefix = reader.ReadLine().ToCharArray()[0];
-                        _fileNamePrefix = "Debug";
+                        DropboxApiKey = reader.ReadLine();
+                        MainBotToken = reader.ReadLine();
+                        AuxiliaryBotToken = reader.ReadLine();
+                        MainPrefix = reader.ReadLine().ToCharArray()[0];
+                        AuxiliaryPrefix = reader.ReadLine().ToCharArray()[0];
+                        FileNamePrefix = "Debug";
                     }
                 }
             }
             else
             {
-                _fileNamePrefix = "";
-                _dropboxApiKey = Environment.GetEnvironmentVariable("DropboxToken");
-                _mainBotToken = Environment.GetEnvironmentVariable("MainBotToken");
-                _auxiliaryBotToken = Environment.GetEnvironmentVariable("AuxiliaryBotToken");
-                _mainPrefix = '=';
-                _auxiliaryPrefix = '}';
+                FileNamePrefix = "";
+                DropboxApiKey = Environment.GetEnvironmentVariable("DropboxToken");
+                MainBotToken = Environment.GetEnvironmentVariable("MainBotToken");
+                AuxiliaryBotToken = Environment.GetEnvironmentVariable("AuxiliaryBotToken");
+                MainPrefix = '=';
+                AuxiliaryPrefix = '}';
             }
         }
 

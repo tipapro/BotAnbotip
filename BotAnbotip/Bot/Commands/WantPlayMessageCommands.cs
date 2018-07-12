@@ -129,8 +129,9 @@ namespace BotAnbotip.Bot.Commands
                 .WithThumbnailUrl(foundedMessage.Embeds.First().Thumbnail?.Url)
                 .WithUrl(foundedMessage.Embeds.First().Url);
             var embed = embedBuilder.Build();
-            for (var i = 0; i < maxNum; i++)
+            for (var i = 0; i < userIds.Count; i++)
             {
+                if (i >= maxNum) break;
                 await BotClientManager.MainBot.Guild.GetUser(userIds[i]).SendMessageAsync(invite.Url, false, embed);
             }
         }

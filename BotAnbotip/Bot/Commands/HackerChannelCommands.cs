@@ -7,7 +7,7 @@ using BotAnbotip.Bot.Clients;
 using Discord;
 using BotAnbotip.Bot.Commands;
 using BotAnbotip.Bot.OtherModules;
-using BotAnbotip.Bot.CyclicActions;
+using BotAnbotip.Bot.Services;
 
 namespace BotAnbotip.Bot.Commands
 {
@@ -53,12 +53,12 @@ namespace BotAnbotip.Bot.Commands
 
             if (changedState)
             {
-                CyclicActionManager.HackerChannelAutoChange.Run();
+                ServiceManager.HackerChannelAutoChange.Run();
                 await DataManager.HackerChannelIsRunning.SaveAsync(true);
             }
             else 
             {
-                CyclicActionManager.HackerChannelAutoChange.Stop();
+                ServiceManager.HackerChannelAutoChange.Stop();
                 await DataManager.HackerChannelIsRunning.SaveAsync(false);
             }
         }

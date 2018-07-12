@@ -8,16 +8,16 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BotAnbotip.Bot.CyclicActions
+namespace BotAnbotip.Bot.Services
 {
-    class HackerChannelAutoChangeCyclicAction : CyclicActionBase
+    class HackerChannelAutoChangeService : ServiceBase
     {        
         private const int Length = 10;
         private const int DelayTime = 25;
 
         private static Random random = new Random();
 
-        public HackerChannelAutoChangeCyclicAction(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
+        public HackerChannelAutoChangeService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
         }

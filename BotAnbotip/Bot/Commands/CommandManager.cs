@@ -28,6 +28,8 @@ namespace BotAnbotip.Bot.Commands
         public static RatingListCommands RatingList { get; private set; }
         public static VotingCommands Voting { get; private set; }
         public static WantPlayMessageCommands WantPlayMessage { get; private set; }
+        public static UserProfileCommands UserProfile { get; private set; }
+        
 
         public static HackerChannelCommands HackerChannel { get; private set; }
         public static RainbowRoleCommands RainbowRole { get; private set; }
