@@ -1,4 +1,5 @@
 ﻿using BotAnbotip.Bot.Clients;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,10 +7,13 @@ using System.Threading.Tasks;
 
 namespace BotAnbotip.Bot.Data.CustomClasses
 {
+    [JsonObject]
     public class UserProfile : IComparable<UserProfile>
     {
         public ulong Id { get; }
+        [JsonProperty]
         public int Level { get; private set; }
+        [JsonProperty]
         public long Points { get; private set; }
 
         public UserProfile(ulong id)

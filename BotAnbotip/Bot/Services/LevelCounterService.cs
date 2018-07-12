@@ -40,9 +40,9 @@ namespace BotAnbotip.Bot.Services
                             await DataManager.UserProfiles.Value[user.Id].AddPoints(NumberOfPoints_VoiceChannel);
                         }
                     }
-                }
-                await DataManager.UserProfiles.SaveAsync();
+                }                
                 lastUsers = remainingUsers;
+                await DataManager.UserProfiles.SaveAsync();
             }
         }
 

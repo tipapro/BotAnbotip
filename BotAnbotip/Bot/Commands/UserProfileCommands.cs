@@ -40,6 +40,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithColor(role.Color);
 
             await channel.SendMessageAsync("", false, embedBuilder.Build());
+            await DataManager.UserProfiles.SaveAsync();
         }
     }
 }
