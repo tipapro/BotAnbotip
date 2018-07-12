@@ -10,8 +10,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         public static Dictionary<LevelRoleIds, long> Levels = new Dictionary<LevelRoleIds, long>
         {
             { LevelRoleIds.Медь1, 0 },
-            { LevelRoleIds.Медь2, 225 },
-            { LevelRoleIds.Медь3, 650 },
+            { LevelRoleIds.Медь2, 200 },
+            { LevelRoleIds.Медь3, 550 },
             { LevelRoleIds.Бронза1, 1000 },
             { LevelRoleIds.Бронза2, 2250 },
             { LevelRoleIds.Бронза3, 3500 },
