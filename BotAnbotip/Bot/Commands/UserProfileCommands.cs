@@ -1,4 +1,5 @@
-﻿using BotAnbotip.Bot.Data;
+﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
 using Discord;
@@ -28,12 +29,15 @@ namespace BotAnbotip.Bot.Commands
         {
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
             var profile = DataManager.UserProfiles.Value[user.Id];
+            var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelPoints.RolelList[profile.Level]);
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription("Пользователь: " + user.Mention)
+                .WithDescription(user.Mention)
+                .AddField("Ваше звание", role.Mention, true)
                 .AddField("Ваш уровень", profile.Level, true)
                 .AddField("Ваши очки", profile.Points, true)
-                .WithColor(Color.Orange);
+                .WithThumbnailUrl(user.GetAvatarUrl())
+                .WithColor(role.Color);
 
             await channel.SendMessageAsync("", false, embedBuilder.Build());
         }
