@@ -112,7 +112,6 @@ namespace BotAnbotip.Bot.Commands
                 if ((charArray[i] != ArgumentPrefix) || (charArray[i + 1] == ArgumentPrefix)) continue;
                 resultString = "";
                 argument = charArray[i + 1];
-                startIndex = i + 2;
                 if ((i + 4 < charArray.Length) && (charArray[i + 2] == ':') && (charArray[i + 3] == '"'))
                 {
                     for (var j = i + 4; j < charArray.Length; j++)
@@ -124,7 +123,11 @@ namespace BotAnbotip.Bot.Commands
                         break;
                     }
                 }
-                else if (charArray[i + 2] != ' ') continue;
+                else
+                {
+                    if (charArray[i + 2] != ' ') continue;
+                    startIndex = i + 2;
+                }
                 resultList.Add((argument, resultString));
             }
             text = text.Substring(startIndex).Trim();
