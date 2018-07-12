@@ -32,10 +32,10 @@ namespace BotAnbotip.Bot.Commands
             var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelPoints.RolelList[profile.Level]);
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription(user.Mention)
-                .AddField("Ваше звание", role.Mention, true)
-                .AddField("Ваш уровень", profile.Level, true)
-                .AddField("Ваши очки", profile.Points, true)
+                .AddField("Профиль", user.Mention, true)
+                .AddField("Звание", role.Mention, true)
+                .AddField("Уровень", profile.Level, true)
+                .AddField("Очки", profile.Points, true)
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
 
