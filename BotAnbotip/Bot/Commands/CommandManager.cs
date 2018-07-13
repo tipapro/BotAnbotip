@@ -32,7 +32,6 @@ namespace BotAnbotip.Bot.Commands
         
 
         public static HackerChannelCommands HackerChannel { get; private set; }
-        public static RainbowRoleCommands RainbowRole { get; private set; }
 
         public CommandManager(ulong botId)
         {
@@ -48,14 +47,11 @@ namespace BotAnbotip.Bot.Commands
             UserProfile = new UserProfileCommands();
 
             HackerChannel = new HackerChannelCommands();
-            RainbowRole = new RainbowRoleCommands();
 
             this.botId = botId;
             if (botId == BotClientManager.MainBot.Id)
                 _commandsCollection = new List<CommandsBase> { Announcement, AnonymousMessage, BotControl, Debug, RoleManagement, News,
                 RatingList, Voting, WantPlayMessage, UserProfile };
-            else if (botId == BotClientManager.AuxiliaryBot.Id)
-                _commandsCollection = new List<CommandsBase> { HackerChannel, RainbowRole };
         }
 
         public async Task RunCommand(string commandName, string argument, SocketMessage message)// !!!!!!!!!!

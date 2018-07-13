@@ -53,12 +53,12 @@ namespace BotAnbotip.Bot.Commands
 
             if (changedState)
             {
-                ServiceManager.HackerChannelAutoChange.Run();
+                //ServiceManager.HackerChannelAutoChange.Run();
                 await DataManager.HackerChannelIsRunning.SaveAsync(true);
             }
             else 
             {
-                ServiceManager.HackerChannelAutoChange.Stop();
+                //ServiceManager.HackerChannelAutoChange.Stop();
                 await DataManager.HackerChannelIsRunning.SaveAsync(false);
             }
         }
