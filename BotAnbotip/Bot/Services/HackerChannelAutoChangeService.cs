@@ -27,10 +27,10 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(DelayTime, token);
-                await BotClientManager.AuxiliaryBot.Guild.GetChannel(DataManager.HackerChannelId.Value).ModifyAsync((channelProperties) =>
-                {
-                    channelProperties.Name = GetRandomString(Length);
-                });
+                //await BotClientManager.AuxiliaryBot.Guild.GetChannel(DataManager.HackerChannelId.Value).ModifyAsync((channelProperties) =>
+                //{
+                //    channelProperties.Name = GetRandomString(Length);
+                //});
             }
         }
 

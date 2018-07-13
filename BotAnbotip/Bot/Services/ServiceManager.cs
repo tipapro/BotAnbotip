@@ -15,8 +15,6 @@ namespace BotAnbotip.Bot.Services
         private BotType botType;
 
         public static DailyMessagesService DailyMessages { get; private set; }
-        public static HackerChannelAutoChangeService HackerChannelAutoChange { get; private set; }
-        public static RainbowRoleAutoChangeService RainbowRoleAutoChange { get; private set; }
         public static VipRoleGiveawayService VipRoleGiveaway { get; private set; }
         public static WantPlayAutoRemovingService WantPlayAutoRemoving { get; private set; }
         public static LevelCounterService LevelCounter { get; private set; }
@@ -26,10 +24,6 @@ namespace BotAnbotip.Bot.Services
             botType = type;
             DailyMessages = new DailyMessagesService(BotClientManager.MainBot,
                 "Ошибка ежедневных сообщений", "Ежедневные сообщения запущены", "Ежедневные сообщения остановлены");
-            HackerChannelAutoChange = new HackerChannelAutoChangeService(BotClientManager.AuxiliaryBot,
-                "Ошибка автосмены навзания канала", "Автосмена навзания канала запущена", "Автосмена навзания канала остановлена");
-            RainbowRoleAutoChange = new RainbowRoleAutoChangeService(BotClientManager.AuxiliaryBot,
-                "Ошибка автосмены цвета роли", "Автосмена цвета роли запущена", "Автосмена цвета роли остановлена");
             VipRoleGiveaway = new VipRoleGiveawayService(BotClientManager.MainBot,
                 "Ошибка розыгрыша VIP роли", "Розыгрыш VIP роли запущен", "Розыгрыш VIP роли остановлен");
             WantPlayAutoRemoving = new WantPlayAutoRemovingService(BotClientManager.MainBot,
@@ -47,11 +41,6 @@ namespace BotAnbotip.Bot.Services
                 WantPlayAutoRemoving.Run();
                 LevelCounter.Run();
             }
-            else if (botType == BotType.Auxiliary)
-            {
-                if (DataManager.HackerChannelIsRunning.Value) HackerChannelAutoChange.Run();
-                if (DataManager.RainbowRoleIsRunning.Value) RainbowRoleAutoChange.Run();
-            }
         }
 
         public void TurnOffAll()
@@ -61,11 +50,6 @@ namespace BotAnbotip.Bot.Services
                 DailyMessages.Stop();
                 VipRoleGiveaway.Stop();
                 WantPlayAutoRemoving.Stop();
-            }
-            else if (botType == BotType.Auxiliary)
-            {
-                HackerChannelAutoChange.Stop();
-                RainbowRoleAutoChange.Stop();
             }
         }
     }

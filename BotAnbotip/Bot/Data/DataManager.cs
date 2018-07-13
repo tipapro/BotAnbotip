@@ -19,8 +19,6 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<ulong, UserProfile>> UserProfiles;
 
         public static DropboxData<bool> DidRoleGiveawayBegin;
-        public static DropboxData<bool> RainbowRoleIsRunning;
-        public static DropboxData<ulong> RainbowRoleId;
         public static DropboxData<bool> HackerChannelIsRunning;
         public static DropboxData<ulong> HackerChannelId;
         
@@ -41,8 +39,6 @@ namespace BotAnbotip.Bot.Data
             UserProfiles = InitializeDropboxData(UserProfiles, nameof(UserProfiles));
 
             DidRoleGiveawayBegin = InitializeDropboxData(DidRoleGiveawayBegin, nameof(DidRoleGiveawayBegin));
-            RainbowRoleIsRunning = InitializeDropboxData(RainbowRoleIsRunning, nameof(RainbowRoleIsRunning));
-            RainbowRoleId = InitializeDropboxData(RainbowRoleId, nameof(RainbowRoleId));
             HackerChannelIsRunning = InitializeDropboxData(HackerChannelIsRunning, nameof(HackerChannelIsRunning));
             HackerChannelId = InitializeDropboxData(HackerChannelId, nameof(HackerChannelId));
         }       
@@ -61,9 +57,7 @@ namespace BotAnbotip.Bot.Data
                 await UserProfiles.SaveAsync();
 
                 await DidRoleGiveawayBegin.SaveAsync();
-                await RainbowRoleIsRunning.SaveAsync();
                 await HackerChannelIsRunning.SaveAsync();
-                await RainbowRoleId.SaveAsync();
                 await HackerChannelId.SaveAsync();
             }
             catch (Exception ex)
@@ -87,9 +81,7 @@ namespace BotAnbotip.Bot.Data
                 await UserProfiles.ReadAsync();
 
                 await DidRoleGiveawayBegin.ReadAsync();
-                await RainbowRoleIsRunning.ReadAsync();
                 await HackerChannelIsRunning.ReadAsync();
-                await RainbowRoleId.ReadAsync();
                 await HackerChannelId.ReadAsync();
             }
             catch (Exception ex)
