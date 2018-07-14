@@ -1,6 +1,7 @@
 ﻿using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
+using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,6 @@ namespace BotAnbotip.Bot.Services
 {
     class LevelCounterService : ServiceBase
     {
-        public static long NumberOfPoints_VoiceChannel = 20;
-
         public LevelCounterService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
             base(botClient, errorMessage, startMessage, stopMessage)
         {
@@ -37,7 +36,7 @@ namespace BotAnbotip.Bot.Services
                         if (lastUsers.Contains(user.Id))
                         {                          
                             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
-                            await DataManager.UserProfiles.Value[user.Id].AddPoints(NumberOfPoints_VoiceChannel);
+                            await DataManager.UserProfiles.Value[user.Id].AddPoints((int)ActionsCost.OneMinuteInVoiceChannel * 5);
                         }
                     }
                 }                

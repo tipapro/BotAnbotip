@@ -30,12 +30,12 @@ namespace BotAnbotip.Bot.Clients
             _antiMessageSpam = new AntiSpam(SpamType.Message);
             _antiReactionSpam = new AntiSpam(SpamType.Reaction);
 
-            _client.ReactionAdded += OnReactionAddition;
+            _client.ReactionAdded += OnReactionAdditionAsync;
             _client.ReactionRemoved += OnReactionRemoving;            
             _client.Connected += OnConnection;
             _client.Disconnected += OnDisconnection;
             _client.UserJoined += OnUserJoining;
-            _client.MessageReceived += OnMessageReceiving;
+            _client.MessageReceived += OnMessageReceivingAsync;
 
             await _client.SetGameAsync("ANBOTIP Group");
         }
@@ -45,7 +45,7 @@ namespace BotAnbotip.Bot.Clients
             await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Участник));
             if (DataManager.UserProfiles.Value.ContainsKey(user.Id))
             {
-                await user.AddRoleAsync(Guild.GetRole((ulong)Level.RoleList[DataManager.UserProfiles.Value[user.Id].Level]));
+                await user.AddRoleAsync(Guild.GetRole((ulong)LevelInfo.RoleList[DataManager.UserProfiles.Value[user.Id].Level]));
             }
             else await user.AddRoleAsync(Guild.GetRole((ulong)LevelRoleIds.Медь1));
         }
@@ -63,16 +63,19 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        private Task OnMessageReceiving(SocketMessage message)
+        private async Task OnMessageReceivingAsync(SocketMessage message)
         {
             //_antiMessageSpam.Check(message.Author.Id, message.Content);
+            if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
+                DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
+            await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
             _msgHandler.ProcessTheMessage(message);
-            return Task.CompletedTask;
         }
 
-        private Task OnReactionAddition(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
+        private Task OnReactionAdditionAsync(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             //_antiMessageSpam.Check(reaction.User.Value.Id);
+            _reactionHandler.AddReactionPoints(reaction.User.Value, messageWithReaction.Value.Author);
             _reactionHandler.ProcessTheAddedReaction(messageWithReaction, channel, reaction);
             return Task.CompletedTask;
         }

@@ -108,6 +108,20 @@ namespace BotAnbotip.Bot.Handlers
             }
         }
 
+        public async void AddReactionPoints(IUser reactedUser, IUser receivingReactionUser)
+        {
+            if (!reactedUser.IsBot)
+                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
+                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
+            await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((int)ActionsCost.LeftReaction);
+
+            if (!receivingReactionUser.IsBot)
+                if (receivingReactionUser.Id != reactedUser.Id)
+                    if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
+                        DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
+            await DataManager.UserProfiles.Value[receivingReactionUser.Id].AddPoints((int)ActionsCost.ReceivedReaction);
+        }
+
         public async void ProcessTheRemovedReaction(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             try
@@ -155,6 +169,20 @@ namespace BotAnbotip.Bot.Handlers
             {
                 new ExceptionLogger().Log(ex, "Ошибка при обработке удалённой реакции");
             }
+        }
+
+        public async void RemoveReactionPoints(IUser reactedUser, IUser receivingReactionUser)
+        {
+            if (!reactedUser.IsBot)
+                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
+                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
+            await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((int)ActionsCost.LeftReaction);
+
+            if (!receivingReactionUser.IsBot)
+                if (receivingReactionUser.Id != reactedUser.Id)
+                    if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
+                        DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
+            await DataManager.UserProfiles.Value[receivingReactionUser.Id].RemovePoints((int)ActionsCost.ReceivedReaction);
         }
     }
 }

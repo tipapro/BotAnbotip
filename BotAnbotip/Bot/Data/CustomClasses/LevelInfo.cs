@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BotAnbotip.Bot.Data.CustomClasses
 {
-    class Level
+    class LevelInfo
     {
         public static Dictionary<LevelRoleIds, long> Points = new Dictionary<LevelRoleIds, long>
         {
