@@ -10,6 +10,7 @@
         Voting,
         SubscriptionManager,
         UserLevel,
-        ManageRole
+        ManageRole,
+        Greeting
     }
 }

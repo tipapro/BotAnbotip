@@ -17,25 +17,36 @@ namespace BotAnbotip.Bot.Commands
     {
         public RoleManagementCommands() : base
             (
-            (TransformMessageToSendRoleManageMessageToLobby,
+            (TransformMessageToSendGreetingMessage,
+            new string[] { "gr" }),
+            (TransformMessageToSendRoleManageMessage,
             new string[] { "rm" })
             ){ }
 
-        private static async Task TransformMessageToSendRoleManageMessageToLobby(IMessage message, string argument)
+        private static async Task TransformMessageToSendGreetingMessage(IMessage message, string argument)
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
             await CommandManager.RoleManagement.SendRoleManageMessage(message.Channel);
         }
 
-        public async Task GetAsync(IUser user, ulong roleId)
+        private static async Task TransformMessageToSendRoleManageMessage(IMessage message, string argument)
         {
-            await ((IGuildUser)user).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            await CommandManager.RoleManagement.SendRoleManageMessage(message.Channel);
         }
 
-        public async Task RemoveAsync(IUser user, ulong roleId)
+        public async Task SendGreetingMessage(IMessageChannel channel)
         {
-            await ((IGuildUser)user).RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle(MessageTitles.Titles[TitleType.Greeting])
+                .WithDescription("**Выберите необходимый чат:**")
+                .AddField("Игровая тематика", $"<#{(ulong)ChannelIds.чат_игровой}>", true)
+                .AddField("Внеигровая тематика", $"<#{(ulong)ChannelIds.чат_флудилка}>", true)
+                .WithColor(Color.Purple);
+
+            await channel.SendMessageAsync("", false, embedBuilder.Build());
         }
 
         public async Task SendRoleManageMessage(IMessageChannel channel)
@@ -50,6 +61,16 @@ namespace BotAnbotip.Bot.Commands
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
             await sendedMessage.AddReactionAsync(new Emoji("🎵"));
             await sendedMessage.AddReactionAsync(new Emoji("🈹"));
-        }       
+        }
+
+        public async Task GetAsync(IUser user, ulong roleId)
+        {
+            await ((IGuildUser)user).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+        }
+
+        public async Task RemoveAsync(IUser user, ulong roleId)
+        {
+            await ((IGuildUser)user).RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+        }
     }
 }
