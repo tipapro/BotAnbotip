@@ -84,8 +84,8 @@ namespace BotAnbotip.Bot.Handlers
                                     {
                                         switch (reaction.Emote.Name)
                                         {
-                                            case "🎵": await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
-                                            case "🈹": await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                            case "🎵": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 8) await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
+                                            case "🈹": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 5) await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
                                         }
                                         break;
                                     }
@@ -177,8 +177,8 @@ namespace BotAnbotip.Bot.Handlers
                                 {
                                     switch (reaction.Emote.Name)
                                     {
-                                        case "🎵": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 8) await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
-                                        case "🈹": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 5) await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                        case "🎵": await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
+                                        case "🈹": await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
                                     }
                                     break;
                                 }

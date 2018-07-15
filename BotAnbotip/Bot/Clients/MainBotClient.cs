@@ -75,7 +75,7 @@ namespace BotAnbotip.Bot.Clients
         private Task OnReactionAdditionAsync(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             //_antiMessageSpam.Check(reaction.User.Value.Id);
-            _reactionHandler.AddReactionPoints(reaction.User.Value, messageWithReaction.Value.Author);
+            if (messageWithReaction.HasValue) _reactionHandler.AddReactionPoints(reaction.User.Value, messageWithReaction.Value.Author);
             _reactionHandler.ProcessTheAddedReaction(messageWithReaction, channel, reaction);
             return Task.CompletedTask;
         }
@@ -83,6 +83,7 @@ namespace BotAnbotip.Bot.Clients
         private Task OnReactionRemoving(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
         {
             //_antiMessageSpam.Check(reaction.User.Value.Id);
+            if (messageWithReaction.HasValue) _reactionHandler.RemoveReactionPoints(reaction.User.Value, messageWithReaction.Value.Author);
             _reactionHandler.ProcessTheRemovedReaction(messageWithReaction, channel, reaction);
             return Task.CompletedTask;
         }
