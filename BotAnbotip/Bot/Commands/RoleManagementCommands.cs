@@ -43,8 +43,8 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.ManageRole])
                 .WithDescription("Если вы хотите получить доступ к тематическим чатам, то нажми-те на нужные реакции:")
-                .AddField(":musical_note:", $"<#{(ulong)ChannelIds.чат_музыкальный}>", true)
-                .AddField(":u5272:", $"<#{(ulong)ChannelIds.чат_аниме}>", true)
+                .AddField(":musical_note:(9+ уровень)", $"<#{(ulong)ChannelIds.чат_музыкальный}>", true)
+                .AddField(":u5272:(6+ уровень)", $"<#{(ulong)ChannelIds.чат_аниме}>", true)
                 .WithColor(Color.Purple);
 
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
