@@ -43,8 +43,8 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.ManageRole])
                 .WithDescription("Если вы хотите получить доступ к тематическим чатам, то нажми-те на нужные реакции:" +
-                $":musical_note: ----- <#{(ulong)ChannelIds.чат_музыкальный}> " +
-                $":u5272: ----- <#{(ulong)ChannelIds.чат_аниме}>")
+                $"\n:musical_note: ----- <#{(ulong)ChannelIds.чат_музыкальный}> " +
+                $"\n:u5272: ----- <#{(ulong)ChannelIds.чат_аниме}>")
                 .WithColor(Color.Purple);
 
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
