@@ -121,13 +121,14 @@ namespace BotAnbotip.Bot.Handlers
             }
         }
 
-        public async void AddReactionPoints(IUser reactedUser, IUser receivingReactionUser)
+        public async void AddReactionPoints(IUser reactedUser, Cacheable<IUserMessage, ulong> messageWithReaction)
         {
             if (!reactedUser.IsBot)
                 if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
                     DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
             await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((int)ActionsCost.LeftReaction);
 
+            var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
             if (!receivingReactionUser.IsBot)
                 if (receivingReactionUser.Id != reactedUser.Id)
                     if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
@@ -197,13 +198,14 @@ namespace BotAnbotip.Bot.Handlers
             }
         }
 
-        public async void RemoveReactionPoints(IUser reactedUser, IUser receivingReactionUser)
+        public async void RemoveReactionPoints(IUser reactedUser, Cacheable<IUserMessage, ulong> messageWithReaction)
         {
             if (!reactedUser.IsBot)
                 if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
                     DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
             await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((int)ActionsCost.LeftReaction);
 
+            var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
             if (!receivingReactionUser.IsBot)
                 if (receivingReactionUser.Id != reactedUser.Id)
                     if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
