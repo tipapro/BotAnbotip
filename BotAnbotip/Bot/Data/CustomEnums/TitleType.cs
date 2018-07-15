@@ -9,6 +9,7 @@
         News,
         Voting,
         SubscriptionManager,
-        UserLevel
+        UserLevel,
+        ManageRole
     }
 }

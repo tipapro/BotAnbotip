@@ -9,6 +9,6 @@ namespace BotAnbotip.Bot.Data.CustomEnums
         Message = 15,
         ReceivedReaction = 45,
         LeftReaction = 30,
-        OneMinuteInVoiceChannel = 4
+        OneMinuteInVoiceChannel = 5
     }
 }

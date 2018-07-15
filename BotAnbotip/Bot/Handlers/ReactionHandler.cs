@@ -62,20 +62,33 @@ namespace BotAnbotip.Bot.Handlers
                             switch (MessageTitles.GetType(messageTitle))
                             {
                                 case TitleType.WantPlay:
-                                    switch (reaction.Emote.Name)
                                     {
-                                        case "✅": await Task.Run(() => WantPlayMessageCommands.AddUserAcceptedAsync(message, user)); break;
-                                            /*case "📩":
-                                                await message.RemoveReactionAsync(reaction.Emote, user);
-                                                await Task.Run(() => WantPlayMessageCommands.SendOptionsOfSubscriptionAsync(message, user)); break;*/
+                                        switch (reaction.Emote.Name)
+                                        {
+                                            case "✅": await Task.Run(() => WantPlayMessageCommands.AddUserAcceptedAsync(message, user)); break;
+                                                /*case "📩":
+                                                    await message.RemoveReactionAsync(reaction.Emote, user);
+                                                    await Task.Run(() => WantPlayMessageCommands.SendOptionsOfSubscriptionAsync(message, user)); break;*/
+                                        }
+                                        break;
                                     }
-                                    break;
                                 case TitleType.VipGiveaway:
-                                    if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
-                                        || (DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Contains(user.Id))) break;
-                                    DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Add(user.Id);
-                                    await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
-                                    break;
+                                    {
+                                        if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
+                                            || (DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Contains(user.Id))) break;
+                                        DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Add(user.Id);
+                                        await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
+                                        break;
+                                    }
+                                case TitleType.ManageRole:
+                                    {
+                                        switch (reaction.Emote.Name)
+                                        {
+                                            case "🎵": await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
+                                            case "🈹": await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                        }
+                                        break;
+                                    }
                             }
                         }
                     }
@@ -145,17 +158,30 @@ namespace BotAnbotip.Bot.Handlers
                         switch (MessageTitles.GetType(messageTitle))
                         {
                             case TitleType.WantPlay:
-                                switch (reaction.Emote.Name)
                                 {
-                                    case "✅": await Task.Run(() => WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user)); break;
+                                    switch (reaction.Emote.Name)
+                                    {
+                                        case "✅": await Task.Run(() => WantPlayMessageCommands.RemoveUserAcceptedAsync(message, user)); break;
+                                    }
+                                    break;
                                 }
-                                break;
                             case TitleType.VipGiveaway:
-                                if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
-                                    || (!DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Contains(user.Id))) break;
-                                DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Remove(user.Id);
-                                await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
-                                break;
+                                {
+                                    if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
+                                        || (!DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Contains(user.Id))) break;
+                                    DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Remove(user.Id);
+                                    await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
+                                    break;
+                                }
+                            case TitleType.ManageRole:
+                                {
+                                    switch (reaction.Emote.Name)
+                                    {
+                                        case "🎵": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 9) await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
+                                        case "🈹": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 6) await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                    }
+                                    break;
+                                }
                         }
                     }
                     //Для лички

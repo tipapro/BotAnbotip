@@ -15,7 +15,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             { TitleType.Voting, ":bar_chart:Голосование:bar_chart:" },
             { TitleType.WantPlay, ":video_game:Приглашение в игру:video_game:" },
             { TitleType.SubscriptionManager, ":envelope_with_arrow:Менеджер подписок:envelope_with_arrow:" },
-            { TitleType.UserLevel, ":small_blue_diamond:Уровень пользователя:small_blue_diamond:" }
+            { TitleType.UserLevel, ":small_blue_diamond:Уровень пользователя:small_blue_diamond:" },
+            { TitleType.ManageRole, ":tools:Доступ к тематическим чатам:tools:"}
         };
 
         public static TitleType GetType(string title)
