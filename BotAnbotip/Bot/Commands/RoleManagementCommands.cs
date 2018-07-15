@@ -27,7 +27,7 @@ namespace BotAnbotip.Bot.Commands
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-            await CommandManager.RoleManagement.SendRoleManageMessage(message.Channel);
+            await CommandManager.RoleManagement.SendGreetingMessage(message.Channel);
         }
 
         private static async Task TransformMessageToSendRoleManageMessage(IMessage message, string argument)
