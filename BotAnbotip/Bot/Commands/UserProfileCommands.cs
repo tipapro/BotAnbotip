@@ -33,7 +33,7 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
                 .AddField("Профиль", user.Mention, true)
-                .AddField("Звание", role.Mention, true)
+                .AddField("Звание", LevelInfo.RoleList[profile.Level], true)
                 .AddField("Уровень", profile.Level, true)
                 .AddField("Очки", profile.Points, true)
                 .WithThumbnailUrl(user.GetAvatarUrl())
