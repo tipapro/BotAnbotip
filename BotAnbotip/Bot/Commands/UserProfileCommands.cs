@@ -22,10 +22,10 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToShowPointsAndLevel(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            await CommandManager.UserProfile.ShowPointsAndLevel(message.Author, message.Channel);
+            await CommandManager.UserProfile.ShowPointsAndLevel(message.Author);
         }
 
-        public async Task ShowPointsAndLevel(IUser user, IMessageChannel channel)
+        public async Task ShowPointsAndLevel(IUser user)
         {
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
             var profile = DataManager.UserProfiles.Value[user.Id];
@@ -39,7 +39,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
 
-            await channel.SendMessageAsync("", false, embedBuilder.Build());
+            await user.SendMessageAsync("", false, embedBuilder.Build());
             await DataManager.UserProfiles.SaveAsync();
         }
     }
