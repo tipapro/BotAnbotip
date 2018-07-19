@@ -1,4 +1,5 @@
 ﻿using BotAnbotip.Bot.Clients;
+using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
@@ -72,6 +73,13 @@ namespace BotAnbotip.Bot.Commands
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
             await sendedMessage.AddReactionAsync(new Emoji("👍"));
             await sendedMessage.AddReactionAsync(new Emoji("👎"));
+
+            if (!user.IsBot)
+            {
+                if (!DataManager.UserProfiles.Value.ContainsKey(user.Id))
+                    DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
+                await DataManager.UserProfiles.Value[user.Id].AddPoints((int)ActionsCost.SendedNews);
+            }
         }
     }
 }

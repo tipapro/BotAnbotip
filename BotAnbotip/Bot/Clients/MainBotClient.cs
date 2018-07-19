@@ -66,10 +66,14 @@ namespace BotAnbotip.Bot.Clients
         private async Task OnMessageReceivingAsync(SocketMessage message)
         {
             //_antiMessageSpam.Check(message.Author.Id, message.Content);
-            if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
-                DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
-            await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
-            _msgHandler.ProcessTheMessage(message);
+            if (!message.Author.IsBot)
+            {
+                if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
+                    DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
+                await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
+                _msgHandler.ProcessTheMessage(message);
+            }
+            
         }
 
         private Task OnReactionAdditionAsync(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)

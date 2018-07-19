@@ -2,9 +2,11 @@
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
+using BotAnbotip.Bot.Data.Group;
 using Discord;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,7 +17,9 @@ namespace BotAnbotip.Bot.Commands
         public UserProfileCommands() : base
             (
             (TransformMessageToShowPointsAndLevel,
-            new string[] { "мойуровень", "mylevel" })
+            new string[] { "мойуровень", "mylevel" }),
+            (TransformMessageToFine,
+            new string[] { "штраф", "fine" })
             )
         { }
 
@@ -23,6 +27,17 @@ namespace BotAnbotip.Bot.Commands
         {
             await message.DeleteAsync();
             await CommandManager.UserProfile.ShowPointsAndLevel(message.Author);
+        }
+
+        private static async Task TransformMessageToFine(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            var strArray = argument.Split(' ');
+            var userId = ulong.Parse(new string((from c in strArray[0]
+                                              where char.IsNumber(c)
+                                              select c).ToArray()));
+            await DataManager.UserProfiles.Value[userId].RemovePoints(long.Parse(strArray[1]));
         }
 
         public async Task ShowPointsAndLevel(IUser user)
