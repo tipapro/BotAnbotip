@@ -32,11 +32,18 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
             List<string> subjects = new List<string>();
+            string imageUrl = null;
             foreach(var (arg, str) in CommandManager.ClearAndGetCommandArguments(ref argument))
             {
-                if (arg == 's') subjects.Add(str);
+                switch (arg)
+                {
+                    case 'и':
+                    case 'i': imageUrl = str; break;
+                    case 'о':
+                    case 's': subjects.Add(str); break;
+                }
             }
-            await CommandManager.Voting.AddVotingdAsync(message.Channel, argument, subjects);
+            await CommandManager.Voting.AddVotingdAsync(message.Channel, argument, subjects, imageUrl);
         }
 
         private static async Task TransformMessageToDeleteVotingAsync(IMessage message, string argument)
@@ -47,7 +54,7 @@ namespace BotAnbotip.Bot.Commands
             await CommandManager.Voting.DeleteVotingAsync(message.Channel, messageId);
         }
 
-        public async Task AddVotingdAsync(IMessageChannel channel, string topic, List<string> subjects)
+        public async Task AddVotingdAsync(IMessageChannel channel, string topic, List<string> subjects, string imageUrl = null)
         {
             string resultStr = "**" + topic + "**\n";
 
@@ -58,6 +65,11 @@ namespace BotAnbotip.Bot.Commands
                 .WithTitle(MessageTitles.Titles[TitleType.Voting])
                 .WithColor(Color.Gold)
                 .WithDescription(resultStr);
+
+            if (imageUrl != null)
+            {
+                embedBuilder.WithImageUrl(imageUrl);
+            }
 
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
 
