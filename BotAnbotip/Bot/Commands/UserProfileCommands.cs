@@ -19,7 +19,9 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToShowPointsAndLevel,
             new string[] { "мойуровень", "mylevel" }),
             (TransformMessageToFine,
-            new string[] { "штраф", "fine" })
+            new string[] { "штраф", "fine" }),
+            (TransformMessageToReward,
+            new string[] { "награди", "reward"})
             )
         { }
 
@@ -37,7 +39,26 @@ namespace BotAnbotip.Bot.Commands
             var userId = ulong.Parse(new string((from c in strArray[0]
                                               where char.IsNumber(c)
                                               select c).ToArray()));
-            await DataManager.UserProfiles.Value[userId].RemovePoints(long.Parse(strArray[1]));
+            var points = long.Parse(strArray[1]);
+            await DataManager.UserProfiles.Value[userId].RemovePoints(points);
+            await DataManager.UserProfiles.SaveAsync();
+            await BotClientManager.MainBot.Log(new LogMessage(LogSeverity.Info, 
+                "LevelChange: Remove", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
+        }
+
+        private static async Task TransformMessageToReward(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            var strArray = argument.Split(' ');
+            var userId = ulong.Parse(new string((from c in strArray[0]
+                                                 where char.IsNumber(c)
+                                                 select c).ToArray()));
+            var points = long.Parse(strArray[1]);
+            await DataManager.UserProfiles.Value[userId].AddPoints(points > 100000 ? 100000 : points);
+            await DataManager.UserProfiles.SaveAsync();
+            await BotClientManager.MainBot.Log(new LogMessage(LogSeverity.Info,
+                "LevelChange: Add", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
         }
 
         public async Task ShowPointsAndLevel(IUser user)

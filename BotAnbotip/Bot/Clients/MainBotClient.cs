@@ -71,6 +71,7 @@ namespace BotAnbotip.Bot.Clients
                 if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
                     DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
                 await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
+                await DataManager.UserProfiles.SaveAsync();
                 _msgHandler.ProcessTheMessage(message);
             }
             

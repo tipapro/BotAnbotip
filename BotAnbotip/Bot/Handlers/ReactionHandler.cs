@@ -134,6 +134,7 @@ namespace BotAnbotip.Bot.Handlers
                     if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
                         DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
             await DataManager.UserProfiles.Value[receivingReactionUser.Id].AddPoints((int)ActionsCost.ReceivedReaction);
+            await DataManager.UserProfiles.SaveAsync();
         }
 
         public async void ProcessTheRemovedReaction(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
@@ -211,6 +212,7 @@ namespace BotAnbotip.Bot.Handlers
                     if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
                         DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
             await DataManager.UserProfiles.Value[receivingReactionUser.Id].RemovePoints((int)ActionsCost.ReceivedReaction);
+            await DataManager.UserProfiles.SaveAsync();
         }
     }
 }
