@@ -43,7 +43,7 @@ namespace BotAnbotip.Bot.Commands
                     case 's': subjects.Add(str); break;
                 }
             }
-            await CommandManager.Voting.AddVotingdAsync(message.Channel, argument, subjects, imageUrl);
+            await CommandManager.Voting.AddVotingdAsync(message.Author, message.Channel, argument, subjects, imageUrl);
         }
 
         private static async Task TransformMessageToDeleteVotingAsync(IMessage message, string argument)
@@ -54,7 +54,7 @@ namespace BotAnbotip.Bot.Commands
             await CommandManager.Voting.DeleteVotingAsync(message.Channel, messageId);
         }
 
-        public async Task AddVotingdAsync(IMessageChannel channel, string topic, List<string> subjects, string imageUrl = null)
+        public async Task AddVotingdAsync(IUser user, IMessageChannel channel, string topic, List<string> subjects, string imageUrl = null)
         {
             string resultStr = "**" + topic + "**\n";
 
@@ -82,7 +82,15 @@ namespace BotAnbotip.Bot.Commands
                 await sendedMessage.AddReactionAsync(new Emoji(Numerals[i + 1]));
 
             DataManager.VotingLists.Value.Add(sendedMessage.Id, new List<(string, int)>());
+
             await DataManager.VotingLists.SaveAsync();
+            if (!user.IsBot)
+            {
+                if (!DataManager.UserProfiles.Value.ContainsKey(user.Id))
+                    DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
+                await DataManager.UserProfiles.Value[user.Id].AddPoints((int)ActionsCost.SendedVoting);
+                await DataManager.UserProfiles.SaveAsync();
+            }
         }
 
         public async Task DeleteVotingAsync(IMessageChannel channel, ulong messageId)
