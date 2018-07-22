@@ -9,6 +9,7 @@ using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Clients;
 using BotAnbotip.Bot.OtherModules;
+using BotAnbotip.Bot.Data.CustomClasses;
 
 namespace BotAnbotip.Bot.Handlers
 {
@@ -45,6 +46,17 @@ namespace BotAnbotip.Bot.Handlers
             {
                 new ExceptionLogger().Log(ex, "Ошибка при обработке отправленного сообщения");
             }
+        }
+
+        public async void AddMessagePoints(SocketMessage message)
+        {
+            await Task.Run(async () =>
+            {
+                if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
+                    DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
+                await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
+                await DataManager.UserProfiles.SaveAsync();
+            });
         }
     }
 }

@@ -63,18 +63,15 @@ namespace BotAnbotip.Bot.Clients
             return Task.CompletedTask;
         }
 
-        private async Task OnMessageReceivingAsync(SocketMessage message)
+        private Task OnMessageReceivingAsync(SocketMessage message)
         {
             //_antiMessageSpam.Check(message.Author.Id, message.Content);
             if (!message.Author.IsBot)
             {
-                if (!DataManager.UserProfiles.Value.ContainsKey(message.Author.Id))
-                    DataManager.UserProfiles.Value.Add(message.Author.Id, new UserProfile(message.Author.Id));
-                await DataManager.UserProfiles.Value[message.Author.Id].AddPoints((int)ActionsCost.Message);
-                await DataManager.UserProfiles.SaveAsync();
+                _msgHandler.AddMessagePoints(message);
                 _msgHandler.ProcessTheMessage(message);
             }
-            
+            return Task.CompletedTask;
         }
 
         private Task OnReactionAdditionAsync(Cacheable<IUserMessage, ulong> messageWithReaction, ISocketMessageChannel channel, SocketReaction reaction)
