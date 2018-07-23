@@ -21,9 +21,9 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             Id = id;
         }
 
-        public async Task AddPoints(long numberOfPoints)
+        public async Task AddPoints(long numberOfPoints, bool inPercent = false)
         {
-            Points += numberOfPoints;
+            Points += inPercent ? (long)Math.Round(Points * numberOfPoints * 0.01) : numberOfPoints;
             await CheckRiseOfUserLevelRole();
         }
 

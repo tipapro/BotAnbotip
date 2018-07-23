@@ -128,14 +128,14 @@ namespace BotAnbotip.Bot.Handlers
                 if (!reactedUser.IsBot)
                     if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
                         DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
-                await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((int)ActionsCost.LeftReaction);
+                await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((long)ActionsCost.LeftReaction);
 
                 var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
                 if (!receivingReactionUser.IsBot)
                     if (receivingReactionUser.Id != reactedUser.Id)
                         if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
                             DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
-                await DataManager.UserProfiles.Value[receivingReactionUser.Id].AddPoints((int)ActionsCost.ReceivedReaction);
+                await DataManager.UserProfiles.Value[receivingReactionUser.Id].AddPoints((long)ActionsCost.ReceivedReaction);
                 await DataManager.UserProfiles.SaveAsync();
             });
         }
@@ -209,14 +209,14 @@ namespace BotAnbotip.Bot.Handlers
                 if (!reactedUser.IsBot)
                     if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
                         DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
-                await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((int)ActionsCost.LeftReaction);
+                await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((long)ActionsCost.LeftReaction);
 
                 var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
                 if (!receivingReactionUser.IsBot)
                     if (receivingReactionUser.Id != reactedUser.Id)
                         if (!DataManager.UserProfiles.Value.ContainsKey(receivingReactionUser.Id))
                             DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
-                await DataManager.UserProfiles.Value[receivingReactionUser.Id].RemovePoints((int)ActionsCost.ReceivedReaction);
+                await DataManager.UserProfiles.Value[receivingReactionUser.Id].RemovePoints((long)ActionsCost.ReceivedReaction);
                 await DataManager.UserProfiles.SaveAsync();
             });
         }

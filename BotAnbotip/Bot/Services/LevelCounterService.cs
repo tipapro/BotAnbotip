@@ -36,7 +36,7 @@ namespace BotAnbotip.Bot.Services
                         if (lastUsers.Contains(user.Id))
                         {                          
                             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
-                            await DataManager.UserProfiles.Value[user.Id].AddPoints((int)ActionsCost.OneMinuteInVoiceChannel * 5);
+                            await DataManager.UserProfiles.Value[user.Id].AddPoints((long)ActionsCost.OneMinuteInVoiceChannel * 5);
                         }
                     }
                 }                

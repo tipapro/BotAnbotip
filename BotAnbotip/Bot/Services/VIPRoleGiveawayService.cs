@@ -38,10 +38,10 @@ namespace BotAnbotip.Bot.Services
                     DataManager.DebugTriger[1] = false;
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
                     
-                    var winner = await ChooseTheWinner();
+                    var winnerId = await ChooseTheWinner();
                     string winnerText, giveawayText;
-                    if (winner == 0) winnerText =  "Победитель не определён из-за нехватки участников.";
-                    else winnerText =  "Победитель этой недели: <@!" + winner + ">.";
+                    if (winnerId == 0) winnerText =  "Победитель не определён из-за нехватки участников.";
+                    else winnerText =  "Победитель этой недели: <@!" + winnerId + ">.";
 
                    
                     if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)) DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
@@ -52,7 +52,7 @@ namespace BotAnbotip.Bot.Services
                         "Правила:\n" +
                     "```1) Поставьте лайк этому посту;\n" +
                     "2) Ждать понедельника.\n```" +
-                    "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю.";
+                    "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю + 15% очков.";
 
                     var embedBuilder = new EmbedBuilder()
                         .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])
@@ -63,6 +63,11 @@ namespace BotAnbotip.Bot.Services
                         .GetTextChannel((ulong)ChannelIds.чат_флудилка).SendMessageAsync("", false, embedBuilder.Build());
                     await sendedMessage.AddReactionAsync(new Emoji("💙"));
                     await sendedMessage.PinAsync();
+
+                    if (!DataManager.UserProfiles.Value.ContainsKey(winnerId))
+                        DataManager.UserProfiles.Value.Add(winnerId, new UserProfile(winnerId));
+                    await DataManager.UserProfiles.Value[winnerId].AddPoints((long)ActionsCost.Percents_VIPWin, true);
+                    await DataManager.UserProfiles.SaveAsync();
                 }
             }
         }

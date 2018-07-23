@@ -78,7 +78,7 @@ namespace BotAnbotip.Bot.Commands
             {
                 if (!DataManager.UserProfiles.Value.ContainsKey(user.Id))
                     DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
-                await DataManager.UserProfiles.Value[user.Id].AddPoints((int)ActionsCost.SendedNews);
+                await DataManager.UserProfiles.Value[user.Id].AddPoints((long)ActionsCost.Percents_SendedNews, true);
                 await DataManager.UserProfiles.SaveAsync();
             }
         }
