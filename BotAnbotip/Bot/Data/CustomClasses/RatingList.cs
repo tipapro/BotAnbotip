@@ -61,6 +61,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
     {
         [JsonProperty]
         private List<RLObject> _listOfRLObjects;
+        [JsonProperty]
+        private Dictionary<string, RLObject> _collectionOfRLObjects;
 
         public int Count => _listOfRLObjects.Count;
 
@@ -70,6 +72,14 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         }
 
         public RLObject this[int position] => _listOfRLObjects[position];
+
+        public void Test()
+        {
+            _collectionOfRLObjects = new Dictionary<string, RLObject>();
+            foreach (var obj in _listOfRLObjects)
+                if (!_collectionOfRLObjects.ContainsKey(obj.Name))
+                    _collectionOfRLObjects.Add(obj.Name, obj);
+        }
 
 
         public (int, RLObject) FindByName(string name)      // Неэффективно!!!

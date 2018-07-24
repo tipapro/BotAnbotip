@@ -10,6 +10,9 @@ namespace BotAnbotip
         {
             PrivateData.Read();
             await DataManager.ReadAllDataAsync();
+            foreach (var pair in DataManager.RatingChannels.Value)
+                pair.Value.ListOfObjects.Test();
+            await DataManager.RatingChannels.SaveAsync();
 
             await BotClientManager.MainBot.PrepareAsync();
 
