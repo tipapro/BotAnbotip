@@ -10,8 +10,8 @@ namespace BotAnbotip.Bot.Data.CustomEnums
         ReceivedReaction = 57,
         LeftReaction = 42,
         OneMinuteInVoiceChannel = 7,
-        Percents_SendedNews = 10,
-        Percents_SendedVoting = 7,
-        Percents_VIPWin = 15
+        Percents_SendedNews = 2,
+        Percents_SendedVoting = 1,
+        Percents_VIPWin = 4
     }
 }
