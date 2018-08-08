@@ -16,7 +16,7 @@ namespace BotAnbotip.Bot.Handlers
 {
     class ReactionHandler
     {
-        private AntiSpam antiSpam;
+        private readonly AntiSpam antiSpam;
 
         public ReactionHandler()
         {

@@ -12,7 +12,7 @@ namespace BotAnbotip.Bot.Services
 {
     class ServiceManager
     {
-        private BotType botType;
+        private readonly BotType botType;
 
         public static DailyMessagesService DailyMessages { get; private set; }
         public static VipRoleGiveawayService VipRoleGiveaway { get; private set; }

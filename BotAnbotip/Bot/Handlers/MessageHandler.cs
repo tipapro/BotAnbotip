@@ -15,8 +15,8 @@ namespace BotAnbotip.Bot.Handlers
 {
     class MessageHandler
     {
-        private ulong botId;
-        private char prefix;
+        private readonly ulong botId;
+        private readonly char prefix;
 
         private CommandManager _cmdManager;
 

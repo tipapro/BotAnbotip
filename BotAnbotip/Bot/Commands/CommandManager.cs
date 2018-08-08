@@ -15,9 +15,7 @@ namespace BotAnbotip.Bot.Commands
     {
         public const char ArgumentPrefix = '/';
 
-        private ulong botId;
-
-        private List<CommandsBase> _commandsCollection;
+        private readonly List<CommandsBase> _commandsCollection;
 
         public static AnnouncementCommands Announcement { get; private set; }
         public static AnonymousMessageCommands AnonymousMessage { get; private set; }
@@ -48,7 +46,6 @@ namespace BotAnbotip.Bot.Commands
 
             HackerChannel = new HackerChannelCommands();
 
-            this.botId = botId;
             if (botId == BotClientManager.MainBot.Id)
                 _commandsCollection = new List<CommandsBase> { Announcement, AnonymousMessage, BotControl, Debug, RoleManagement, News,
                 RatingList, Voting, WantPlayMessage, UserProfile };

@@ -22,7 +22,7 @@ namespace BotAnbotip.Bot.Commands
             new string[] { "-голосование", "удалиголосование", "-voting", "deletevoting" })
             ){ }
 
-        static private Dictionary<int, string> Numerals = new Dictionary<int, string> {
+        private static readonly Dictionary<int, string> Numerals = new Dictionary<int, string> {
             { 1, "1\u20E3" }, { 2, "2\u20E3" }, { 3, "3\u20E3" }, { 4, "4\u20E3" }, { 5, "5\u20E3" },
             { 6, "6\u20E3" }, { 7, "7\u20E3" }, { 8, "8\u20E3" }, { 9, "9\u20E3" }, { 10, "🔟" }, };
 
