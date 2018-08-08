@@ -72,9 +72,12 @@ namespace BotAnbotip.Bot.Commands
                 .AddField("Звание", LevelInfo.RoleList[profile.Level].ToString().Replace('1', '⭐').Replace("2", "⭐⭐").Replace("3", "⭐⭐⭐"), true)
                 .AddField("Уровень", profile.Level, true)
                 .AddField("Очки", profile.Points, true)
-                .AddField("Осталось", LevelInfo.Points[LevelInfo.RoleList[profile.Level]] - profile.Points, true)
+                
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
+
+            if (LevelInfo.RoleList.Length > profile.Level + 1)
+                embedBuilder.AddField("Осталось", LevelInfo.Points[LevelInfo.RoleList[profile.Level + 1]] - profile.Points, true);
 
             await user.SendMessageAsync("", false, embedBuilder.Build());
             await DataManager.UserProfiles.SaveAsync();
