@@ -66,7 +66,16 @@ namespace BotAnbotip.Bot.Commands
         public static bool CheckPermission(IGuildUser user, RoleIds minimalRole)
         {
             var userRoles = user.RoleIds;
-            byte reqPermLevel = GetRequiredPermLevel(minimalRole);
+            byte reqPermLevel = GetRolePermLevel((ulong)minimalRole);
+            var userPermLevel = GetUserPermLevel(userRoles);
+
+            if (reqPermLevel <= userPermLevel) return true;
+            user.SendMessageAsync("У вас недостаточно прав: минимальный уровень - " + minimalRole).GetAwaiter().GetResult();
+            return false;
+        }
+
+        public static byte GetUserPermLevel(IEnumerable<ulong> userRoles)
+        {
             byte userPermLevel = (byte)PermLevelOfRole.everyone;
 
             if (userRoles.Contains((ulong)RoleIds.Основатель)) userPermLevel = (byte)PermLevelOfRole.Основатель;
@@ -75,22 +84,19 @@ namespace BotAnbotip.Bot.Commands
             else if (userRoles.Contains((ulong)RoleIds.Модератор)) userPermLevel = (byte)PermLevelOfRole.Модератор;
             else if (userRoles.Contains((ulong)RoleIds.Активный_Участник)) userPermLevel = (byte)PermLevelOfRole.Активный_Участник;
             else if (userRoles.Contains((ulong)RoleIds.Участник)) userPermLevel = (byte)PermLevelOfRole.Участник;
-
-            if (reqPermLevel <= userPermLevel) return true;
-            user.SendMessageAsync("У вас недостаточно прав: минимальный уровень - " + minimalRole).GetAwaiter().GetResult();
-            return false;
+            return userPermLevel;
         }
 
-        public static byte GetRequiredPermLevel(RoleIds minimalRole)
+        public static byte GetRolePermLevel(ulong minimalRole)
         {
             switch (minimalRole)
             {
-                case RoleIds.Участник: return (byte)PermLevelOfRole.Участник;
-                case RoleIds.Активный_Участник: return (byte)PermLevelOfRole.Активный_Участник;
-                case RoleIds.Модератор: return (byte)PermLevelOfRole.Модератор;
-                case RoleIds.Администратор: return (byte)PermLevelOfRole.Администратор;
-                case RoleIds.Заместитель: return (byte)PermLevelOfRole.Заместитель;
-                case RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
+                case (ulong)RoleIds.Участник: return (byte)PermLevelOfRole.Участник;
+                case (ulong)RoleIds.Активный_Участник: return (byte)PermLevelOfRole.Активный_Участник;
+                case (ulong)RoleIds.Модератор: return (byte)PermLevelOfRole.Модератор;
+                case (ulong)RoleIds.Администратор: return (byte)PermLevelOfRole.Администратор;
+                case (ulong)RoleIds.Заместитель: return (byte)PermLevelOfRole.Заместитель;
+                case (ulong)RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
                 default: return 0;
             }
         }

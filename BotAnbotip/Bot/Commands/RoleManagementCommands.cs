@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using BotAnbotip.Bot.Data;
-using Discord.WebSocket;
 using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.Clients;
 using Discord;
@@ -20,7 +16,9 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToSendGreetingMessage,
             new string[] { "gr" }),
             (TransformMessageToSendRoleManageMessage,
-            new string[] { "rm" })
+            new string[] { "rm" }),
+            (TransformMessageToGiveRole,
+            new string[] { "giverole", "дайроль" })
             ){ }
 
         private static async Task TransformMessageToSendGreetingMessage(IMessage message, string argument)
@@ -35,6 +33,22 @@ namespace BotAnbotip.Bot.Commands
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
             await CommandManager.RoleManagement.SendRoleManageMessage(message.Channel);
+        }
+
+        private static async Task TransformMessageToGiveRole(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var userId = ulong.Parse(new string((from c in strArray[0]
+                                                 where char.IsWhiteSpace(c) || char.IsNumber(c)
+                                                 select c
+                                                 ).ToArray()));
+            var roleId = ulong.Parse(new string((from c in strArray[1]
+                                                 where char.IsWhiteSpace(c) || char.IsNumber(c)
+                                                 select c
+                                                 ).ToArray()));
+            await CommandManager.RoleManagement.GiveRoleAsync((IGuildUser)message.Author, userId, roleId);
         }
 
         public async Task SendGreetingMessage(IMessageChannel channel)
@@ -71,6 +85,13 @@ namespace BotAnbotip.Bot.Commands
         public async Task RemoveAsync(IUser user, ulong roleId)
         {
             await ((IGuildUser)user).RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
+        }
+
+        public async Task GiveRoleAsync(IGuildUser user, ulong userId, ulong roleId)
+        {
+            if (CommandManager.GetUserPermLevel(user.RoleIds) > CommandManager.GetRolePermLevel(roleId))
+                await BotClientManager.MainBot.Guild.GetUser(userId)
+                    .AddRoleAsync(BotClientManager.MainBot.Guild.GetRole(roleId));
         }
     }
 }

@@ -35,7 +35,7 @@ namespace BotAnbotip.Bot.Commands
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-            var strArray = argument.Split(' ');
+            var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
                                               where char.IsNumber(c)
                                               select c).ToArray()));
@@ -50,7 +50,7 @@ namespace BotAnbotip.Bot.Commands
         {
             await message.DeleteAsync();
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
-            var strArray = argument.Split(' ');
+            var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
                                                  where char.IsNumber(c)
                                                  select c).ToArray()));
