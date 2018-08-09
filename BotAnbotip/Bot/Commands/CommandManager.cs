@@ -94,7 +94,7 @@ namespace BotAnbotip.Bot.Commands
                 case (ulong)RoleIds.Администратор: return (byte)PermLevelOfRole.Администратор;
                 case (ulong)RoleIds.Заместитель: return (byte)PermLevelOfRole.Заместитель;
                 case (ulong)RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
-                default: return 0;
+                default: return byte.MaxValue;
             }
         }
 
