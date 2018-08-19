@@ -6,9 +6,9 @@ namespace BotAnbotip.Bot.Data.CustomEnums
 {
     public enum ActionsCost
     {
-        Message = 24,
-        ReceivedReaction = 57,
-        LeftReaction = 42,
+        Message = 38,
+        ReceivedReaction = 53,
+        LeftReaction = 41,
         OneMinuteInVoiceChannel = 7,
         Percents_SendedNews = 2,
         Percents_SendedVoting = 1,
