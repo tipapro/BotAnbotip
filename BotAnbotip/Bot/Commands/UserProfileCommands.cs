@@ -3,6 +3,7 @@ using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
+using BotAnbotip.Bot.OtherModules;
 using Discord;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace BotAnbotip.Bot.Commands
 
         private static async Task TransformMessageToShowPointsAndLevel(IMessage message, string argument)
         {
+            if (message.Channel.Id != (ulong)ChannelIds.чат_бот) return;
             await message.DeleteAsync();
             await CommandManager.UserProfile.ShowPointsAndLevel(message.Author);
         }
@@ -70,11 +72,12 @@ namespace BotAnbotip.Bot.Commands
                 LevelInfo.Points[LevelInfo.RoleList[profile.Level + 1]] : profile.Points;
             var curLevelPoints = LevelInfo.Points[LevelInfo.RoleList[profile.Level]];
             var toNextLevelPoints = nextLevelPoints - curLevelPoints;
-            var scoredPoint = profile.Points - curLevelPoints;
+            var scoredPoints = profile.Points - curLevelPoints;
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription(scoredPoint + " / " + toNextLevelPoints + "\n" + OtherModules.OtherMethods.GenerateTextProgressBar(scoredPoint, toNextLevelPoints))
+                .WithDescription("```**" + scoredPoints + " / " + toNextLevelPoints + "**\n" + 
+                OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "```")
                 .AddField("Профиль", user.Mention, true)
                 .AddField("Звание", LevelInfo.RoleList[profile.Level].ToString().Replace('1', '⭐').Replace("2", "⭐⭐").Replace("3", "⭐⭐⭐"), true)
                 .AddField("Уровень", profile.Level, true)
@@ -83,7 +86,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
 
-            await user.SendMessageAsync("", false, embedBuilder.Build());
+            await ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_бот)).SendMessageAsync("", false, embedBuilder.Build());
             await DataManager.UserProfiles.SaveAsync();
         }
     }
