@@ -66,17 +66,19 @@ namespace BotAnbotip.Bot.Commands
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
             var profile = DataManager.UserProfiles.Value[user.Id];
             var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[profile.Level]);
-            long nextLevelPoints = LevelInfo.RoleList.Length > profile.Level + 1 ? 
+            var nextLevelPoints = LevelInfo.RoleList.Length > profile.Level + 1 ? 
                 LevelInfo.Points[LevelInfo.RoleList[profile.Level + 1]] : profile.Points;
-            long curLevelPoints = LevelInfo.Points[LevelInfo.RoleList[profile.Level]];
+            var curLevelPoints = LevelInfo.Points[LevelInfo.RoleList[profile.Level]];
+            var toNextLevelPoints = nextLevelPoints - curLevelPoints;
+            var scoredPoint = profile.Points - curLevelPoints;
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription(user.Mention + "\n" + OtherModules.OtherMethods.GenerateTextProgressBar(profile.Points - curLevelPoints, nextLevelPoints - curLevelPoints))
+                .WithDescription(scoredPoint + " / " + toNextLevelPoints + "\n" + OtherModules.OtherMethods.GenerateTextProgressBar(scoredPoint, toNextLevelPoints))
                 .AddField("Профиль", user.Mention, true)
                 .AddField("Звание", LevelInfo.RoleList[profile.Level].ToString().Replace('1', '⭐').Replace("2", "⭐⭐").Replace("3", "⭐⭐⭐"), true)
                 .AddField("Уровень", profile.Level, true)
-                .AddField("Очки", profile.Points, true)
+                .AddField("Всего очков", profile.Points, true)
                 
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
