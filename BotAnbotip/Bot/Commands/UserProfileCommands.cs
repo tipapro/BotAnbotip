@@ -76,8 +76,8 @@ namespace BotAnbotip.Bot.Commands
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription("**" + scoredPoints + " / " + toNextLevelPoints + "**\n```fix\n" + 
-                OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "```")
+                .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" + 
+                scoredPoints + " / " + toNextLevelPoints + "``")
                 .AddField("Профиль", user.Mention, true)
                 .AddField("Звание", LevelInfo.RoleList[profile.Level].ToString().Replace('1', '⭐').Replace("2", "⭐⭐").Replace("3", "⭐⭐⭐"), true)
                 .AddField("Уровень", profile.Level, true)
