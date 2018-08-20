@@ -78,7 +78,8 @@ namespace BotAnbotip.Bot.Commands
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
                 .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" + 
                 scoredPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " / " + 
-                toNextLevelPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + "``")
+                toNextLevelPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " (" + 
+                Math.Round(scoredPoints * 100f / toNextLevelPoints, 2).ToString("N2", new System.Globalization.CultureInfo("ru-ru")) + "%)``")
                 .AddField("Профиль", user.Mention, true)
                 .AddField("Звание", "<@&" + (ulong)LevelInfo.RoleList[profile.Level] + ">", true)
                 .AddField("Уровень", profile.Level, true)
