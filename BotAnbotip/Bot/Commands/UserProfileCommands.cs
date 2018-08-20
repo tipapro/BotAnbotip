@@ -77,9 +77,10 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
                 .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" + 
-                scoredPoints + " / " + toNextLevelPoints + "``")
+                scoredPoints.ToString("N", new System.Globalization.CultureInfo("ru-ru")) + " / " + 
+                toNextLevelPoints.ToString("N", new System.Globalization.CultureInfo("ru-ru")) + "``")
                 .AddField("Профиль", user.Mention, true)
-                .AddField("Звание", "<@&" + (ulong)LevelInfo.RoleList[profile.Level] + ">", true)
+                .AddField("Звание", "<@&" + ((ulong)LevelInfo.RoleList[profile.Level]).ToString("N", new System.Globalization.CultureInfo("ru-ru")) + ">", true)
                 .AddField("Уровень", profile.Level, true)
                 .AddField("Всего очков", profile.Points, true)
                 
