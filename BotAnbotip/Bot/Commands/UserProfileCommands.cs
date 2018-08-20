@@ -79,7 +79,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" + 
                 scoredPoints + " / " + toNextLevelPoints + "``")
                 .AddField("Профиль", user.Mention, true)
-                .AddField("Звание", "<@" + LevelInfo.RoleList[profile.Level] + ">", true)
+                .AddField("Звание", "<@" + (ulong)LevelInfo.RoleList[profile.Level] + ">", true)
                 .AddField("Уровень", profile.Level, true)
                 .AddField("Всего очков", profile.Points, true)
                 
