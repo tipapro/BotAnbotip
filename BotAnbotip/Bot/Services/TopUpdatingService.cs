@@ -28,6 +28,7 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
+                var resultStr = "";
                 DataManager.UserTopList.Value = DataManager.UserTopList.Value.Count == 0 ? DataManager.UserTopList.Value : 
                     new List<(ulong, long, int)>();
                 foreach(var pair in DataManager.UserProfiles.Value)
@@ -51,14 +52,16 @@ namespace BotAnbotip.Bot.Services
                 DataManager.UserTopList.Value.Sort(
                     new Comparison<(ulong, long, int)>((firstObj, secondObj) => secondObj.Item2.CompareTo(firstObj.Item2)));
                 await DataManager.UserTopList.SaveAsync();
-                var embedBuilder = new EmbedBuilder()
-                .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
-                .WithColor(Color.DarkRed);
                 for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
                 {
-                    embedBuilder.AddField((i + 1).ToString(), "<@&" + (ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3] + ">" + 
-                        DataManager.UserTopList.Value[i].Item2 + " <@" + DataManager.UserTopList.Value[i].Item1 + ">");
+                    resultStr += "**" + (i + 1) + ")** <@&" + (ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3] + ">" + 
+                        DataManager.UserTopList.Value[i].Item2.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + 
+                        " <@" + DataManager.UserTopList.Value[i].Item1 + ">\n";
                 }
+                var embedBuilder = new EmbedBuilder()
+                    .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
+                    .WithDescription(resultStr)
+                    .WithColor(Color.DarkRed);
                 var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.top20);
                 var message = await channel.GetMessagesAsync(1).FlattenAsync();
                 if (message.Count() == 0) await channel.SendMessageAsync("", false, embedBuilder.Build());
