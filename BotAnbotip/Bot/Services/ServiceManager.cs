@@ -18,6 +18,7 @@ namespace BotAnbotip.Bot.Services
         public static VipRoleGiveawayService VipRoleGiveaway { get; private set; }
         public static WantPlayAutoRemovingService WantPlayAutoRemoving { get; private set; }
         public static LevelCounterService LevelCounter { get; private set; }
+        public static TopUpdatingService TopUpdating { get; private set; }
 
         public ServiceManager(BotType type)
         {
@@ -30,6 +31,8 @@ namespace BotAnbotip.Bot.Services
                 "Ошибка автоудаления приглашений в игру", "Автоудаление приглашений в игру запущено", "Автоудаление приглашений в игру остановлены");
             LevelCounter = new LevelCounterService(BotClientManager.MainBot,
                 "Ошибка счётчика уровня", "Счётчик уровня запущен", "Счётчик уровня остановлен");
+            TopUpdating = new TopUpdatingService(BotClientManager.MainBot,
+                "Ошибка автообновления топа", "Автообновление топа запущен", "Автообновление топа остановлен");
         }
 
         public void RunAll()
@@ -40,6 +43,7 @@ namespace BotAnbotip.Bot.Services
                 VipRoleGiveaway.Run();
                 WantPlayAutoRemoving.Run();
                 LevelCounter.Run();
+                TopUpdating.Run();
             }
         }
 
@@ -50,6 +54,8 @@ namespace BotAnbotip.Bot.Services
                 DailyMessages.Stop();
                 VipRoleGiveaway.Stop();
                 WantPlayAutoRemoving.Stop();
+                LevelCounter.Stop();
+                TopUpdating.Stop();
             }
         }
     }
