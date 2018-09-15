@@ -59,9 +59,9 @@ namespace BotAnbotip.Bot.Services
                         DataManager.UserTopList.Value[i].Item2 + " <@" + DataManager.UserTopList.Value[i].Item1 + ">");
                 }
                 var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.top20);
-                var message = (IUserMessage)(await channel.GetMessagesAsync(1).FlattenAsync())?.First();
-                if (message == null) await channel.SendMessageAsync("", false, embedBuilder.Build());
-                else await message.ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
+                var message = await channel.GetMessagesAsync(1).FlattenAsync();
+                if (message.Count() == 0) await channel.SendMessageAsync("", false, embedBuilder.Build());
+                else await ((IUserMessage)message.First()).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
             }
         }
     }
