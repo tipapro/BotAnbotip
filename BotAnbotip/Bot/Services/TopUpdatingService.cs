@@ -28,7 +28,6 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
-                string resultString = "";
                 DataManager.UserTopList.Value = DataManager.UserTopList.Value.Count == 0 ? DataManager.UserTopList.Value : new List<(ulong, long)>();
                 foreach(var pair in DataManager.UserProfiles.Value)
                 {
@@ -56,7 +55,7 @@ namespace BotAnbotip.Bot.Services
                 .WithColor(Color.DarkGrey);
                 for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
                 {
-                    embedBuilder.AddField("", (i + 1) + ") " + 
+                    embedBuilder.AddField(">", (i + 1) + ") " + 
                         DataManager.UserTopList.Value[i].Item2 + " <@" + DataManager.UserTopList.Value[i].Item1 + ">");
                 }
                 var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.top20);
