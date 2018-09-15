@@ -11,6 +11,7 @@
         SubscriptionManager,
         UserLevel,
         ManageRole,
-        Greeting
+        Greeting,
+        UsersTop
     }
 }

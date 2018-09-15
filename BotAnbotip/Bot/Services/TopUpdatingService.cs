@@ -28,13 +28,14 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
-                DataManager.UserTopList.Value = DataManager.UserTopList.Value.Count == 0 ? DataManager.UserTopList.Value : new List<(ulong, long)>();
+                DataManager.UserTopList.Value = DataManager.UserTopList.Value.Count == 0 ? DataManager.UserTopList.Value : 
+                    new List<(ulong, long, int)>();
                 foreach(var pair in DataManager.UserProfiles.Value)
                 {
-                    if (DataManager.UserTopList.Value.Contains((pair.Key, pair.Value.Points))) continue;
+                    if (DataManager.UserTopList.Value.Contains((pair.Key, pair.Value.Points, pair.Value.Level))) continue;
                     if (DataManager.UserTopList.Value.Count < AmountOfTopUsers)
                     {
-                        DataManager.UserTopList.Value.Add((pair.Key, pair.Value.Points));
+                        DataManager.UserTopList.Value.Add((pair.Key, pair.Value.Points, pair.Value.Level));
                     }
                     else
                     {
@@ -42,20 +43,20 @@ namespace BotAnbotip.Bot.Services
                         {
                             if (pair.Value.Points > DataManager.UserTopList.Value[i].Item2)
                             {
-                                DataManager.UserTopList.Value[i] = (pair.Key, pair.Value.Points);
+                                DataManager.UserTopList.Value[i] = (pair.Key, pair.Value.Points, pair.Value.Level);
                             }
                         }
                     }
                 }
                 DataManager.UserTopList.Value.Sort(
-                    new Comparison<(ulong, long)>((firstObj, secondObj) => secondObj.Item2.CompareTo(firstObj.Item2)));
+                    new Comparison<(ulong, long, int)>((firstObj, secondObj) => secondObj.Item2.CompareTo(firstObj.Item2)));
                 await DataManager.UserTopList.SaveAsync();
                 var embedBuilder = new EmbedBuilder()
-                .WithTitle(MessageTitles.Titles[TitleType.Anonymous])
-                .WithColor(Color.DarkGrey);
+                .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
+                .WithColor(Color.DarkRed);
                 for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
                 {
-                    embedBuilder.AddField(">", (i + 1) + ") " + 
+                    embedBuilder.AddField((i + 1).ToString(), "<@&" + (ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3] + ">" + 
                         DataManager.UserTopList.Value[i].Item2 + " <@" + DataManager.UserTopList.Value[i].Item1 + ">");
                 }
                 var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.top20);

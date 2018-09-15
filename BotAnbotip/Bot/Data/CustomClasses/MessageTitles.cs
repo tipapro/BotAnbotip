@@ -17,7 +17,8 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             { TitleType.SubscriptionManager, ":envelope_with_arrow:Менеджер подписок:envelope_with_arrow:" },
             { TitleType.UserLevel, ":small_blue_diamond:Уровень пользователя:small_blue_diamond:" },
             { TitleType.ManageRole, ":tools:Доступ к тематическим чатам:tools:"},
-            { TitleType.Greeting, ":cyclone:Приветствуем Вас на нашем сервере!:cyclone:"}
+            { TitleType.Greeting, ":cyclone:Приветствуем Вас на нашем сервере!:cyclone:"},
+            { TitleType.UsersTop, ":op:топ20:top:"}
         };
 
         public static TitleType GetType(string title)
