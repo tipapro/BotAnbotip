@@ -61,7 +61,9 @@ namespace BotAnbotip.Bot.Services
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
                     .WithDescription(resultStr)
-                    .WithColor(Color.DarkRed);
+                    .WithColor(Color.DarkRed)
+                    .WithCurrentTimestamp()
+                    .WithAuthor("Последнее обновление: ");
                 var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.top20);
                 var message = await channel.GetMessagesAsync(1).FlattenAsync();
                 if (message.Count() == 0) await channel.SendMessageAsync("", false, embedBuilder.Build());
