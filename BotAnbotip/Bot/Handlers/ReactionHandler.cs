@@ -119,11 +119,6 @@ namespace BotAnbotip.Bot.Handlers
         {
             await Task.Run(async () =>
             {
-                if (reactedUser.IsBot) return;
-                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
-                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
-                await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((long)ActionsCost.LeftReaction);
-
                 var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
                 if (receivingReactionUser.IsBot) return;
                 if (receivingReactionUser.Id != reactedUser.Id)
@@ -131,6 +126,11 @@ namespace BotAnbotip.Bot.Handlers
                         DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
                 await DataManager.UserProfiles.Value[receivingReactionUser.Id].AddPoints((long)ActionsCost.ReceivedReaction);
                 await DataManager.UserProfiles.SaveAsync();
+
+                if (reactedUser.IsBot) return;
+                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
+                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
+                await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((long)ActionsCost.LeftReaction);
             });
         }
 
@@ -190,11 +190,6 @@ namespace BotAnbotip.Bot.Handlers
         {
             await Task.Run(async () =>
             {
-                if (reactedUser.IsBot) return;
-                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
-                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
-                await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((long)ActionsCost.LeftReaction);
-
                 var receivingReactionUser = (await messageWithReaction.DownloadAsync()).Author;
                 if (receivingReactionUser.IsBot) return;
                 if (receivingReactionUser.Id != reactedUser.Id)
@@ -202,6 +197,12 @@ namespace BotAnbotip.Bot.Handlers
                         DataManager.UserProfiles.Value.Add(receivingReactionUser.Id, new UserProfile(receivingReactionUser.Id));
                 await DataManager.UserProfiles.Value[receivingReactionUser.Id].RemovePoints((long)ActionsCost.ReceivedReaction);
                 await DataManager.UserProfiles.SaveAsync();
+
+                if (reactedUser.IsBot) return;
+                if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
+                    DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
+                await DataManager.UserProfiles.Value[reactedUser.Id].RemovePoints((long)ActionsCost.LeftReaction);
+
             });
         }
     }
