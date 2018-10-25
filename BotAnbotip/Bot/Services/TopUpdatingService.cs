@@ -40,7 +40,7 @@ namespace BotAnbotip.Bot.Services
                     }
                     else
                     {
-                        for (int i = DataManager.UserTopList.Value.Count - 1; i > 0; i--)
+                        for (int i = DataManager.UserTopList.Value.Count - 1; i >= 0; i--)
                         {
                             if (pair.Value.Points > DataManager.UserTopList.Value[i].Item2)
                             {
