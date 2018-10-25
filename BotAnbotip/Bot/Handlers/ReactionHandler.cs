@@ -119,7 +119,7 @@ namespace BotAnbotip.Bot.Handlers
         {
             await Task.Run(async () =>
             {
-                if (!reactedUser.IsBot) return;
+                if (reactedUser.IsBot) return;
                 if (!DataManager.UserProfiles.Value.ContainsKey(reactedUser.Id))
                     DataManager.UserProfiles.Value.Add(reactedUser.Id, new UserProfile(reactedUser.Id));
                 await DataManager.UserProfiles.Value[reactedUser.Id].AddPoints((long)ActionsCost.LeftReaction);
