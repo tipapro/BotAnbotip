@@ -28,7 +28,7 @@ namespace BotAnbotip.Bot.Services
                 {
                     if ((DateTime.Now - pair.Value.Item1.DateTime).Duration() > new TimeSpan(1, 0, 0, 0))
                     {
-                        var message = await ((IMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(pair.Key);
+                        var message = await ((IMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_gaming)).GetMessageAsync(pair.Key);
                         if (message != null) await message.DeleteAsync();
                         toDelete.Add(pair.Key);
                     }

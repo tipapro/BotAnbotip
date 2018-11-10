@@ -24,7 +24,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Moderator)) return;
             string  imageUrl = null, videoUrl = null;
             var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
             foreach(var (arg, str) in argumentList)

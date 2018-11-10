@@ -41,7 +41,7 @@ namespace BotAnbotip.Bot.Handlers
                         var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                         if (channelCategory == null) return;
                         //для рейтингового листа
-                        if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы)
+                        if (channelCategory.Id == (ulong)CategoryIds.Rating_Lists)
                         {
                             await message.RemoveReactionAsync(reaction.Emote, user);
                             string objName = message.Embeds.First().Title;
@@ -80,7 +80,7 @@ namespace BotAnbotip.Bot.Handlers
                                     switch (reaction.Emote.Name)
                                     {
                                         case "🎵": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 8) await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
-                                        case "🈹": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 5) await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                        case "🈹": if (DataManager.UserProfiles.Value[reaction.UserId].Level > 5) await Task.Run(() => CommandManager.RoleManagement.GetAsync(reaction.User.Value, (ulong)RoleIds.Anime_Fun)); break;
                                     }
                                     break;
                             }
@@ -152,7 +152,7 @@ namespace BotAnbotip.Bot.Handlers
                         var channelCategory = await ((IGuildChannel)channel).GetCategoryAsync();
                         if (channelCategory == null) return;
                         // для рейтингового листа
-                        if (channelCategory.Id == (ulong)CategoryIds.Рейтинговые_Листы) return;
+                        if (channelCategory.Id == (ulong)CategoryIds.Rating_Lists) return;
                         // для остальных категорий
                         switch (MessageTitles.GetType(messageTitle))
                         {
@@ -168,7 +168,7 @@ namespace BotAnbotip.Bot.Handlers
                                 switch (reaction.Emote.Name)
                                 {
                                     case "🎵": await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.DJ)); break;
-                                    case "🈹": await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.Любитель_Аниме)); break;
+                                    case "🈹": await Task.Run(() => CommandManager.RoleManagement.RemoveAsync(reaction.User.Value, (ulong)RoleIds.Anime_Fun)); break;
                                 }
                                 break;
                         }

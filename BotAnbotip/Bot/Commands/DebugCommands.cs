@@ -20,7 +20,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToChangeFlagAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             var num = int.Parse(argument);
             await CommandManager.Debug.ChangeFlagAsync(num);
         }

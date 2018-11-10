@@ -60,7 +60,7 @@ namespace BotAnbotip.Bot.Services
                         .WithColor(Color.Blue);
 
                     var sendedMessage = await BotClientManager.MainBot.Guild
-                        .GetTextChannel((ulong)ChannelIds.anbotip).SendMessageAsync("", false, embedBuilder.Build());
+                        .GetTextChannel((ulong)ChannelIds.giveaways).SendMessageAsync("", false, embedBuilder.Build());
                     await sendedMessage.AddReactionAsync(new Emoji("💙"));
                     await sendedMessage.PinAsync();
 

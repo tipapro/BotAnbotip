@@ -21,7 +21,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Администратор)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Admin)) return;
             await CommandManager.Announcement.SendAsync(message.Channel, argument);
         }
 

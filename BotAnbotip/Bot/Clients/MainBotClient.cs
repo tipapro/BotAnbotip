@@ -42,14 +42,14 @@ namespace BotAnbotip.Bot.Clients
 
         private async Task OnUserJoining(SocketGuildUser user)
         {
-            await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Участник));
+            await user.AddRoleAsync(Guild.GetRole((ulong)RoleIds.Member));
             if (!user.IsBot)
             {
                 if (DataManager.UserProfiles.Value.ContainsKey(user.Id))
                 {
                     await user.AddRoleAsync(Guild.GetRole((ulong)LevelInfo.RoleList[DataManager.UserProfiles.Value[user.Id].Level]));
                 }
-                else await user.AddRoleAsync(Guild.GetRole((ulong)LevelRoleIds.Медь1));
+                else await user.AddRoleAsync(Guild.GetRole((ulong)LevelRoleIds.Copper1));
             }
         }
 

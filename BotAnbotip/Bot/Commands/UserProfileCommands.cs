@@ -28,7 +28,7 @@ namespace BotAnbotip.Bot.Commands
 
         private static async Task TransformMessageToShowPointsAndLevel(IMessage message, string argument)
         {
-            if (message.Channel.Id != (ulong)ChannelIds.чат_бот) return;
+            if (message.Channel.Id != (ulong)ChannelIds.chat_botcmd) return;
             await message.DeleteAsync();
             await CommandManager.UserProfile.ShowPointsAndLevel(message.Author);
         }
@@ -36,7 +36,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToFine(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
                                               where char.IsNumber(c)
@@ -51,7 +51,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToReward(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
                                                  where char.IsNumber(c)
@@ -88,7 +88,7 @@ namespace BotAnbotip.Bot.Commands
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
 
-            await ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_бот)).SendMessageAsync("", false, embedBuilder.Build());
+            await ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_botcmd)).SendMessageAsync("", false, embedBuilder.Build());
             await DataManager.UserProfiles.SaveAsync();
         }
     }

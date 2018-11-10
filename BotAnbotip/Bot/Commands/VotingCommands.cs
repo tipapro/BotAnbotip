@@ -30,7 +30,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToAddVotingdAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Moderator)) return;
             List<string> subjects = new List<string>();
             string imageUrl = null;
             foreach(var (arg, str) in CommandManager.ClearAndGetCommandArguments(ref argument))
@@ -49,7 +49,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToDeleteVotingAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Moderator)) return;
             ulong messageId = ulong.Parse(argument);
             await CommandManager.Voting.DeleteVotingAsync(message.Channel, messageId);
         }

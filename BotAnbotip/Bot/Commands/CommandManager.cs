@@ -75,12 +75,12 @@ namespace BotAnbotip.Bot.Commands
         {
             byte userPermLevel = (byte)PermLevelOfRole.everyone;
 
-            if (userRoles.Contains((ulong)RoleIds.Основатель)) userPermLevel = (byte)PermLevelOfRole.Основатель;
-            else if (userRoles.Contains((ulong)RoleIds.Заместитель)) userPermLevel = (byte)PermLevelOfRole.Заместитель;
-            else if (userRoles.Contains((ulong)RoleIds.Администратор)) userPermLevel = (byte)PermLevelOfRole.Администратор;
-            else if (userRoles.Contains((ulong)RoleIds.Модератор)) userPermLevel = (byte)PermLevelOfRole.Модератор;
-            else if (userRoles.Contains((ulong)RoleIds.Активный_Участник)) userPermLevel = (byte)PermLevelOfRole.Активный_Участник;
-            else if (userRoles.Contains((ulong)RoleIds.Участник)) userPermLevel = (byte)PermLevelOfRole.Участник;
+            if (userRoles.Contains((ulong)RoleIds.Founder)) userPermLevel = (byte)PermLevelOfRole.Founder;
+            else if (userRoles.Contains((ulong)RoleIds.Co_founder)) userPermLevel = (byte)PermLevelOfRole.Co_founder;
+            else if (userRoles.Contains((ulong)RoleIds.Admin)) userPermLevel = (byte)PermLevelOfRole.Admin;
+            else if (userRoles.Contains((ulong)RoleIds.Moderator)) userPermLevel = (byte)PermLevelOfRole.Moderator;
+            else if (userRoles.Contains((ulong)RoleIds.DELETED_Active_Member)) userPermLevel = (byte)PermLevelOfRole.DELETED_Active_Member;
+            else if (userRoles.Contains((ulong)RoleIds.Member)) userPermLevel = (byte)PermLevelOfRole.Member;
             return userPermLevel;
         }
 
@@ -88,12 +88,12 @@ namespace BotAnbotip.Bot.Commands
         {
             switch (minimalRole)
             {
-                case (ulong)RoleIds.Участник: return (byte)PermLevelOfRole.Участник;
-                case (ulong)RoleIds.Активный_Участник: return (byte)PermLevelOfRole.Активный_Участник;
-                case (ulong)RoleIds.Модератор: return (byte)PermLevelOfRole.Модератор;
-                case (ulong)RoleIds.Администратор: return (byte)PermLevelOfRole.Администратор;
-                case (ulong)RoleIds.Заместитель: return (byte)PermLevelOfRole.Заместитель;
-                case (ulong)RoleIds.Основатель: return (byte)PermLevelOfRole.Основатель;
+                case (ulong)RoleIds.Member: return (byte)PermLevelOfRole.Member;
+                case (ulong)RoleIds.DELETED_Active_Member: return (byte)PermLevelOfRole.DELETED_Active_Member;
+                case (ulong)RoleIds.Moderator: return (byte)PermLevelOfRole.Moderator;
+                case (ulong)RoleIds.Admin: return (byte)PermLevelOfRole.Admin;
+                case (ulong)RoleIds.Co_founder: return (byte)PermLevelOfRole.Co_founder;
+                case (ulong)RoleIds.Founder: return (byte)PermLevelOfRole.Founder;
                 default: return byte.MaxValue;
             }
         }

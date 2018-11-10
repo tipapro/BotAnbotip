@@ -23,14 +23,14 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToStopAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.BotControl.StopAsync();
         }
 
         private static async Task TransformMessageToClearDataAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.BotControl.ClearDataAsync();
         }
 

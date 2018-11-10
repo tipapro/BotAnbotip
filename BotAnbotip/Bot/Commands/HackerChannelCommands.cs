@@ -22,7 +22,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToChangeStateAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
 
             var strArray = argument.Split(' ');
 

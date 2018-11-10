@@ -7,11 +7,11 @@ namespace BotAnbotip.Bot.Data.Group
     enum PermLevelOfRole : byte
     {              
         everyone = 0,
-        Участник = 1,
-        Активный_Участник = 2,
-        Модератор = 3,
-        Администратор = 4,
-        Заместитель = 5,
-        Основатель = 6
+        Member = 1,
+        DELETED_Active_Member = 2,
+        Moderator = 3,
+        Admin = 4,
+        Co_founder = 5,
+        Founder = 6
     }
 }

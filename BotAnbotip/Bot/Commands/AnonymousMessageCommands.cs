@@ -27,14 +27,14 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.DELETED_Active_Member)) return;
             await CommandManager.AnonymousMessage.SendAsync(message.Author, message.Channel, argument);
         }
 
         private static async Task TransformMessageToDeleteAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.DELETED_Active_Member)) return;
             ulong messageId = ulong.Parse(argument);
             await CommandManager.AnonymousMessage.DeleteAsync(message.Author, message.Channel, messageId);
         }
@@ -42,7 +42,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToGetAuthorAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             ulong messageId = ulong.Parse(argument);
             await CommandManager.AnonymousMessage.GetAuthorAsync(message.Author, messageId);
         }

@@ -29,7 +29,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToSendAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.DELETED_Active_Member)) return;
 
             string gameImage = null;
             string gameUrl = null;
@@ -50,14 +50,14 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToRemoveAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.DELETED_Active_Member)) return;
             await CommandManager.WantPlayMessage.RemoveAsync(message.Author, ulong.Parse(argument));
         }
 
         private static async Task TransformMessageToInviteAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Активный_Участник)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.DELETED_Active_Member)) return;
             var strArray = new string((from c in argument
                                    where char.IsWhiteSpace(c) || char.IsNumber(c)
                                      select c
@@ -84,7 +84,7 @@ namespace BotAnbotip.Bot.Commands
             if (gameUrl != null) embedBuilder.WithUrl(gameUrl);
 
 
-            var sendedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой)).SendMessageAsync("", false, embedBuilder.Build());
+            var sendedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_gaming)).SendMessageAsync("", false, embedBuilder.Build());
 
             await sendedMessage.ModifyAsync((messageProperties) =>
             {
@@ -102,7 +102,7 @@ namespace BotAnbotip.Bot.Commands
         {
             if (DataManager.AgreeingToPlayUsers.Value[messageId].Item2[0] == user.Id)
             {
-                var foundedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой)).GetMessageAsync(messageId);
+                var foundedMessage = await ((ISocketMessageChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_gaming)).GetMessageAsync(messageId);
                 await foundedMessage.DeleteAsync();
                 DataManager.AgreeingToPlayUsers.Value.Remove(messageId);
                 await DataManager.AgreeingToPlayUsers.SaveAsync();
@@ -112,12 +112,12 @@ namespace BotAnbotip.Bot.Commands
         private async Task InviteAsync(IUser user, ulong messageId, List<ulong> userIds)
         {
             int maxNum;
-            if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Заместитель)) maxNum = 13;
-            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Администратор)) maxNum = 9;
-            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Модератор)) maxNum = 7;
-            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Активный_Участник)) maxNum = 5;
+            if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Co_founder)) maxNum = 13;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Admin)) maxNum = 9;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.Moderator)) maxNum = 7;
+            else if (CommandManager.CheckPermission((IGuildUser)user, RoleIds.DELETED_Active_Member)) maxNum = 5;
             else maxNum = 3;
-            var channel = BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.чат_игровой);
+            var channel = BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_gaming);
             var foundedMessage = await ((ISocketMessageChannel)channel).GetMessageAsync(messageId);
             var invite = await channel.CreateInviteAsync();
             var embedBuilder = new EmbedBuilder()
@@ -162,7 +162,7 @@ namespace BotAnbotip.Bot.Commands
 
         public static async Task SendOptionsOfSubscriptionAsync(IMessage message, IUser user)
         {           
-            if(!CommandManager.CheckPermission((IGuildUser)user, RoleIds.Активный_Участник)) return;
+            if(!CommandManager.CheckPermission((IGuildUser)user, RoleIds.DELETED_Active_Member)) return;
 
             ulong authorOfInvitingId = ulong.Parse(message.Embeds.First().Description.Substring(16, 18));
             if (user.Id == authorOfInvitingId) return;

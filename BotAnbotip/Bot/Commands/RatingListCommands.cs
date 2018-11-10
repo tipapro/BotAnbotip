@@ -42,7 +42,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToAddListAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
 
             RatingListType listType = RatingListType.Other;
             var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
@@ -72,7 +72,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToRemoveListAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             ulong ratingListId = ulong.Parse(argument);
             await CommandManager.RatingList.RemoveListAsync(ratingListId);
         }
@@ -80,7 +80,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToAddValueAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
 
             string thumbnailUrl = null, url = null;
             var argumentList = CommandManager.ClearAndGetCommandArguments(ref argument);
@@ -100,21 +100,21 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToRemoveValueAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.RatingList.RemoveValueAsync(message.Channel, argument);
         }
 
         private static async Task TransformMessageToReverseAsync(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.RatingList.ReverseAsync(message.Channel);
         }
 
         private static async Task TransformMessageToUpdateList(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             int fromPos = 0, toPos = 0;
             if (argument == "-1")
             {
@@ -133,7 +133,7 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToUpdateReactions(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             int fromPos = 0, toPos = 0;
             if (argument == "-1")
             {
@@ -154,20 +154,20 @@ namespace BotAnbotip.Bot.Commands
             var newRatingChannel = await BotClientManager.MainBot.Guild.CreateTextChannelAsync(listName);
             await newRatingChannel.ModifyAsync((textChannelProperties) =>
             {
-                textChannelProperties.CategoryId = (ulong)CategoryIds.Рейтинговые_Листы;
+                textChannelProperties.CategoryId = (ulong)CategoryIds.Rating_Lists;
             });
 
-            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Главный_Бот),
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Main_Bot),
                 OverwritePermissions.AllowAll(newRatingChannel));
 
             await newRatingChannel.AddPermissionOverwriteAsync(
-                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Музыкальный_Бот),
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Music_Bot),
                 OverwritePermissions.DenyAll(newRatingChannel));
             await newRatingChannel.AddPermissionOverwriteAsync(
-                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Чат_Бот),
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Chat_Bot),
                 OverwritePermissions.DenyAll(newRatingChannel));
             await newRatingChannel.AddPermissionOverwriteAsync(
-                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds._Бот),
+                BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.DELETED__Bot),
                 OverwritePermissions.DenyAll(newRatingChannel));
             await newRatingChannel.AddPermissionOverwriteAsync(
                 BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Backend_Bot),
@@ -177,16 +177,16 @@ namespace BotAnbotip.Bot.Commands
                 BotClientManager.MainBot.Guild.EveryoneRole,
                 OverwritePermissions.DenyAll(newRatingChannel));
 
-            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Активный_Участник),
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.DELETED_Active_Member),
                 OverwritePermissions.DenyAll(newRatingChannel).Modify(
                     createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
-            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Модератор),
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Moderator),
                 OverwritePermissions.DenyAll(newRatingChannel).Modify(
                     createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
-            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Администратор),
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Admin),
                 OverwritePermissions.DenyAll(newRatingChannel).Modify(
                     createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
-            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Заместитель),
+            await newRatingChannel.AddPermissionOverwriteAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.Co_founder),
                 OverwritePermissions.DenyAll(newRatingChannel).Modify(
                     createInstantInvite: PermValue.Allow, readMessages: PermValue.Allow, readMessageHistory: PermValue.Allow));
 

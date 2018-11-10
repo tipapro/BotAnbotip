@@ -24,21 +24,21 @@ namespace BotAnbotip.Bot.Commands
         private static async Task TransformMessageToSendGreetingMessage(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.RoleManagement.SendGreetingMessage(message.Channel);
         }
 
         private static async Task TransformMessageToSendRoleManageMessage(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Основатель)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             await CommandManager.RoleManagement.SendRoleManageMessage(message.Channel);
         }
 
         private static async Task TransformMessageToGiveRole(IMessage message, string argument)
         {
             await message.DeleteAsync();
-            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Модератор)) return;
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Moderator)) return;
             var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
                                                  where char.IsWhiteSpace(c) || char.IsNumber(c)
@@ -56,8 +56,8 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.Greeting])
                 .WithDescription("**Выберите необходимый чат:**")
-                .AddField("Игровая тематика", $"<#{(ulong)ChannelIds.чат_игровой}>", true)
-                .AddField("Внеигровая тематика", $"<#{(ulong)ChannelIds.чат_флудилка}>", true)
+                .AddField("Игровая тематика", $"<#{(ulong)ChannelIds.chat_gaming}>", true)
+                .AddField("Внеигровая тематика", $"<#{(ulong)ChannelIds.chat_offtop}>", true)
                 .WithColor(Color.Purple);
 
             await channel.SendMessageAsync("", false, embedBuilder.Build());
@@ -68,8 +68,8 @@ namespace BotAnbotip.Bot.Commands
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.ManageRole])
                 .WithDescription("Если вы хотите получить доступ к тематическим чатам, то нажмите на нужные реакции:")
-                .AddField(":musical_note:(9+ уровень)", $"<#{(ulong)ChannelIds.чат_музыкальный}>", true)
-                .AddField(":u5272:(6+ уровень)", $"<#{(ulong)ChannelIds.чат_аниме}>", true)
+                .AddField(":musical_note:(9+ уровень)", $"<#{(ulong)ChannelIds.chat_music}>", true)
+                .AddField(":u5272:(6+ уровень)", $"<#{(ulong)ChannelIds.chat_anime}>", true)
                 .WithColor(Color.Purple);
 
             var sendedMessage = await channel.SendMessageAsync("", false, embedBuilder.Build());
