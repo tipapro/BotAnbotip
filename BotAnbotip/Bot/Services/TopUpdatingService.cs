@@ -46,15 +46,17 @@ namespace BotAnbotip.Bot.Services
                         {
                             if (user.Points > DataManager.UserTopList.Value[i].Item2)
                             {
-                                for (int j = 0; j < i; j++)
+                                for (int j = DataManager.UserTopList.Value.Count - 1; j > i; j--)
                                 {
-                                    DataManager.UserTopList.Value[j] = DataManager.UserTopList.Value[j + 1];
+                                    DataManager.UserTopList.Value[j] = DataManager.UserTopList.Value[j - 1];
                                 }
                                 DataManager.UserTopList.Value[i] = (id, user.Points, user.Level);
                                 break;
                             }
                         }
                     }
+                    DataManager.UserTopList.Value.Sort(
+                            new Comparison<(ulong, long, int)>((firstObj, secondObj) => secondObj.Item2.CompareTo(firstObj.Item2)));
                 }              
                 await DataManager.UserTopList.SaveAsync();
 
@@ -74,7 +76,7 @@ namespace BotAnbotip.Bot.Services
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
                 .WithDescription(resultStr)
-                .WithColor(Color.Teal)
+                .WithColor(Color.DarkTeal)
                 .WithCurrentTimestamp()
                 .WithFooter("Последнее обновление: ");
             var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.usertop);
