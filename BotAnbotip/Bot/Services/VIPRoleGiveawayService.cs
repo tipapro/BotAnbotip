@@ -28,9 +28,9 @@ namespace BotAnbotip.Bot.Services
         {
             while (IsStarted)
             {
-                if ((DateTime.Now.DayOfWeek != DayOfWeek.Monday) && (DataManager.DidRoleGiveawayBegin == true))
+                if (((DateTime.UtcNow + new TimeSpan(3, 0, 0)).DayOfWeek != DayOfWeek.Monday) && (DataManager.DidRoleGiveawayBegin == true))
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(false);
-                while (DateTime.Now.DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[0])
+                while ((DateTime.UtcNow + new TimeSpan(3, 0, 0)).DayOfWeek != DayOfWeek.Monday && !DataManager.DebugTriger[0])
                     await Task.Delay(new TimeSpan(0, 10, 0), token);
                 DataManager.DebugTriger[0] = false;
                 if (!DataManager.DidRoleGiveawayBegin.Value && !DataManager.DebugTriger[1])
@@ -39,30 +39,13 @@ namespace BotAnbotip.Bot.Services
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
                     
                     var winnerId = await ChooseTheWinner();
-                    string winnerText, giveawayText;
-                    if (winnerId == 0) winnerText =  "Победитель не определён из-за нехватки участников.";
-                    else winnerText =  "Победитель этой недели: <@!" + winnerId + ">.";
-
-                   
-                    if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)) DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
+                    
+                    if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP))
+                        DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
                     else DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
                     await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
-                    giveawayText = "\nА наш розыгрыш продолжается.\n" +
-                        "Условия:\n" +
-                    "```1) Поставьте лайк этому посту;\n" +
-                    "2) Ждать понедельника.\n```" +
-                    "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю + 15% очков.";
-
-                    var embedBuilder = new EmbedBuilder()
-                        .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])
-                        .WithDescription(winnerText + giveawayText)
-                        .WithColor(Color.Blue);
-
-                    var sendedMessage = await BotClientManager.MainBot.Guild
-                        .GetTextChannel((ulong)ChannelIds.giveaways).SendMessageAsync("", false, embedBuilder.Build());
-                    await sendedMessage.AddReactionAsync(new Emoji("💙"));
-                    await sendedMessage.PinAsync();
+                    DisplayResult(winnerId);
 
                     if (!DataManager.UserProfiles.Value.ContainsKey(winnerId))
                         DataManager.UserProfiles.Value.Add(winnerId, new UserProfile(winnerId));
@@ -70,6 +53,28 @@ namespace BotAnbotip.Bot.Services
                     await DataManager.UserProfiles.SaveAsync();
                 }
             }
+        }
+
+        private async void DisplayResult(ulong winnerId)
+        {
+            var winnerText = winnerId == 0 ? "Победитель не определён из-за нехватки участников." :
+                        "Победитель этой недели: <@!" + winnerId + ">.";
+
+            var giveawayText = "\nА наш розыгрыш продолжается.\n" +
+                "Условия:\n" +
+                "```1) Поставьте лайк этому посту;\n" +
+                "2) Ждать понедельника.\n```" +
+                "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю + 15% очков.";
+
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])
+                .WithDescription(winnerText + giveawayText)
+                .WithColor(Color.Blue);
+
+            var sendedMessage = await BotClientManager.MainBot.Guild
+                .GetTextChannel((ulong)ChannelIds.giveaways).SendMessageAsync("", false, embedBuilder.Build());
+            await sendedMessage.AddReactionAsync(new Emoji("💙"));
+            await sendedMessage.PinAsync(); 
         }
 
         public static async Task<ulong> ChooseTheWinner()
