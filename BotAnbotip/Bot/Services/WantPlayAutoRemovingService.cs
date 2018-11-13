@@ -13,8 +13,7 @@ namespace BotAnbotip.Bot.Services
 {
     class WantPlayAutoRemovingService : ServiceBase
     {
-        public WantPlayAutoRemovingService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public WantPlayAutoRemovingService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 

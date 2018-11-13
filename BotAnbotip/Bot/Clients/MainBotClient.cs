@@ -11,7 +11,7 @@ using BotAnbotip.Bot.Data.CustomClasses;
 
 namespace BotAnbotip.Bot.Clients
 {
-    public class MainBotClient:BotClientBase
+    public class MainBotClient : BotClientBase
     {
         private MessageHandler _msgHandler;
         private ReactionHandler _reactionHandler;
@@ -19,7 +19,7 @@ namespace BotAnbotip.Bot.Clients
         private AntiSpam _antiMessageSpam;
         private ServiceManager _cyclicActionManager;
 
-        public MainBotClient(BotType type) : base(type)
+        public MainBotClient() : base(BotType.Main)
         {
         }
 

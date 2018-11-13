@@ -23,16 +23,11 @@ namespace BotAnbotip.Bot.Services
         public ServiceManager(BotType type)
         {
             botType = type;
-            DailyMessages = new DailyMessagesService(BotClientManager.MainBot,
-                "Ошибка ежедневных сообщений", "Ежедневные сообщения запущены", "Ежедневные сообщения остановлены");
-            VipRoleGiveaway = new VipRoleGiveawayService(BotClientManager.MainBot,
-                "Ошибка розыгрыша VIP роли", "Розыгрыш VIP роли запущен", "Розыгрыш VIP роли остановлен");
-            WantPlayAutoRemoving = new WantPlayAutoRemovingService(BotClientManager.MainBot,
-                "Ошибка автоудаления приглашений в игру", "Автоудаление приглашений в игру запущено", "Автоудаление приглашений в игру остановлены");
-            LevelCounter = new LevelCounterService(BotClientManager.MainBot,
-                "Ошибка счётчика уровня", "Счётчик уровня запущен", "Счётчик уровня остановлен");
-            TopUpdating = new TopUpdatingService(BotClientManager.MainBot,
-                "Ошибка автообновления топа", "Автообновление топа запущен", "Автообновление топа остановлен");
+            DailyMessages = new DailyMessagesService(BotClientManager.MainBot, "Ежедневные сообщения");
+            VipRoleGiveaway = new VipRoleGiveawayService(BotClientManager.MainBot, "Розыгрыш VIP роли");
+            WantPlayAutoRemoving = new WantPlayAutoRemovingService(BotClientManager.MainBot, "Автоудаление приглашений в игру");
+            LevelCounter = new LevelCounterService(BotClientManager.MainBot, "Счётчик уровня");
+            TopUpdating = new TopUpdatingService(BotClientManager.MainBot, "Автообновление топа");
         }
 
         public void RunAll()

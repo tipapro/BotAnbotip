@@ -14,8 +14,7 @@ namespace BotAnbotip.Bot.Services
 {
     class DailyMessagesService : ServiceBase
     {
-        public DailyMessagesService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public DailyMessagesService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 

@@ -7,8 +7,7 @@ namespace BotAnbotip.Bot.Services
 {
     class AutoSaverService : ServiceBase
     {
-        public AutoSaverService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public AutoSaverService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
     }

@@ -7,8 +7,7 @@ namespace BotAnbotip.Bot.Services
 {
     class BotHelperService : ServiceBase
     {
-        public BotHelperService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) : 
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public BotHelperService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
     }

@@ -2,10 +2,8 @@
 using BotAnbotip.Bot.Data;
 using BotAnbotip.Bot.Data.CustomClasses;
 using BotAnbotip.Bot.Data.CustomEnums;
-using BotAnbotip.Bot.Data.Group;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,8 +11,7 @@ namespace BotAnbotip.Bot.Services
 {
     class LevelCounterService : ServiceBase
     {
-        public LevelCounterService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public LevelCounterService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 

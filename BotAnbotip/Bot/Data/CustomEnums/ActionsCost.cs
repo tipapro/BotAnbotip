@@ -12,6 +12,6 @@ namespace BotAnbotip.Bot.Data.CustomEnums
         OneMinuteInVoiceChannel = 7,
         Percents_SendedNews = 2,
         Percents_SendedVoting = 1,
-        Percents_VIPWin = 15
+        Percents_VIPWin = 10
     }
 }

@@ -17,8 +17,7 @@ namespace BotAnbotip.Bot.Services
 
         private static Random random = new Random();
 
-        public HackerChannelAutoChangeService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public HackerChannelAutoChangeService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 

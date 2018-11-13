@@ -21,8 +21,6 @@ namespace BotAnbotip.Bot.Data
 
         public async Task ReadAsync()
         {
-            if (!DropboxIntegration.IsAuthorized) DropboxIntegration.Authorize(PrivateData.DropboxApiKey);
-
             string json = await DropboxIntegration.DownloadAsync(PrivateData.FileNamePrefix + _fileName + ".json");
 
             if (json != "") _value = JsonConvert.DeserializeObject<T>(json);

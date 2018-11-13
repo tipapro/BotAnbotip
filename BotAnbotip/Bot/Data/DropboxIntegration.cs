@@ -13,28 +13,29 @@ namespace BotAnbotip.Bot.Data
 {
     class DropboxIntegration
     {
-        private static DropboxClient DBClient;
+        private static DropboxClient Client;
         public static bool IsAuthorized;
 
         public static void Authorize(string apiKey)
         {
-            DBClient = new DropboxClient(apiKey);
+            Client = new DropboxClient(apiKey);
             IsAuthorized = true;
         }
 
-        public static async Task<bool> UploadAsync(string UploadfileName, string str)
+        public static async Task<bool> UploadAsync(string uploadFileName, string text)
         {
+            if (!IsAuthorized) Authorize(PrivateData.DropboxApiKey);
             try
             {
-                using (var stream = GenerateStreamFromString(str))
+                using (var stream = GenerateStreamFromString(text))
                 {
-                    await DBClient.Files.UploadAsync("/" + UploadfileName, WriteMode.Overwrite.Instance, body: stream);
+                    await Client.Files.UploadAsync("/" + uploadFileName, WriteMode.Overwrite.Instance, body: stream);
                 }
                 return true;
             }
             catch (Exception)
             {
-                Console.WriteLine("UploadAsync Error: " + UploadfileName);
+                Console.WriteLine("UploadAsync Error: " + uploadFileName);
                 return false;
             }
 
@@ -42,9 +43,10 @@ namespace BotAnbotip.Bot.Data
 
         public static async Task<string> DownloadAsync(string DropboxFileName)
         {
+            if (!IsAuthorized) Authorize(PrivateData.DropboxApiKey);
             try
             {
-                var response = await DBClient.Files.DownloadAsync("/" + DropboxFileName);
+                var response = await Client.Files.DownloadAsync("/" + DropboxFileName);
                 string result = await response.GetContentAsStringAsync();
                 Console.WriteLine("DownloadAsync Success: " + DropboxFileName);
                 return result;
@@ -52,16 +54,16 @@ namespace BotAnbotip.Bot.Data
             catch (Exception)
             {
                 Console.WriteLine("DownloadAsync Error: " + DropboxFileName);
-                return "";
+                return string.Empty;
             }
 
         }
 
-        public static Stream GenerateStreamFromString(string s)
+        public static Stream GenerateStreamFromString(string text)
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
-            writer.Write(s);
+            writer.Write(text);
             writer.Flush();
             stream.Position = 0;
             return stream;

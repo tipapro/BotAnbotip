@@ -1,8 +1,6 @@
 ﻿using BotAnbotip.Bot.Clients;
 using Discord;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,12 +19,12 @@ namespace BotAnbotip.Bot.Services
 
         public BotClientBase BotClient { get; }
 
-        public ServiceBase(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage)
+        public ServiceBase(BotClientBase botClient, string serviceName)
         {
             BotClient = botClient;
-            ErrorMessage = errorMessage;
-            StartMessage = startMessage;
-            StopMessage = stopMessage;
+            ErrorMessage = $"Ошибка службы \"{serviceName}\"";
+            StartMessage = $"Cлужбы \"{serviceName}\" запущена";
+            StopMessage = $"Cлужбы \"{serviceName}\" остановлена";
             _cycleMethod = Cycle;
         }
 

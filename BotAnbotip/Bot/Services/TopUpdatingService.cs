@@ -15,10 +15,9 @@ namespace BotAnbotip.Bot.Services
 {
     class TopUpdatingService : ServiceBase
     {
-        const int AmountOfTopUsers = 10;
+        const int AmountOfTopUsers = 100;
 
-        public TopUpdatingService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public TopUpdatingService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 
@@ -69,9 +68,9 @@ namespace BotAnbotip.Bot.Services
             var resultStr = "";
             for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
             {
-                resultStr += "**" + (i + 1) + ")** `[" + DataManager.UserTopList.Value[i].Item2.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) +
-                    "]` <@&" + (ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3] + "> " +
-                    " <@" + DataManager.UserTopList.Value[i].Item1 + ">\n";
+                resultStr += $"**{i + 1})** `[{DataManager.UserTopList.Value[i].Item2.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}]` " +
+                    $"<@&{(ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3]}> " +
+                    $" <@{DataManager.UserTopList.Value[i].Item1}>\n";
             }
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UsersTop])

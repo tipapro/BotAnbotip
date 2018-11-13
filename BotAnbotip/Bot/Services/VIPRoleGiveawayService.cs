@@ -19,8 +19,7 @@ namespace BotAnbotip.Bot.Services
         private static Random random = new Random();
         public static string RandomOrgURL = "";
 
-        public VipRoleGiveawayService(BotClientBase botClient, string errorMessage, string startMessage, string stopMessage) :
-            base(botClient, errorMessage, startMessage, stopMessage)
+        public VipRoleGiveawayService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
         }
 
@@ -39,11 +38,6 @@ namespace BotAnbotip.Bot.Services
                     await DataManager.DidRoleGiveawayBegin.SaveAsync(true);
                     
                     var winnerId = await ChooseTheWinner();
-                    
-                    if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP))
-                        DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
-                    else DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
-                    await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
                     DisplayResult(winnerId);
 
@@ -58,13 +52,14 @@ namespace BotAnbotip.Bot.Services
         private async void DisplayResult(ulong winnerId)
         {
             var winnerText = winnerId == 0 ? "Победитель не определён из-за нехватки участников." :
-                        "Победитель этой недели: <@!" + winnerId + ">.";
+                        $"Победитель этой недели: <@!{winnerId}>.";
 
             var giveawayText = "\nА наш розыгрыш продолжается.\n" +
                 "Условия:\n" +
                 "```1) Поставьте лайк этому посту;\n" +
                 "2) Ждать понедельника.\n```" +
-                "В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему VIP роль на неделю + 15% очков.";
+                $"В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему " +
+                $"<@&{(ulong)RoleIds.VIP}> роль на неделю + 15% очков.";
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])
@@ -80,25 +75,36 @@ namespace BotAnbotip.Bot.Services
         public static async Task<ulong> ChooseTheWinner()
         {
             if (!DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP)
-                        || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0) return 0;
-
-            var maxRand = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count - 1;
-            var randomNum = await GetRandomNumber(0, maxRand);
-
-            Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
-            ulong winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
-            if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] == winner)
+                        || DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count == 0)
+                return 0;
+            ulong winner;
+            if (DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count != 1)
             {
-                randomNum = await GetRandomNumber(0, maxRand);
+
+                var maxRand = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP].Count - 1;
+                var randomNum = await GetRandomNumber(0, maxRand);
+
                 Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
                 winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
+                if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] == winner)
+                {
+                    randomNum = await GetRandomNumber(0, maxRand);
+                    Console.WriteLine("Рандомное число: " + randomNum + " из " + maxRand);
+                    winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][randomNum];
+                }
             }
+            else winner = DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP][0];
             await BotClientManager.MainBot.Guild.GetUser(winner).AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
             if (DataManager.LastWinner.Value.ContainsKey(GiveawayType.VIP) && DataManager.LastWinner.Value[GiveawayType.VIP] != 0)
                 await BotClientManager.MainBot.Guild.GetUser(DataManager.LastWinner.Value[GiveawayType.VIP])
                  .RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)RoleIds.VIP));
             DataManager.LastWinner.Value[GiveawayType.VIP] = winner;
             await DataManager.LastWinner.SaveAsync();
+
+            if (DataManager.ParticipantsOfTheGiveaway.Value.ContainsKey(GiveawayType.VIP))
+                DataManager.ParticipantsOfTheGiveaway.Value[GiveawayType.VIP] = new List<ulong>();
+            else DataManager.ParticipantsOfTheGiveaway.Value.Add(GiveawayType.VIP, new List<ulong>());
+            await DataManager.ParticipantsOfTheGiveaway.SaveAsync();
 
             return winner;
         }
@@ -113,7 +119,7 @@ namespace BotAnbotip.Bot.Services
             {
                 while (counter < 5)
                 {
-                    HttpWebResponse resp = (HttpWebResponse)await request.GetResponseAsync();
+                    var resp = (HttpWebResponse)await request.GetResponseAsync();
                     using (StreamReader sr = new StreamReader(resp.GetResponseStream()))
                     {
                         if (int.TryParse(sr.ReadToEnd().Trim(), out randomNum))
