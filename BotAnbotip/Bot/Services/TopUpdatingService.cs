@@ -73,6 +73,7 @@ namespace BotAnbotip.Bot.Services
                     $" <@{DataManager.UserTopList.Value[i].Item1}>\n";
             }
             var embedBuilder = new EmbedBuilder()
+                .WithAuthor(BotClientManager.MainBot.Guild.GetUser(430498598057410561))
                 .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
                 .WithDescription(resultStr)
                 .WithColor(Color.DarkTeal)
