@@ -81,10 +81,10 @@ namespace BotAnbotip.Bot.Services
                 var embedBuilder = new EmbedBuilder()
                 .WithAuthor(BotClientManager.MainBot.Guild.GetUser(userId))
                 .WithDescription(str)
-                .WithColor(role.Color)
-                .WithCurrentTimestamp();
+                .WithColor(role.Color);
+                
                 if (i == DataManager.UserTopList.Value.Count - 1)
-                    embedBuilder = embedBuilder.WithFooter("Последнее обновление: ");
+                    embedBuilder = embedBuilder.WithFooter("Последнее обновление: ").WithCurrentTimestamp();
 
                 if (messages.Count() <= i) await channel.SendMessageAsync("", false, embedBuilder.Build());
                 else await ((IUserMessage)messages.First()).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
