@@ -87,7 +87,7 @@ namespace BotAnbotip.Bot.Services
                     embedBuilder = embedBuilder.WithFooter("Последнее обновление: ").WithCurrentTimestamp();
 
                 if (messages.Count() <= i) await channel.SendMessageAsync("", false, embedBuilder.Build());
-                else await ((IUserMessage)messages.[DataManager.UserTopList.Value.Count - i - 1]).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
+                else await ((IUserMessage)messages[DataManager.UserTopList.Value.Count - i - 1]).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
             }
             
         }
