@@ -69,7 +69,7 @@ namespace BotAnbotip.Bot.Services
         private async void DisplayTop()
         {
             var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.usertop);
-            var messages = await channel.GetMessagesAsync(AmountOfTopUsers).FlattenAsync();
+            var messages = await channel.GetMessagesAsync(DataManager.UserTopList.Value.Count).FlattenAsync();
 
             for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
             {
@@ -87,7 +87,7 @@ namespace BotAnbotip.Bot.Services
                     embedBuilder = embedBuilder.WithFooter("Последнее обновление: ").WithCurrentTimestamp();
 
                 if (messages.Count() <= i) await channel.SendMessageAsync("", false, embedBuilder.Build());
-                else await ((IUserMessage)messages.First()).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
+                else await ((IUserMessage)messages.[DataManager.UserTopList.Value.Count - i - 1]).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
             }
             
         }
