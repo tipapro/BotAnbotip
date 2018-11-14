@@ -15,7 +15,7 @@ namespace BotAnbotip.Bot.Services
 {
     class TopUpdatingService : ServiceBase
     {
-        const int AmountOfTopUsers = 100;
+        const int AmountOfTopUsers = 10;
 
         public TopUpdatingService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {
@@ -27,12 +27,15 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
-                
-                DataManager.UserTopList.Value = DataManager.UserTopList.Value.Count == 0 ? DataManager.UserTopList.Value : 
-                    new List<(ulong, long, int)>();
-                foreach(var (id , user) in DataManager.UserProfiles.Value)
+
+                if (DataManager.UserTopList.Value.Count == 0)
+                    DataManager.UserTopList.Value = new List<(ulong, long, int)>();
+                else if (DataManager.UserTopList.Value.Count > AmountOfTopUsers)
+                    DataManager.UserTopList.Value = DataManager.UserTopList.Value.GetRange(0, AmountOfTopUsers);
+                foreach (var (id , user) in DataManager.UserProfiles.Value)
                 {
-                    if (DataManager.UserTopList.Value.Contains((id, user.Points, user.Level))) continue;
+                    if (DataManager.UserTopList.Value.Contains((id, user.Points, user.Level)))
+                        continue;
                     if (DataManager.UserTopList.Value.Count < AmountOfTopUsers)
                     {
                         DataManager.UserTopList.Value.Add((id, user.Points, user.Level));
@@ -65,24 +68,28 @@ namespace BotAnbotip.Bot.Services
 
         private async void DisplayTop()
         {
-            var resultStr = "";
+            var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.usertop);
+            var messages = await channel.GetMessagesAsync(AmountOfTopUsers).FlattenAsync();
+
             for (int i = 0; i < DataManager.UserTopList.Value.Count; i++)
             {
-                resultStr += $"**{i + 1})** `[{DataManager.UserTopList.Value[i].Item2.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}]` " +
-                    $"<@&{(ulong)LevelInfo.RoleList[DataManager.UserTopList.Value[i].Item3]}> " +
-                    $" <@{DataManager.UserTopList.Value[i].Item1}>\n";
+                var (userId, points, level) = DataManager.UserTopList.Value[i];
+                var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[level]);
+
+                var str = $"**{i + 1})** `[{points.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}]` " +
+                    $"<@&{role.Id}> ";
+                var embedBuilder = new EmbedBuilder()
+                .WithAuthor(BotClientManager.MainBot.Guild.GetUser(userId))
+                .WithDescription(str)
+                .WithColor(role.Color)
+                .WithCurrentTimestamp();
+                if (i == DataManager.UserTopList.Value.Count - 1)
+                    embedBuilder = embedBuilder.WithFooter("Последнее обновление: ");
+
+                if (messages.Count() <= i) await channel.SendMessageAsync("", false, embedBuilder.Build());
+                else await ((IUserMessage)messages.First()).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
             }
-            var embedBuilder = new EmbedBuilder()
-                .WithAuthor(BotClientManager.MainBot.Guild.GetUser(430498598057410561))
-                .WithTitle(MessageTitles.Titles[TitleType.UsersTop])
-                .WithDescription(resultStr)
-                .WithColor(Color.DarkTeal)
-                .WithCurrentTimestamp()
-                .WithFooter("Последнее обновление: ");
-            var channel = BotClientManager.MainBot.Guild.GetTextChannel((ulong)ChannelIds.usertop);
-            var message = await channel.GetMessagesAsync(1).FlattenAsync();
-            if (message.Count() == 0) await channel.SendMessageAsync("", false, embedBuilder.Build());
-            else await((IUserMessage)message.First()).ModifyAsync((prop) => { prop.Embed = embedBuilder.Build(); });
+            
         }
     }
 }
