@@ -28,10 +28,10 @@ namespace BotAnbotip.Bot.Services
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
 
-                if (DataManager.UserTopList.Value.Count == 0)
+                
                     DataManager.UserTopList.Value = new List<(ulong, long, int)>();
-                else if (DataManager.UserTopList.Value.Count > AmountOfTopUsers)
-                    DataManager.UserTopList.Value = DataManager.UserTopList.Value.GetRange(0, AmountOfTopUsers);
+                
+
                 foreach (var (id , user) in DataManager.UserProfiles.Value)
                 {
                     if (DataManager.UserTopList.Value.Contains((id, user.Points, user.Level)))
