@@ -107,21 +107,21 @@ namespace BotAnbotip.Bot.Commands
             var toRemove = new List<ulong>();
             foreach (var (userId, userProfile) in DataManager.UserProfiles.Value)
             {
+                await userProfile.UpdateLevel();
                 var user = BotClientManager.MainBot.Guild.GetUser(userId);
+                if (user is null) continue;
                 if (user.IsBot)
                 {
                     toRemove.Add(userId);
                     continue;
                 }
-                if (user is null) continue;
                 var userRoles = user.Roles;
                 foreach (var role in userRoles)
                     if (LevelInfo.RoleList.Contains((LevelRoleIds)role.Id)) await user.RemoveRoleAsync(role);
                 for (int i = 1; i <= LevelInfo.RoleList.Length; i++)
                 {
                     if (LevelInfo.Points[LevelInfo.RoleList[i]] < userProfile.Points) continue;
-                    await user.AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[i - 1]));
-                    await userProfile.UpdateLevel();
+                    await user.AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[i - 1]));                   
                     break;
                 }
                 await Task.Delay(100);
