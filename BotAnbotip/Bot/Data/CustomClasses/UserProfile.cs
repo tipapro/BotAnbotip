@@ -33,6 +33,12 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             await CheckFallingOfUserLevelRole();
         }
 
+        public async Task UpdateLevel()
+        {
+            await CheckRiseOfUserLevelRole();
+            await CheckFallingOfUserLevelRole();
+        }
+
         private async Task CheckRiseOfUserLevelRole()
         {
             if (Level == LevelInfo.RoleList.Length - 1) return;
