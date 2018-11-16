@@ -59,7 +59,7 @@ namespace BotAnbotip.Bot.Services
                 "```1) Поставьте лайк этому посту;\n" +
                 "2) Ждать понедельника.\n```" +
                 $"В понедельник бот выберет случайного лайкнувшего этот пост пользователя и выдаст ему " +
-                $"<@&{(ulong)RoleIds.VIP}> роль на неделю + 15% очков.";
+                $"<@&{(ulong)RoleIds.VIP}> роль на неделю + {(int)ActionsCost.Percents_VIPWin}% очков.";
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.VipGiveaway])

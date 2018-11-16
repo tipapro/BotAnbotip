@@ -32,17 +32,17 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             { LevelRoleIds.Emerald3, 600000 },
             { LevelRoleIds.Ruby1, 768000 },
             { LevelRoleIds.Ruby2, 990000 },
-            { LevelRoleIds.Ruby3, 1500000 },
-            { LevelRoleIds.Diamond1, 2300000 },
-            { LevelRoleIds.Diamond2, 3800000 },
-            { LevelRoleIds.Diamond3, 5500000 },
-            { LevelRoleIds.Magma1, 8900000 },
-            { LevelRoleIds.Magma2, 13000000 },
+            { LevelRoleIds.Ruby3, 1300000 },
+            { LevelRoleIds.Diamond1, 2100000 },
+            { LevelRoleIds.Diamond2, 3600000 },
+            { LevelRoleIds.Diamond3, 5200000 },
+            { LevelRoleIds.Magma1, 8400000 },
+            { LevelRoleIds.Magma2, 12000000 },
             { LevelRoleIds.Magma3, 19000000 },
-            { LevelRoleIds.Dark_matter1, 26000000 },
-            { LevelRoleIds.Dark_matter2, 32000000 },
-            { LevelRoleIds.Dark_matter3, 48000000 },
-            { LevelRoleIds.Singularity, 64000000 }
+            { LevelRoleIds.Dark_matter1, 25000000 },
+            { LevelRoleIds.Dark_matter2, 31000000 },
+            { LevelRoleIds.Dark_matter3, 43000000 },
+            { LevelRoleIds.Singularity, 58000000 }
         };
 
         public static LevelRoleIds[] RoleList = 
