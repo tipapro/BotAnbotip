@@ -17,7 +17,7 @@ namespace BotAnbotip.Bot.Data
         public static DropboxData<Dictionary<GiveawayType, ulong>> LastWinner;   //GiveawayType -- UserId
         public static DropboxData<Dictionary<ulong, Dictionary<string, List<ulong>>>> Subscribers;    //User -- Games -- His subscribers
         public static DropboxData<Dictionary<ulong, UserProfile>> UserProfiles;
-        public static DropboxData<List<(ulong, long, int)>> UserTopList;
+        public static DropboxData<List<(ulong Id, long Points, int Level)>> UserTopList;
 
 
         public static DropboxData<bool> DidRoleGiveawayBegin;

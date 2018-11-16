@@ -22,7 +22,9 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToFine,
             new string[] { "штраф", "fine" }),
             (TransformMessageToReward,
-            new string[] { "награди", "reward"})
+            new string[] { "награди", "reward"}),
+            (TransformMessageToUpdateAll,
+            new string[] { "обновиуровни"})
             )
         { }
 
@@ -63,6 +65,13 @@ namespace BotAnbotip.Bot.Commands
                 "LevelChange: Add", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
         }
 
+        private static async Task TransformMessageToUpdateAll(IMessage message, string argument)
+        {
+            await message.DeleteAsync();
+            if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
+            await CommandManager.UserProfile.UpdateAll();
+        }
+
         public async Task ShowPointsAndLevel(IUser user)
         {
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
@@ -90,6 +99,22 @@ namespace BotAnbotip.Bot.Commands
 
             await ((ITextChannel)BotClientManager.MainBot.Guild.GetChannel((ulong)ChannelIds.chat_botcmd)).SendMessageAsync("", false, embedBuilder.Build());
             await DataManager.UserProfiles.SaveAsync();
+        }
+
+        public async Task UpdateAll()
+        {
+            foreach(var (userId, userProfile) in DataManager.UserProfiles.Value)
+            {
+                var user = BotClientManager.MainBot.Guild.GetUser(userId);
+                var userRoles = user.Roles;
+                foreach (var role in userRoles)
+                    if (LevelInfo.RoleList.Contains((LevelRoleIds)role.Id)) await user.RemoveRoleAsync(role);
+                for (int i = 1; i <= LevelInfo.RoleList.Length; i++)
+                {
+                    if (LevelInfo.Points[LevelInfo.RoleList[i]] < userProfile.Points) continue;
+                    await user.AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[i - 1]));
+                }
+            }
         }
     }
 }

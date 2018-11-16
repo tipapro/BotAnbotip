@@ -27,12 +27,8 @@ namespace BotAnbotip.Bot.Services
             while (IsStarted)
             {
                 await Task.Delay(new TimeSpan(0, 5, 0), token);
-
-                
                     DataManager.UserTopList.Value = new List<(ulong, long, int)>();
-                
-
-                foreach (var (id , user) in DataManager.UserProfiles.Value)
+                foreach (var (id, user) in DataManager.UserProfiles.Value)
                 {
                     if (DataManager.UserTopList.Value.Contains((id, user.Points, user.Level)))
                         continue;
@@ -46,7 +42,7 @@ namespace BotAnbotip.Bot.Services
                     {
                         for (int i = DataManager.UserTopList.Value.Count - 1; i >= 0; i--)
                         {
-                            if (user.Points > DataManager.UserTopList.Value[i].Item2)
+                            if (user.Points > DataManager.UserTopList.Value[i].Points)
                             {
                                 for (int j = DataManager.UserTopList.Value.Count - 1; j > i; j--)
                                 {
@@ -59,7 +55,7 @@ namespace BotAnbotip.Bot.Services
                     }
                     DataManager.UserTopList.Value.Sort(
                             new Comparison<(ulong, long, int)>((firstObj, secondObj) => secondObj.Item2.CompareTo(firstObj.Item2)));
-                }              
+                }             
                 await DataManager.UserTopList.SaveAsync();
 
                 DisplayTop();
@@ -76,7 +72,7 @@ namespace BotAnbotip.Bot.Services
                 var (userId, points, level) = DataManager.UserTopList.Value[i];
                 var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[level]);
 
-                var str = $"**{i + 1})** `[{points.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}]` " +
+                var str = $"**{i + 1})** `{points.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}` " +
                     $"<@&{role.Id}> ";
                 var embedBuilder = new EmbedBuilder()
                 .WithAuthor(BotClientManager.MainBot.Guild.GetUser(userId))
