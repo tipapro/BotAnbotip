@@ -15,7 +15,7 @@ namespace BotAnbotip.Bot.Services
 {
     class TopUpdatingService : ServiceBase
     {
-        const int AmountOfTopUsers = 10;
+        const int AmountOfTopUsers = 100;
 
         public TopUpdatingService(BotClientBase botClient, string serviceName) : base(botClient, serviceName)
         {

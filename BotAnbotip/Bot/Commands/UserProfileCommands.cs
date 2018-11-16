@@ -23,9 +23,9 @@ namespace BotAnbotip.Bot.Commands
             (TransformMessageToFine,
             new string[] { "штраф", "fine" }),
             (TransformMessageToReward,
-            new string[] { "награди", "reward"}),
+            new string[] { "награди", "reward" }),
             (TransformMessageToUpdateAll,
-            new string[] { "обновиуровни"})
+            new string[] { "обновиуровни" })
             )
         { }
 
@@ -42,12 +42,12 @@ namespace BotAnbotip.Bot.Commands
             if (!CommandManager.CheckPermission((IGuildUser)message.Author, RoleIds.Founder)) return;
             var strArray = argument.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var userId = ulong.Parse(new string((from c in strArray[0]
-                                              where char.IsNumber(c)
-                                              select c).ToArray()));
+                                                 where char.IsNumber(c)
+                                                 select c).ToArray()));
             var points = long.Parse(strArray[1]);
             await DataManager.UserProfiles.Value[userId].RemovePoints(points);
             await DataManager.UserProfiles.SaveAsync();
-            await BotClientManager.MainBot.Log(new LogMessage(LogSeverity.Info, 
+            await BotClientManager.MainBot.Log(new LogMessage(LogSeverity.Info,
                 "LevelChange: Remove", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
         }
 
@@ -78,7 +78,7 @@ namespace BotAnbotip.Bot.Commands
             if (!DataManager.UserProfiles.Value.ContainsKey(user.Id)) DataManager.UserProfiles.Value.Add(user.Id, new UserProfile(user.Id));
             var profile = DataManager.UserProfiles.Value[user.Id];
             var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[profile.Level]);
-            var nextLevelPoints = LevelInfo.RoleList.Length > profile.Level + 1 ? 
+            var nextLevelPoints = LevelInfo.RoleList.Length > profile.Level + 1 ?
                 LevelInfo.Points[LevelInfo.RoleList[profile.Level + 1]] : profile.Points;
             var curLevelPoints = LevelInfo.Points[LevelInfo.RoleList[profile.Level]];
             var toNextLevelPoints = nextLevelPoints - curLevelPoints;
@@ -86,15 +86,15 @@ namespace BotAnbotip.Bot.Commands
 
             var embedBuilder = new EmbedBuilder()
                 .WithTitle(MessageTitles.Titles[TitleType.UserLevel])
-                .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" + 
-                scoredPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " / " + 
-                toNextLevelPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " (" + 
+                .WithDescription("``" + OtherMethods.GenerateTextProgressBar(scoredPoints, toNextLevelPoints) + "\n" +
+                scoredPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " / " +
+                toNextLevelPoints.ToString("N0", new System.Globalization.CultureInfo("ru-ru")) + " (" +
                 Math.Round(scoredPoints * 100f / toNextLevelPoints, 2).ToString("N2", new System.Globalization.CultureInfo("ru-ru")) + "%)``")
                 .AddField("Профиль", user.Mention, true)
                 .AddField("Звание", "<@&" + (ulong)LevelInfo.RoleList[profile.Level] + ">", true)
                 .AddField("Уровень", profile.Level, true)
                 .AddField("Всего очков", profile.Points.ToString("N0", new System.Globalization.CultureInfo("ru-ru")), true)
-                
+
                 .WithThumbnailUrl(user.GetAvatarUrl())
                 .WithColor(role.Color);
 
@@ -104,9 +104,15 @@ namespace BotAnbotip.Bot.Commands
 
         public async Task UpdateAll()
         {
+            var toRemove = new List<ulong>();
             foreach (var (userId, userProfile) in DataManager.UserProfiles.Value)
             {
                 var user = BotClientManager.MainBot.Guild.GetUser(userId);
+                if (user.IsBot)
+                {
+                    toRemove.Add(userId);
+                    continue;
+                }
                 if (user is null) continue;
                 var userRoles = user.Roles;
                 foreach (var role in userRoles)
@@ -120,6 +126,7 @@ namespace BotAnbotip.Bot.Commands
                 }
                 await Task.Delay(100);
             }
+            foreach (var id in toRemove) DataManager.UserProfiles.Value.Remove(id);
             await DataManager.UserProfiles.SaveAsync();
         }
     }
