@@ -5,6 +5,7 @@ using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.Group;
 using BotAnbotip.Bot.OtherModules;
 using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -105,7 +106,15 @@ namespace BotAnbotip.Bot.Commands
         {
             foreach(var (userId, userProfile) in DataManager.UserProfiles.Value)
             {
-                var user = BotClientManager.MainBot.Guild.GetUser(userId);
+                SocketGuildUser user;
+                try
+                {
+                    user = BotClientManager.MainBot.Guild.GetUser(userId);
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
                 var userRoles = user.Roles;
                 foreach (var role in userRoles)
                     if (LevelInfo.RoleList.Contains((LevelRoleIds)role.Id)) await user.RemoveRoleAsync(role);
