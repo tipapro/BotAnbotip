@@ -113,7 +113,9 @@ namespace BotAnbotip.Bot.Commands
                 {
                     if (LevelInfo.Points[LevelInfo.RoleList[i]] < userProfile.Points) continue;
                     await user.AddRoleAsync(BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[i - 1]));
+                    break;
                 }
+                await DataManager.UserProfiles.SaveAsync();
             }
         }
     }
