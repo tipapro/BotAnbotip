@@ -104,17 +104,10 @@ namespace BotAnbotip.Bot.Commands
 
         public async Task UpdateAll()
         {
-            foreach(var (userId, userProfile) in DataManager.UserProfiles.Value)
+            foreach (var (userId, userProfile) in DataManager.UserProfiles.Value)
             {
-                SocketGuildUser user;
-                try
-                {
-                    user = BotClientManager.MainBot.Guild.GetUser(userId);
-                }
-                catch (Exception ex)
-                {
-                    continue;
-                }
+                var user = BotClientManager.MainBot.Guild.GetUser(userId);
+                if (user is null) continue;
                 var userRoles = user.Roles;
                 foreach (var role in userRoles)
                     if (LevelInfo.RoleList.Contains((LevelRoleIds)role.Id)) await user.RemoveRoleAsync(role);
