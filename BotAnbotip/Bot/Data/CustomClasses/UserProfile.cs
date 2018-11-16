@@ -44,17 +44,19 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             if (Level == LevelInfo.RoleList.Length - 1) return;
             if (LevelInfo.Points[LevelInfo.RoleList[Level + 1]] > Points) return;
             
-            var oldRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
-            var user = BotClientManager.MainBot.Guild.GetUser(Id);
-
+            var oldRole = (ulong)LevelInfo.RoleList[Level];
             while ((Level < LevelInfo.RoleList.Length - 1) && (LevelInfo.Points[LevelInfo.RoleList[Level + 1]] <= Points))
             {
                 Level++;
             }
-            
-            var newRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
-            await user.RemoveRoleAsync(oldRole);
-            await user.AddRoleAsync(newRole);
+            try
+            {
+                var user = BotClientManager.MainBot.Guild.GetUser(Id);
+                var newRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
+                await user.RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole(oldRole));
+                await user.AddRoleAsync(newRole);
+            }
+            finally { }
         }
 
         private async Task CheckFallingOfUserLevelRole()
@@ -62,17 +64,19 @@ namespace BotAnbotip.Bot.Data.CustomClasses
             if (Level == 0) return;
             if (LevelInfo.Points[LevelInfo.RoleList[Level]] < Points) return;
 
-            var oldRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
-            var user = BotClientManager.MainBot.Guild.GetUser(Id);
-
+            var oldRole = (ulong)LevelInfo.RoleList[Level];
             while ((Level > 0) && (LevelInfo.Points[LevelInfo.RoleList[Level]] > Points))
             {
                 Level--;
             }
-
-            var newRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
-            await user.RemoveRoleAsync(oldRole);
-            await user.AddRoleAsync(newRole);
+            try
+            {
+                var user = BotClientManager.MainBot.Guild.GetUser(Id);
+                var newRole = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[Level]);
+                await user.RemoveRoleAsync(BotClientManager.MainBot.Guild.GetRole(oldRole));
+                await user.AddRoleAsync(newRole);
+            }
+            finally { }
         }
 
         public int CompareTo(UserProfile other)
