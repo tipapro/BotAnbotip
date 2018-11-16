@@ -71,11 +71,11 @@ namespace BotAnbotip.Bot.Services
             {
                 var (userId, points, level) = DataManager.UserTopList.Value[i];
                 var role = BotClientManager.MainBot.Guild.GetRole((ulong)LevelInfo.RoleList[level]);
-
+                var user = BotClientManager.MainBot.Guild.GetUser(userId);
                 var str = $"**{i + 1})** `{points.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}` " +
                     $"<@&{role.Id}> ";
                 var embedBuilder = new EmbedBuilder()
-                .WithAuthor(BotClientManager.MainBot.Guild.GetUser(userId))
+                .WithAuthor(user?.Mention ?? "Unknown User", user?.GetAvatarUrl())
                 .WithDescription(str)
                 .WithColor(role.Color);
                 
