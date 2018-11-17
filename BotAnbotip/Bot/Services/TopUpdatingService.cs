@@ -75,7 +75,7 @@ namespace BotAnbotip.Bot.Services
                 var str = $"**{i + 1})** `{points.ToString("N0", new System.Globalization.CultureInfo("ru-ru"))}` " +
                     $"<@&{role.Id}> ";
                 var embedBuilder = new EmbedBuilder()
-                .WithAuthor(user?.Username ?? "Unknown User", user?.GetAvatarUrl())
+                .WithAuthor(user?.Username ?? "#Unknown" + user?.Discriminator ?? "User", user?.GetAvatarUrl())
                 .WithDescription(str)
                 .WithColor(role.Color);
                 
