@@ -11,7 +11,7 @@ namespace BotAnbotip.Bot.Data.CustomClasses
         {
             { LevelRoleIds.Copper1, 0 },
             { LevelRoleIds.Copper2, 155 },
-            { LevelRoleIds.Copper3, 278ы },
+            { LevelRoleIds.Copper3, 278 },
             { LevelRoleIds.Bronze1, 410 },
             { LevelRoleIds.Bronze2, 590 },
             { LevelRoleIds.Bronze3, 760 },
