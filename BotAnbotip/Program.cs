@@ -9,29 +9,43 @@ using System.Threading.Tasks;
 namespace BotAnbotip
 {    public class Program
     {
+        private static ILogger<Program> _logger;
+
         public static void Main(string[] args) => MainAsync().GetAwaiter().GetResult();
         public static async Task MainAsync()
         {
-            PrivateData.Read();
-            await DataManager.ReadAllDataAsync();
-            foreach (var pair in DataManager.RatingChannels.Value)
-                pair.Value.ListOfObjects.Test();
-            await DataManager.RatingChannels.SaveAsync();
-
-            await BotClientManager.MainBot.PrepareAsync();
-
-            bool mainLaunchResult = false;
-            while (!mainLaunchResult) mainLaunchResult = await BotClientManager.MainBot.Launch();
-
-            AppDomain.CurrentDomain.ProcessExit += (obj, args) => Console.WriteLine("Выход");
-            // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-            AppDomain.CurrentDomain.ProcessExit += (obj, args) => NLog.LogManager.Shutdown();
-
             var servicesProvider = BuildDi();
-            //var runner = servicesProvider.GetRequiredService<Runner>();
+            var loggerFactory = servicesProvider.GetRequiredService<ILoggerFactory>();
+            _logger = loggerFactory.CreateLogger<Program>();
+            PrepareAll(loggerFactory);
 
-            await Task.Delay(-1);
-            NLog.LogManager.Shutdown();
+            try
+            {
+                PrivateData.Read();
+                await DataManager.ReadAllDataAsync();
+                foreach (var pair in DataManager.RatingChannels.Value)
+                    pair.Value.ListOfObjects.Test();
+                await DataManager.RatingChannels.SaveAsync();
+
+                await BotClientManager.MainBot.PrepareAsync();
+
+                bool mainLaunchResult = false;
+                while (!mainLaunchResult) mainLaunchResult = await BotClientManager.MainBot.Launch();
+
+                AppDomain.CurrentDomain.ProcessExit += (obj, args) => Console.WriteLine("Выход");
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                AppDomain.CurrentDomain.ProcessExit += (obj, args) => NLog.LogManager.Shutdown();
+
+
+                //var runner = servicesProvider.GetRequiredService<Runner>();
+
+                await Task.Delay(-1);
+                NLog.LogManager.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Система не запущена");
+            }
         }
 
         private static void PrepareAll(ILoggerFactory loggerFactory)
