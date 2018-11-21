@@ -71,7 +71,7 @@ namespace BotAnbotip
             //configure NLog
             loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
             NLog.LogManager.Configuration = new NLog.Config.LoggingConfiguration();
-            NLog.LogManager.Configuration.AddTarget(new NLog.Targets.ColoredConsoleTarget());
+            NLog.LogManager.Configuration.AddTarget(new NLog.Targets.ColoredConsoleTarget("HerokuConsole"));
 
             return serviceProvider;
         }
