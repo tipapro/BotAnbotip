@@ -8,18 +8,22 @@ using BotAnbotip.Bot.Services;
 using BotAnbotip.Bot.Handlers;
 using BotAnbotip.Bot.Data.CustomEnums;
 using BotAnbotip.Bot.Data.CustomClasses;
+using Microsoft.Extensions.Logging;
+using NLog;
 
 namespace BotAnbotip.Bot.Clients
 {
     public class MainBotClient : BotClientBase
     {
+        
+
         private MessageHandler _msgHandler;
         private ReactionHandler _reactionHandler;
         private AntiSpam _antiReactionSpam;
         private AntiSpam _antiMessageSpam;
         private ServiceManager _cyclicActionManager;
 
-        public MainBotClient() : base(BotType.Main)
+        public MainBotClient(ILoggerFactory loggerFactory) : base(BotType.Main, loggerFactory)
         {
         }
 

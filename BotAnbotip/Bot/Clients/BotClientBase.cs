@@ -2,6 +2,7 @@
 using BotAnbotip.Bot.Data.CustomEnums;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace BotAnbotip.Bot.Clients
 {
     public class BotClientBase
     {
+        protected readonly ILogger<BotClientBase> _logger;
         protected bool _isLoaded;
         protected ulong _id;
         protected DiscordSocketClient _client;
@@ -21,8 +23,9 @@ namespace BotAnbotip.Bot.Clients
         public SocketGuild Guild => _guild;
         public BotType Type => _type;
 
-        public BotClientBase(BotType type)
+        public BotClientBase(BotType type, ILoggerFactory loggerFactory)
         {
+            _logger = loggerFactory.CreateLogger<BotClientBase>();
             _isLoaded = false;
             _type = type;
             _client = new DiscordSocketClient();            
@@ -44,9 +47,9 @@ namespace BotAnbotip.Bot.Clients
             {
                 _isLoaded = true;
                 _id = _client.CurrentUser.Id;
-                Log(new LogMessage(LogSeverity.Info, "", "Бот запущен"));
+                _logger.LogInformation("Бот {_type} запущен", _type);
             }
-            Log(new LogMessage(LogSeverity.Info, "", "Бот авторизован"));
+            _logger.LogInformation("Бот {_type} авторизован", _type);
             return Task.CompletedTask;
         }
 
@@ -73,7 +76,15 @@ namespace BotAnbotip.Bot.Clients
 
         public Task Log(LogMessage msg)
         {
-            Console.WriteLine(DateTime.Now + "  " + Type + "Bot: " + msg.Message);
+            switch (msg.Severity)
+            {
+                case LogSeverity.Critical: _logger.LogCritical(msg.Exception, msg.Message); break;
+                case LogSeverity.Error: _logger.LogError(msg.Exception, msg.Message); break;
+                case LogSeverity.Warning: _logger.LogWarning(msg.Exception, msg.Message); break;
+                case LogSeverity.Info: _logger.LogInformation(msg.Exception, msg.Message); break;
+                case LogSeverity.Verbose: _logger.LogTrace(msg.Exception, msg.Message); break;
+                case LogSeverity.Debug: _logger.LogDebug(msg.Exception, msg.Message); break;
+            }
             return Task.CompletedTask;
         }
     }
