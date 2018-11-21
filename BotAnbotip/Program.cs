@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace BotAnbotip
@@ -14,7 +15,7 @@ namespace BotAnbotip
         public static void Main(string[] args) => MainAsync().GetAwaiter().GetResult();
         public static async Task MainAsync()
         {
-            var servicesProvider = BuildDi();
+            var servicesProvider = await BuildDi();
             var loggerFactory = servicesProvider.GetRequiredService<ILoggerFactory>();
             _logger = loggerFactory.CreateLogger<Program>();
             PrepareAll(loggerFactory);
@@ -46,6 +47,8 @@ namespace BotAnbotip
             {
                 _logger.LogCritical(ex, "Система не запущена");
             }
+            Console.WriteLine();
+            Console.ReadKey();
         }
 
         private static void PrepareAll(ILoggerFactory loggerFactory)
@@ -53,7 +56,7 @@ namespace BotAnbotip
             BotClientManager.Prepare(loggerFactory);
         }
 
-        private static IServiceProvider BuildDi()
+        private static async Task<IServiceProvider> BuildDi()
         {
             var services = new ServiceCollection();
 
@@ -70,8 +73,14 @@ namespace BotAnbotip
 
             //configure NLog
             loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
-            NLog.LogManager.Configuration = new NLog.Config.LoggingConfiguration();
-            NLog.LogManager.Configuration.AddTarget(new NLog.Targets.ColoredConsoleTarget("HerokuConsole"));
+            using (var fileStream = new FileStream("nlog.config", FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(fileStream))
+            {
+                writer.Write(await DropboxIntegration.DownloadAsync("nlog.config"));
+            }
+                NLog.LogManager.LoadConfiguration("nlog.config");
+            //NLog.LogManager.Configuration = new NLog.Config.LoggingConfiguration();
+            //NLog.LogManager.Configuration.AddTarget(new NLog.Targets.ConsoleTarget("HerokuConsole"));
 
             return serviceProvider;
         }
