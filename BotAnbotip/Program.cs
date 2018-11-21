@@ -15,6 +15,7 @@ namespace BotAnbotip
         public static void Main(string[] args) => MainAsync().GetAwaiter().GetResult();
         public static async Task MainAsync()
         {
+            PrivateData.Read();
             var servicesProvider = await BuildDi();
             var loggerFactory = servicesProvider.GetRequiredService<ILoggerFactory>();
             _logger = loggerFactory.CreateLogger<Program>();
@@ -22,7 +23,6 @@ namespace BotAnbotip
 
             try
             {
-                PrivateData.Read();
                 await DataManager.ReadAllDataAsync();
                 foreach (var pair in DataManager.RatingChannels.Value)
                     pair.Value.ListOfObjects.Test();
