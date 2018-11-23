@@ -1,5 +1,7 @@
-﻿using BotAnbotip.Bot.Clients;
-using BotAnbotip.Bot.Data;
+﻿using BotAnbotip.Clients;
+using BotAnbotip.Data;
+using BotAnbotip.Services;
+using BotAnbotip.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
@@ -16,73 +18,34 @@ namespace BotAnbotip
         public static async Task MainAsync()
         {
             PrivateData.Read();
-            var servicesProvider = await BuildDi();
-            var loggerFactory = servicesProvider.GetRequiredService<ILoggerFactory>();
+            new ServiceControlManager(Data.CustomEnums.BotType.Auxiliary);
+            var loggerFactory = ServiceControlManager.ServiceProvider.GetRequiredService<ILoggerFactory>();
             _logger = loggerFactory.CreateLogger<Program>();
-            PrepareAll(loggerFactory);
+
+            await PrepareAll(loggerFactory);
 
             try
             {
-                await DataManager.ReadAllDataAsync();
-                foreach (var pair in DataManager.RatingChannels.Value)
-                    pair.Value.ListOfObjects.Test();
-                await DataManager.RatingChannels.SaveAsync();
-
-                await BotClientManager.MainBot.PrepareAsync();
-
                 bool mainLaunchResult = false;
-                while (!mainLaunchResult) mainLaunchResult = await BotClientManager.MainBot.Launch();
-
-                AppDomain.CurrentDomain.ProcessExit += (obj, args) => Console.WriteLine("Выход");
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                AppDomain.CurrentDomain.ProcessExit += (obj, args) => NLog.LogManager.Shutdown();
-
-
-                //var runner = servicesProvider.GetRequiredService<Runner>();
-
-                await Task.Delay(-1);
-                NLog.LogManager.Shutdown();
+                while (!mainLaunchResult) mainLaunchResult = await ClientControlManager.MainBot.Launch(); 
             }
             catch (Exception ex)
             {
-                _logger.LogCritical(ex, "Система не запущена");
+                _logger.LogCritical(ex, "Application crashed");
             }
-            Console.WriteLine();
-            Console.ReadKey();
-        }
-
-        private static void PrepareAll(ILoggerFactory loggerFactory)
-        {
-            BotClientManager.Prepare(loggerFactory);
-        }
-
-        private static async Task<IServiceProvider> BuildDi()
-        {
-            var services = new ServiceCollection();
-
-            //Runner is the custom class
-            //services.AddTransient<Runner>();
-
-            services.AddSingleton<ILoggerFactory, LoggerFactory>();
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
-            services.AddLogging((builder) => builder.SetMinimumLevel(LogLevel.Trace));
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-
-            //configure NLog
-            loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
-            using (var fileStream = new FileStream("nlog.config", FileMode.Create, FileAccess.Write))
-            using (var writer = new StreamWriter(fileStream))
+            AppDomain.CurrentDomain.ProcessExit += (obj, args) =>
             {
-                writer.Write(await DropboxIntegration.DownloadAsync("nlog.config"));
-            }
-                NLog.LogManager.LoadConfiguration("nlog.config");
-            //NLog.LogManager.Configuration = new NLog.Config.LoggingConfiguration();
-            //NLog.LogManager.Configuration.AddTarget(new NLog.Targets.ConsoleTarget("HerokuConsole"));
+                _logger.LogInformation("Application was powered off.", obj, args);
+                NLog.LogManager.Shutdown();
+            };
+            await Task.Delay(-1);
+        }
 
-            return serviceProvider;
+        private static async Task PrepareAll(ILoggerFactory loggerFactory)
+        {
+            ClientControlManager.Prepare(loggerFactory);
+            await DataControlManager.ReadAllDataAsync();
+            await ClientControlManager.MainBot.PrepareAsync();
         }
     }
 }
