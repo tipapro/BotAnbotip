@@ -1,4 +1,5 @@
-﻿using BotAnbotip.Services.Interfaces;
+﻿using BotAnbotip.Data;
+using BotAnbotip.Services.Interfaces;
 using Dropbox.Api;
 using Dropbox.Api.Files;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ namespace BotAnbotip.Services
         public DropboxStorage(ILogger<DropboxStorage> logger)
         {
             _logger = logger;
+            Authorize(PrivateData.DropboxApiKey);
         }
 
         public void Authorize(string apiKey)
