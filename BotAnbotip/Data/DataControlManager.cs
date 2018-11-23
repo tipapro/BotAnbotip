@@ -26,7 +26,7 @@ namespace BotAnbotip.Data
         public static bool[] DebugTriger = new bool[5];
 
 
-        public static void InitializeCloudData<T>(ref CloudData<T> obj, string fileName) => new CloudData<T>(fileName);
+        public static void InitializeCloudData<T>(ref CloudData<T> obj, string fileName) => obj = new CloudData<T>(fileName);
 
         public static void InitializeAll()
         {
