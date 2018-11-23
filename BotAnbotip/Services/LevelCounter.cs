@@ -2,6 +2,7 @@
 using BotAnbotip.Data;
 using BotAnbotip.Data.CustomClasses;
 using BotAnbotip.Data.CustomEnums;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,7 +12,7 @@ namespace BotAnbotip.Services
 {
     class LevelCounter : ServiceBase
     {
-        public LevelCounter(ClientBase botClient, string serviceName) : base(botClient, serviceName)
+        public LevelCounter(ClientBase botClient, string serviceName, ILoggerFactory loggerFactory) : base(botClient, serviceName, loggerFactory)
         {
         }
 

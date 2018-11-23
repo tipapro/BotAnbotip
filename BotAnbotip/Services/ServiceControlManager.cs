@@ -31,10 +31,11 @@ namespace BotAnbotip.Services
             botType = type;
             ServiceProvider = BuildDi();
             CloudStorage = ServiceProvider.GetRequiredService<ICloudStorage>();
-            VipRoleGiveaway = new VipRoleGiveawayService(ClientControlManager.MainBot, "Розыгрыш VIP роли");
-            WantPlayAutoRemoving = new InvitationRemover(ClientControlManager.MainBot, "Автоудаление приглашений в игру");
-            LevelCounter = new LevelCounter(ClientControlManager.MainBot, "Счётчик уровня");
-            TopUpdating = new TopUpdater(ClientControlManager.MainBot, "Автообновление топа");
+            var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+            VipRoleGiveaway = new VipRoleGiveawayService(ClientControlManager.MainBot, "Розыгрыш VIP роли", loggerFactory);
+            WantPlayAutoRemoving = new InvitationRemover(ClientControlManager.MainBot, "Автоудаление приглашений в игру", loggerFactory);
+            LevelCounter = new LevelCounter(ClientControlManager.MainBot, "Счётчик уровня", loggerFactory);
+            TopUpdating = new TopUpdater(ClientControlManager.MainBot, "Автообновление топа", loggerFactory);
         }
 
         public void RunAll()

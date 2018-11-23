@@ -10,6 +10,7 @@ using BotAnbotip.Data.CustomClasses;
 using BotAnbotip.Data.CustomEnums;
 using BotAnbotip.Data.Group;
 using Discord;
+using Microsoft.Extensions.Logging;
 
 namespace BotAnbotip.Services
 {
@@ -17,7 +18,7 @@ namespace BotAnbotip.Services
     {
         const int AmountOfTopUsers = 100;
 
-        public TopUpdater(ClientBase botClient, string serviceName) : base(botClient, serviceName)
+        public TopUpdater(ClientBase botClient, string serviceName, ILoggerFactory loggerFactory) : base(botClient, serviceName, loggerFactory)
         {
         }
 

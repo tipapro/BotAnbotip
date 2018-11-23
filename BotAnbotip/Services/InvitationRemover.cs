@@ -3,6 +3,7 @@ using BotAnbotip.Data;
 using BotAnbotip.Data.Group;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace BotAnbotip.Services
 {
     class InvitationRemover : ServiceBase
     {
-        public InvitationRemover(ClientBase botClient, string serviceName) : base(botClient, serviceName)
+        public InvitationRemover(ClientBase botClient, string serviceName, ILoggerFactory loggerFactory) : base(botClient, serviceName, loggerFactory)
         {
         }
 

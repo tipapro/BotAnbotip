@@ -4,6 +4,7 @@ using BotAnbotip.Data.CustomClasses;
 using BotAnbotip.Data.CustomEnums;
 using BotAnbotip.Data.Group;
 using Discord;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace BotAnbotip.Services
         private static Random random = new Random();
         public static string RandomOrgURL = "";
 
-        public VipRoleGiveawayService(ClientBase botClient, string serviceName) : base(botClient, serviceName)
+        public VipRoleGiveawayService(ClientBase botClient, string serviceName, ILoggerFactory loggerFactory) : base(botClient, serviceName, loggerFactory)
         {
         }
 
