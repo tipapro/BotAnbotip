@@ -47,7 +47,7 @@ namespace BotAnbotip.Commands
             var points = long.Parse(strArray[1]);
             await DataControlManager.UserProfiles.Value[userId].RemovePoints(points);
             await DataControlManager.UserProfiles.SaveAsync();
-            await ClientControlManager.MainBot.ConvertToNLog(new LogMessage(LogSeverity.Info,
+            //await ClientControlManager.MainBot.ConvertToNLog(new LogMessage(LogSeverity.Info,
                 "LevelChange: Remove", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
         }
 
@@ -62,7 +62,7 @@ namespace BotAnbotip.Commands
             var points = long.Parse(strArray[1]);
             await DataControlManager.UserProfiles.Value[userId].AddPoints(points > 100000 ? 100000 : points);
             await DataControlManager.UserProfiles.SaveAsync();
-            await ClientControlManager.MainBot.ConvertToNLog(new LogMessage(LogSeverity.Info,
+            //await ClientControlManager.MainBot.ConvertToNLog(new LogMessage(LogSeverity.Info,
                 "LevelChange: Add", "Who: " + message.Author.Id + " How much: " + points + " To whom: " + userId));
         }
 
