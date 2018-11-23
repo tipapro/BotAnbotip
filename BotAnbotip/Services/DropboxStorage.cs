@@ -13,9 +13,9 @@ namespace BotAnbotip.Services
         private readonly ILogger<DropboxStorage> _logger;
         private static DropboxClient Client;
 
-        public DropboxStorage(ILoggerFactory loggerFactory)
+        public DropboxStorage(ILogger<DropboxStorage> logger)
         {
-            _logger = loggerFactory.CreateLogger<DropboxStorage>();
+            _logger = logger;
         }
 
         public void Authorize(string apiKey)
