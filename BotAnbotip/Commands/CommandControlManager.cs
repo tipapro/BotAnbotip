@@ -29,8 +29,6 @@ namespace BotAnbotip.Commands
         public static UserProfileCommands UserProfile { get; private set; }
         
 
-        public static HackerChannelCommands HackerChannel { get; private set; }
-
         public CommandControlManager(ulong botId)
         {
             Announcement = new AnnouncementCommands();
@@ -43,8 +41,6 @@ namespace BotAnbotip.Commands
             Voting = new VotingCommands();
             WantPlayMessage = new WantPlayMessageCommands();
             UserProfile = new UserProfileCommands();
-
-            HackerChannel = new HackerChannelCommands();
 
             if (botId == ClientControlManager.MainBot.Client.CurrentUser.Id)
                 _commandsCollection = new List<CommandBase> { Announcement, AnonymousMessage, BotControl, Debug, RoleManagement, News,
