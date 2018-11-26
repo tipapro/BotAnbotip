@@ -42,7 +42,7 @@ namespace BotAnbotip.Services
             try
             {
                 _logger.LogInformation("Service \"{ServiceName}\" is launched", ServiceName);
-                await Cycle(_cts.Token);
+                await Task.Run(() => Cycle(_cts.Token));
             }
             catch (Exception ex)
             {
