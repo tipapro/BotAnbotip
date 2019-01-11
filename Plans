@@ -1,0 +1,2 @@
+Rebuild by pattern "Command"
+Delete antipattern ServiceLocator(ServiceProvider)
